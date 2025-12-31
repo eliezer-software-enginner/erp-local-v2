@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 public class AppRoutes {
-    public static Router defineRoutes(Stage stage) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public Router defineRoutes(Stage stage) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         var routes = Set.of(
                 new Router.Route("home", router -> new HomeScreen(router), new Router.RouteProps(900, 700)),
                 new Router.Route("profile",router-> new ProfileScreen(router), new Router.RouteProps(900, 700)),

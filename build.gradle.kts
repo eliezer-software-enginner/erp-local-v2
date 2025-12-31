@@ -54,6 +54,7 @@ dependencies {
     implementation("megalodonte:props:1.0.0")
     implementation("megalodonte:megalodonte-hot-preview:1.0.0")
     implementation("megalodonte:megalodonte-router:1.0.0-beta")
+    implementation("megalodonte:megalodonte-styles:1.0.0")
     //implementation("megalodonte:megalodonte-previewer-components:1.0.0")
 
     // Dependências JavaFX removidas (agora gerenciadas pelo bloco 'javafx { ... }')

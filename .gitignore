@@ -44,3 +44,4 @@ bin/
 *.txt
 
 java_fx_modules
+build.gradle-funcionando_gera_fatjar.kts-draft

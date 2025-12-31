@@ -28,14 +28,16 @@ public class Main extends Application {
         initializeScene(primaryStage);
         initHotReload(primaryStage);
 
-        final var router = AppRoutes.defineRoutes(stage);
+     //   final var router = new AppRoutes().defineRoutes(stage);
 
         stage.show();
     }
 
     public static void initializeScene(Stage stage) throws Exception {
         stage.setTitle("Adb file pusher");
-        stage.setResizable(false);
+        //stage.setResizable(false);
+
+        final var router = new AppRoutes().defineRoutes(stage);
 
         final String[] images = {"/logo_32x32.png", "/logo_256x256.png"};
 
@@ -43,15 +45,11 @@ public class Main extends Application {
             stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream(image))));
         }
 
-
-       // final var root = new VBox(new UI().render().getNode());
-
-        //stage.setScene(new Scene(root, 700, 500));
         System.out.println("[App] Scene re-initialized.");
     }
 
     private void initHotReload(Stage primaryStage){
-        Set<String> exclusions = new HashSet<String>();
+        Set<String> exclusions = new HashSet<>();
         exclusions.add("my_app.hotreload.CoesionApp");
         exclusions.add("my_app.hotreload.Reloader");
 
