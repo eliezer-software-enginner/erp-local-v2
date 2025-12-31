@@ -1,0 +1,6 @@
+eliezer@eliezer-IdeaPad-3-15ALC6:~/Documents/my-projects/java/hot-reloading-javafx-lib$ git tag v1.0.0
+eliezer@eliezer-IdeaPad-3-15ALC6:~/Documents/my-projects/java/hot-reloading-javafx-lib$ git push --tags
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0
+To github-eliezer-novo:eliezer-software-enginner/hotreload-library-javafx.git
+ * [new tag]         v1.0.0 -> v1.0.0
+eliezer@eliezer-IdeaPad-3-15ALC6:~/Documents/my-projects/java/hot-reloading-javafx-lib$
