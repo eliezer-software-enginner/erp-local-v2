@@ -5,34 +5,20 @@ import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
 import megalodonte.components.inputs.TextAreaInput;
+import megalodonte.props.CardProps;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.entypo.Entypo;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
 
-import static org.kordamp.ikonli.entypo.Entypo.SLIDESHARE;
-
 public class ProdutoScreen {
     Router router;
+    ProdutoScreenViewModel vm;
 
     public ProdutoScreen(Router router) {
+        this.vm = new ProdutoScreenViewModel();
     }
-
-    State<String> codigoBarrasState = new State<>("123456789");
-    State<String> descState = new State<>("123456789");
-
-    List<String> unidades = List.of("UN","KG","ml");
-    State<String> unidadeSelected = new State<>("UN");
-
-    List<String> categorias = List.of("Padrão");
-    State<String> categoriaSelected = new State<>("Padrão");
-
-    List<String> fornecedores = List.of("Fornecedor Padrão");
-    State<String> fornecedorSelected = new State<>("Fornecedor Padrão");
-
-    State<String> observações = new State<>("");
-
 
     public Component render (){
         return new Column(new ColumnProps().paddingAll(15))
@@ -40,13 +26,13 @@ public class ProdutoScreen {
                         new Row(new RowProps().paddingAll(20)
                                 .spacingOf(20), new RowStyler().borderWidth(1).borderColor("black").borderRadius(1))
                                 .child(ContainerLeft())
+                                .child(new SpacerHorizontal().fill())
                                 .child(ContainerRight())
                 )
                 .child(new SpacerVertical(30))
                 .child(new Text("Informaçoẽs", new TextProps().fontSize(30)))
                 .child(new Text("Dica 1: Pressione CTRL + G para gerar o código de barras",new TextProps().fontSize(24).color("orange")))
-                .child(new Text("Dica 2: O sistema não permite gravar produtos diferentes com o mesmo código de barras!",new TextProps().fontSize(24).color("orange")))
-                ;
+                .child(new Text("Dica 2: O sistema não permite gravar produtos diferentes com o mesmo código de barras!",new TextProps().fontSize(24).color("orange")));
     }
 
 
@@ -54,10 +40,13 @@ public class ProdutoScreen {
 
         State<String> imagemState = new State<>("/assets/produto-generico.png");
 
-        return new Column()
-                .child(new Text("Foto do produto",new TextProps().fontSize(20).bold()))
-                .child(new Image(imagemState, new ImageProps().size(200)))
-                .child(new Button("Inserir imagem", new ButtonProps().fontSize(20)));
+        return new Card(
+                new Column()
+                    .child(new Text("Foto do produto",new TextProps().fontSize(20).bold()))
+                    .child(new Image(imagemState, new ImageProps().size(120)))
+                    .child(new Button("Inserir imagem", new ButtonProps().fontSize(20).bgColor("#A6B1E1"))),
+                new CardProps().height(300).padding(20)
+        );
     }
      Component ContainerLeft (){
         var rowProps = new RowProps().spacingOf(10);
@@ -65,37 +54,29 @@ public class ProdutoScreen {
                 .child(
                         new Row(rowProps)
                         .child(new Row(new RowProps().bottomVertically())
-                                        .child(InputColumn("SKU(Código de barras)", codigoBarrasState))
+                                        .child(InputColumn("SKU(Código de barras)", vm.codigoBarras))
                                         .child(new Button("Gerar", new ButtonProps().height(40)))
-
                         )
-                        .child(InputColumn("Descrição", descState))
+                        .child(InputColumn("Descrição curta", vm.descricao))
+                                .child(SelectColumn("Unidade", vm.unidades ,vm.unidadeSelected))
+                                .child(InputColumn("Marca", vm.marca))
                 ).child(new Row(rowProps)
-                        .child(SelectColumn("Unidade", unidades ,unidadeSelected))
-                        .child(InputColumn("Preço de compra", descState, Entypo.CREDIT))
-                    .child(InputColumn("Margem %", codigoBarrasState))
-                    .child(InputColumn("Lucro", descState,Entypo.CREDIT))
-                        .child(InputColumn("Preço de venda", descState,Entypo.CREDIT))
+                        .child(InputColumn("Preço de compra", vm.precoCompra, Entypo.CREDIT))
+                    .child(InputColumn("Margem %", vm.margem))
+                    .child(InputColumn("Lucro", vm.lucro,Entypo.CREDIT))
+                        .child(InputColumn("Preço de venda", vm.precoVenda,Entypo.CREDIT))
                 )
                 .child(new Row(rowProps)
-                        .child(SelectColumn("Categoria",categorias, categoriaSelected))
-                        .child(SelectColumn("Fornecedor", fornecedores, fornecedorSelected))//fornecedor padrão
-                        .child(InputColumn("Margem %", codigoBarrasState))
-                        .child(InputColumn("Lucro", descState))
-                        .child(InputColumn("Preço de venda", descState))
+                        .child(SelectColumn("Categoria",vm.categorias, vm.categoriaSelected))
+                        .child(SelectColumn("Fornecedor", vm.fornecedores, vm.fornecedorSelected))//fornecedor padrão
+                        .child(InputColumn("Garantia", vm.garantia))
+                        .child(InputColumn("Validade", vm.validade))
+                        .child(InputColumn("Comissão", vm.comissao))
                 )
                 .child(new Row(rowProps)
-                        .child(InputColumn("Garantia", codigoBarrasState))
-                        .child(InputColumn("Marca", descState))//fornecedor padrão
-                        .child(InputColumn("Validade", codigoBarrasState))
-                        .child(InputColumn("Comissão", descState))
-                )
-                .child(new Row(rowProps)
-                        .child(TextAreaColumn("Observações", observações))
-                        .child(InputColumn("Estoque", descState))//fornecedor padrão
-                )
-
-                ;
+                        .child(TextAreaColumn("Observações", vm.observacoes))
+                        .child(InputColumn("Estoque", vm.estoque))//fornecedor padrão
+                );
     }
 
     Component SelectColumn(String label,List<String> list, State<String> stateSelected){
