@@ -10,7 +10,10 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.entypo.Entypo;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ProdutoScreen {
     Router router;
@@ -65,8 +68,7 @@ public class ProdutoScreen {
                     .child(InputColumn("Margem %", vm.margem))
                     .child(InputColumn("Lucro", vm.lucro,Entypo.CREDIT))
                         .child(InputColumn("Preço de venda", vm.precoVenda,Entypo.CREDIT))
-                )
-                .child(new Row(rowProps)
+                ).child(new Row(rowProps)
                         .child(SelectColumn("Categoria",vm.categorias, vm.categoriaSelected))
                         .child(SelectColumn("Fornecedor", vm.fornecedores, vm.fornecedorSelected))//fornecedor padrão
                         .child(InputColumn("Garantia", vm.garantia))
@@ -84,8 +86,7 @@ public class ProdutoScreen {
                 .child(new Text(label, new TextProps().fontSize(25)))
                 .child(new Select<String>(new SelectProps().height(40))
                         .items(list)
-                        .value(stateSelected))
-                ;
+                        .value(stateSelected));
     }
 
     Component TextAreaColumn(String label, State<String> inputState){
@@ -97,14 +98,29 @@ public class ProdutoScreen {
     Component InputColumn(String label, State<String> inputState){
         return new Column()
                 .child(new Text(label, new TextProps().fontSize(25)))
-                .child(new Input(inputState,new InputProps().fontSize(20).height(40)))
-                ;
+                .child(new Input(inputState,new InputProps().fontSize(20).height(40)));
     }
+
+    private static final NumberFormat BRL =
+            NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
     Component InputColumn(String label, State<String> inputState, Ikon icon){
             var fonticon = FontIcon.of(icon, 15, Color.web("green"));
-            return new Column()
+
+            var inputProps = new InputProps().fontSize(20).height(40);
+
+            var input = icon == Entypo.CREDIT? new Input(inputState, inputProps)
+                .onChange(value -> {
+                    String numeric = value.replaceAll("[^0-9]", "");
+                    if (numeric.isEmpty()) return "";
+
+                    BigDecimal raw = new BigDecimal(numeric).movePointLeft(2);
+
+                    return BRL.format(raw);
+                }) : new Input(inputState, inputProps);
+
+        return new Column()
                     .child(new Text(label, new TextProps().fontSize(25)))
-                    .child(new Input(inputState,new InputProps().fontSize(20).height(40)).left(fonticon));
+                    .child(input.left(fonticon));
     }
 }
