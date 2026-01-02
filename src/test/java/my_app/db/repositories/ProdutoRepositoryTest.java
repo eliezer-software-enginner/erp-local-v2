@@ -2,8 +2,7 @@ package my_app.db.repositories;
 
 import my_app.db.DB;
 import my_app.db.DBInitializer;
-import my_app.db.models.Models;
-import my_app.db.models.Models.Produto;
+import my_app.db.models.ProdutoModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,38 +25,69 @@ class ProdutoRepositoryTest {
 
     @Test
     void salvar() throws SQLException {
-        Produto p = produtoFake();
+        ProdutoModel p = produtoFake();
         repo.salvar(p);
 
-        Produto encontrado = repo.buscarPorCodigoBarras(p.codigoBarras);
+        ProdutoModel encontrado = repo.buscarPorCodigoBarras(p.codigoBarras);
 
         assertNotNull(encontrado);
         assertEquals("Arroz", encontrado.descricao);
     }
 
     @Test
-    void buscarPorCodigoBarras() {
+    void buscarPorCodigoBarras() throws SQLException {
+        ProdutoModel p = produtoFake();
+        repo.salvar(p);
+
+        var encontrado = repo.buscarPorCodigoBarras("123");
+        var inexistente = repo.buscarPorCodigoBarras("999");
+
+        assertNotNull(encontrado);
+        assertEquals("Arroz", encontrado.descricao);
+
+        assertNull(inexistente);
     }
 
+
     @Test
-    void listar() {
+    void listar() throws SQLException {
+        assertTrue(repo.listar().isEmpty());
+
+        ProdutoModel p1 = produtoFake();
+        ProdutoModel p2 = produtoFake();
+        p2.codigoBarras = "456";
+        p2.descricao = "Feijão";
+
+        repo.salvar(p1);
+        repo.salvar(p2);
+
+        var lista = repo.listar();
+
+        assertEquals(2, lista.size());
+        assertTrue(
+                lista.stream().anyMatch(p -> p.descricao.equals("Arroz"))
+        );
+        assertTrue(
+                lista.stream().anyMatch(p -> p.descricao.equals("Feijão"))
+        );
     }
+
 
     @Test
     void atualizar() throws SQLException {
-        Produto p = produtoFake();
+        ProdutoModel p = produtoFake();
         repo.salvar(p);
 
         p.descricao = "Arroz Integral";
         repo.atualizar(p);
 
-        Produto atualizado = repo.buscarPorCodigoBarras(p.codigoBarras);
+        ProdutoModel atualizado = repo.buscarPorCodigoBarras(p.codigoBarras);
         assertEquals("Arroz Integral", atualizado.descricao);
     }
 
     @Test
     void excluir() throws SQLException {
-        Produto p = produtoFake();
+        ProdutoModel p = produtoFake();
         repo.salvar(p);
 
         repo.excluir(p.codigoBarras);
@@ -65,15 +95,15 @@ class ProdutoRepositoryTest {
         assertNull(repo.buscarPorCodigoBarras(p.codigoBarras));
     }
 
-    private Produto produtoFake() {
-        Produto p = new Produto();
+    private ProdutoModel produtoFake() {
+        var p = new ProdutoModel();
         p.codigoBarras = "123";
         p.descricao = "Arroz";
         p.precoCompra = new BigDecimal("10");
         p.precoVenda = new BigDecimal("15");
         p.unidade = "UN";
-        p.categoria = "Padrão";
-        p.fornecedor = "Fornecedor Padrão";
+        p.categoriaId = 1L;
+        p.fornecedorId = 1L;
         p.estoque = 5;
         p.observacoes = "";
         p.imagem = "";

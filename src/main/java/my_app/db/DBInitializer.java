@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+//schemas
 public final class DBInitializer {
 
     private DBInitializer() {}
@@ -20,14 +21,22 @@ public final class DBInitializer {
                         descricao TEXT,
                         preco_compra REAL,
                         preco_venda REAL,
-                        margem REAL,
-                        lucro REAL,
                         unidade TEXT,
-                        categoria TEXT,
-                        fornecedor TEXT,
+                        categoria_id INTEGER,
+                        fornecedor_id INTEGER,
                         estoque INTEGER,
                         observacoes TEXT,
-                        imagem TEXT
+                        imagem TEXT,
+                        data_criacao INTEGER,
+                        FOREIGN KEY (categoria_id) REFERENCES categoria(id)
+                    )
+                """);
+
+                st.execute("""
+                    CREATE TABLE IF NOT EXISTS categoria (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nome TEXT NOT NULL UNIQUE,
+                        data_criacao INTEGER NOT NULL
                     )
                 """);
 

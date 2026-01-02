@@ -1,8 +1,7 @@
 package my_app.screens.produtoScreen;
 
 import megalodonte.State;
-import my_app.db.models.Models;
-import my_app.db.models.Models.Produto;
+import my_app.db.models.ProdutoModel;
 import my_app.lifecycle.viewmodel.component.ViewModel;
 import my_app.services.ProdutoService;
 
@@ -41,28 +40,28 @@ public class ProdutoScreenViewModel extends ViewModel {
 
     public final State<String> imagem = new State<>("/assets/produto-generico.png");
 
-    public Produto toProduto() {
-        Produto p = new Produto();
+    public ProdutoModel toProduto() {
+        var p = new ProdutoModel();
         p.codigoBarras = codigoBarras.get();
         p.descricao = descricao.get();
         p.precoCompra = new BigDecimal(precoCompra.get());
         p.precoVenda = new BigDecimal(precoVenda.get());
         p.unidade = unidadeSelected.get();
-        p.categoria = categoriaSelected.get();
-        p.fornecedor = fornecedorSelected.get();
+        p.categoriaId = 1L;   // temporário
+        p.fornecedorId = 1L;  // temporário
         p.estoque = Integer.parseInt(estoque.get());
         p.observacoes = observacoes.get();
         p.imagem = imagem.get();
         return p;
     }
 
-    public void carregar(Produto p) {
+    public void carregar(ProdutoModel p) {
         descricao.set(p.descricao);
         precoCompra.set(p.precoCompra.toString());
         precoVenda.set(p.precoVenda.toString());
         unidadeSelected.set(p.unidade);
-        categoriaSelected.set(p.categoria);
-        fornecedorSelected.set(p.fornecedor);
+        categoriaSelected.set(String.valueOf(p.categoriaId));
+        fornecedorSelected.set(String.valueOf(p.fornecedorId));
         estoque.set(String.valueOf(p.estoque));
         observacoes.set(p.observacoes);
         imagem.set(p.imagem);
@@ -81,7 +80,7 @@ public class ProdutoScreenViewModel extends ViewModel {
     }
 
     public void buscar() throws Exception {
-        Produto p = service.buscar(codigoBarras.get());
+        var p = service.buscar(codigoBarras.get());
         if (p != null) carregar(p);
     }
 
