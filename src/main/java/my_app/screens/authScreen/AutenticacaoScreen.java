@@ -60,6 +60,7 @@ Cor do fundo do input:
 Hexadecimal: #1e293b (definido pela classe bg-slate-800).
      */
 
+    //TODO: alterar cor da placeholder
     Component columnImponent(String label, State<String> inputState, String placeholder){
         return new Column(new ColumnProps().spacingOf(5))
                 .c_child(new Text(label, new TextProps().fontSize(20), new TextStyler().color("#cbd5e1")))
