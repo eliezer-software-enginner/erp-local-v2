@@ -24,7 +24,6 @@ public class AutenticacaoScreen {
     private Theme theme = ThemeManager.theme();
 
     public Component render (){
-        IO.println("[bg] "+theme.colors().background());
         return new Column(new ColumnProps().centerHorizontally().paddingAll(20), new ColumnStyler().bgColor(theme.colors().background()))
                 .c_child(
                         new Card(new Column(
@@ -32,7 +31,7 @@ public class AutenticacaoScreen {
                                 .colors().surface()))
                                 .c_child(new Text("BR Nation", new TextProps().tone(TextTone.PRIMARY).variant(TextVariant.TITLE)))
                                 .c_child(new Text("Bem vindo ao BR Nation, mais que um gerenciador de estoque",
-                                        new TextProps().fontSize(20).tone(TextTone.PRIMARY).variant(TextVariant.SUBTITLE)))//"#94a3b8"
+                                        new TextProps().variant(TextVariant.SUBTITLE), new TextStyler().color("#94a3b8")))
                                 .c_child(new SpacerVertical(10))
                                 .c_child(columnImponent("Chave de Licença", licensa, "XXXX-XXXX-XXXX-XXXX"))
                                 .c_child(columnImponent("Usuário / Login", login, "Seu usuário"))
