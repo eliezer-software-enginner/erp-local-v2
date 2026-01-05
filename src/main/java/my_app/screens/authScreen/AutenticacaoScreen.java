@@ -10,20 +10,32 @@ import megalodonte.props.TextVariant;
 import megalodonte.router.Router;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
+import my_app.db.repositories.LicensaRepository;
+import my_app.screens.components.Components;
+
+import java.sql.SQLException;
 
 public class AutenticacaoScreen {
     private final Router router;
 
-    State<String> licensa = new State<>("");
+    State<String> licensa = new State<>("teste 123");
     State<String> login = new State<>("");
     State<String> senha = new State<>("");
+
+    State<Boolean> hasError = new State<>(false);
+    State<String> errorMessage = new State<>("");
     public AutenticacaoScreen(Router router) {
         this.router = router;
     }
 
     private Theme theme = ThemeManager.theme();
 
+
+
     public Component render (){
+        final ComputedState<String> errorText = ComputedState.of(()->  errorMessage.get(), errorMessage);
+
+
         return new Column(new ColumnProps().centerHorizontally().paddingAll(20), new ColumnStyler().bgColor(theme.colors().background()))
                 .c_child(
                         new Card(new Column(
@@ -34,14 +46,32 @@ public class AutenticacaoScreen {
                                         new TextProps().variant(TextVariant.SUBTITLE), new TextStyler().color("#94a3b8")))
                                 .c_child(new SpacerVertical(10))
                                 .c_child(columnImponent("Chave de Licença", licensa, "XXXX-XXXX-XXXX-XXXX"))
-                                .c_child(columnImponent("Usuário / Login", login, "Seu usuário"))
-                                .c_child(columnImponent("Senha", senha,"••••••••"))
+
+                                .c_child(Show.when(hasError, ()-> Components.errorText(errorText.get())))
+//                                .c_child(columnImponent("Senha", senha,"••••••••"))
                                 .c_child(new Button("Entrar no Sistema",
                                         new ButtonProps().fillWidth().height(45).bgColor("#2563eb")
-                                                .fontSize(20).textColor("white"))),
+                                                .fontSize(20).textColor("white").onClick(()-> verificarChave()))),
                                 new CardProps().padding(0)
                         )
                 );
+    }
+
+    void verificarChave(){
+        //TODO: implementar
+        errorMessage.set("");
+        hasError.set(false);
+
+        var value = licensa.get();
+        try {
+            new LicensaRepository().salvar(value);
+        } catch (SQLException e) {
+            IO.println(e.getMessage());
+            //[SQLITE_CONSTRAINT_UNIQUE] A UNIQUE constraint failed (UNIQUE constraint failed: licensas.valor)
+            errorMessage.set("Erro ao processar licensa, tente de novo em alguns instantes...");
+            hasError.set(true);
+            //throw new RuntimeException(e);
+        }
     }
 
     /*

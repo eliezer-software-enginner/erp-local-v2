@@ -1,30 +1,31 @@
 package my_app.db.repositories;
 
 import my_app.db.DB;
-import my_app.db.models.CategoriaModel;
+import my_app.db.models.FornecedorModel;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoriaRepository {
+public class FornecedorRepository {
 
     private Connection conn() throws SQLException {
         return DB.getInstance().connection();
     }
 
     // CREATE
-    public CategoriaModel salvar(CategoriaModel model) throws SQLException {
+    public FornecedorModel salvar(FornecedorModel model) throws SQLException {
         String sql = """
-        INSERT INTO categoria 
-        (nome, data_criacao) VALUES (?,?)
+        INSERT INTO fornecedor 
+        (nome, cpfCnpj, data_criacao) VALUES (?,?,?)
         """;
 
         long dataCriacao = model.dataCriacao != null ? model.dataCriacao : System.currentTimeMillis();
 
         try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, model.nome);
-            ps.setLong(2, dataCriacao);
+            ps.setString(2, model.cpfCnpj);
+            ps.setLong(3, dataCriacao);
             ps.executeUpdate();
             
             // Recupera o ID gerado
@@ -38,43 +39,43 @@ public class CategoriaRepository {
         return model;
     }
 
-    public List<CategoriaModel> listar() throws SQLException {
-        List<CategoriaModel> lista = new ArrayList<>();
+    public List<FornecedorModel> listar() throws SQLException {
+        List<FornecedorModel> lista = new ArrayList<>();
         try (Statement st = conn().createStatement()) {
-            ResultSet rs = st.executeQuery("SELECT * FROM categoria");
-            while (rs.next()) lista.add(CategoriaModel.fromResultSet(rs));
+            ResultSet rs = st.executeQuery("SELECT * FROM fornecedor");
+            while (rs.next()) lista.add(FornecedorModel.fromResultSet(rs));
         }
         return lista;
     }
 
     // UPDATE
-    public void atualizar(CategoriaModel model) throws SQLException {
+    public void atualizar(FornecedorModel model) throws SQLException {
         String sql = """
-        UPDATE categoria SET nome = ? WHERE id = ?
+        UPDATE fornecedor SET nome = ?, cpfCnpj = ? WHERE id = ?
         """;
 
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
             ps.setString(1, model.nome);
-            ps.setLong(2, model.id);
+            ps.setString(2, model.cpfCnpj);
+            ps.setLong(3, model.id);
             ps.executeUpdate();
         }
     }
 
     public void excluir(Long id) throws SQLException {
         try (PreparedStatement ps =
-                     conn().prepareStatement("DELETE FROM categoria WHERE id = ?")) {
+                     conn().prepareStatement("DELETE FROM fornecedor WHERE id = ?")) {
             ps.setLong(1, id);
             ps.executeUpdate();
         }
     }
 
-    public CategoriaModel buscarPorId(Long id) throws SQLException {
-        String sql = "SELECT * FROM categoria WHERE id = ?";
+    public FornecedorModel buscarPorId(Long id) throws SQLException {
+        String sql = "SELECT * FROM fornecedor WHERE id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
-            return rs.next() ? CategoriaModel.fromResultSet(rs) : null;
+            return rs.next() ? FornecedorModel.fromResultSet(rs) : null;
         }
     }
 }
-

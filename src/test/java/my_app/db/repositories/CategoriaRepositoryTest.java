@@ -26,18 +26,23 @@ class CategoriaRepositoryTest {
     void salvar() throws SQLException {
         var model = categoriaFake();
         model.nome = "cat1";
-        repo.salvar(model);
+        var salvo = repo.salvar(model);
 
-        var encontrado = repo.buscarPorId(model.id);
+        var encontrado = repo.buscarPorId(salvo.id);
 
         assertNotNull(encontrado);
         assertEquals("cat1", encontrado.nome);
+        assertNotNull(salvo.id);
     }
 
     @Test
     void listar() throws SQLException {
         {
-            assertTrue(repo.listar().isEmpty());
+            // Verifica se existe a categoria padrão "Geral"
+            var listaInicial = repo.listar();
+            assertTrue(
+                    listaInicial.stream().anyMatch(p -> p.nome.equals("Geral"))
+            );
 
             var model1 = categoriaFake();
             var model2 = categoriaFake();
@@ -49,7 +54,11 @@ class CategoriaRepositoryTest {
 
             var lista = repo.listar();
 
-            assertEquals(2, lista.size());
+            // Deve ter a categoria "Geral" mais as 2 novas categorias
+            assertEquals(listaInicial.size() + 2, lista.size());
+            assertTrue(
+                    lista.stream().anyMatch(p -> p.nome.equals("Geral"))
+            );
             assertTrue(
                     lista.stream().anyMatch(p -> p.nome.equals("categ1"))
             );
@@ -85,7 +94,7 @@ class CategoriaRepositoryTest {
 
     private CategoriaModel categoriaFake() {
         var model = new CategoriaModel();
-        model.id = 1L;
+        model.id = null; // Deixar o banco definir o ID autoincrement
         model.nome = "cat1";
         model.dataCriacao = System.currentTimeMillis();
         return model;
