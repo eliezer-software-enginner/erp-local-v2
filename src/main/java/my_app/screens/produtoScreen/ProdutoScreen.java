@@ -72,10 +72,12 @@ public class ProdutoScreen implements RouteParamsAware {
 
        var icon = Component.FromJavaFxNode(FontIcon.of(ikon, 50, Color.web(color)));
 
-        return new Card(
+        return new Clickable(new Card(
                 new Column(new ColumnProps().centerHorizontally())
-                    .c_child(new Clickable(icon).onClick(onClick::run))
-                    .c_child(new Text(title, new TextProps().fontSize(19))));
+                    .c_child(icon)
+                    .c_child(new Text(title, new TextProps().fontSize(19)))
+                ), onClick
+        );
     }
 
 

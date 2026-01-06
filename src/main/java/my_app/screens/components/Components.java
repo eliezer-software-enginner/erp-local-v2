@@ -4,6 +4,8 @@ import javafx.scene.paint.Color;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
+import megalodonte.props.CardProps;
+import megalodonte.props.ClickableProps;
 import megalodonte.props.TextProps;
 import megalodonte.props.TextVariant;
 import megalodonte.theme.Theme;
@@ -47,7 +49,7 @@ public class Components {
 
         return new Card(
                 new Column(new ColumnProps().centerHorizontally())
-                        .c_child(new Clickable(icon).onClick(onClick::run))
+                        .c_child(new Clickable(icon, onClick::run))
                         .c_child(new SpacerVertical(6))
                         .c_child(new Text(title, new TextProps().variant(TextVariant.BODY))));
     }
@@ -66,5 +68,41 @@ public class Components {
                         .width(300)
                         .height(35))
                 .left(icon);
+    }
+
+    /**
+     * Exemplo de uso do componente Clickable com efeito TouchableOpacity.
+     */
+    public static Component clickableButton(String text, Runnable onClick) {
+        return new Clickable(
+            new Text(text, new TextProps().variant(TextVariant.BODY)),
+            onClick,
+            new ClickableProps()
+                .padding(12)
+                .borderRadius(8)
+                .backgroundColor(theme.colors().primary())
+                .hoverColor("rgba(0,0,0,0.05)")
+                .activeColor("rgba(0,0,0,0.1)")
+        );
+    }
+
+    /**
+     * Exemplo de Clickable com ícone e texto.
+     */
+    public static Component clickableButtonWithIcon(String text, Ikon icon, String color, Runnable onClick) {
+        var iconNode = Component.FromJavaFxNode(FontIcon.of(icon, 16, Color.web(color)));
+        
+        return new Clickable(
+            new Row(new RowProps().spacingOf(8))
+                .r_child(iconNode)
+                .r_child(new Text(text, new TextProps().variant(TextVariant.BODY))),
+            onClick,
+            new ClickableProps()
+                .padding(10)
+                .borderRadius(6)
+                .backgroundColor("white")
+                .hoverColor("rgba(0,0,0,0.03)")
+                .activeColor("rgba(0,0,0,0.06)")
+        );
     }
 }

@@ -43,7 +43,7 @@ public class AutenticacaoScreen {
                                 .colors().surface()))
                                 .c_child(new Text("BR Nation", new TextProps().tone(TextTone.PRIMARY).variant(TextVariant.TITLE)))
                                 .c_child(new Text("Bem vindo ao BR Nation, mais que um gerenciador de estoque",
-                                        new TextProps().variant(TextVariant.SUBTITLE), new TextStyler().color("#94a3b8")))
+                                        new TextProps().variant(TextVariant.SUBTITLE)))//"#94a3b8"
                                 .c_child(new SpacerVertical(10))
                                 .c_child(columnImponent("Chave de Licença", licensa, "XXXX-XXXX-XXXX-XXXX"))
 
@@ -93,7 +93,7 @@ Hexadecimal: #1e293b (definido pela classe bg-slate-800).
     //TODO: alterar cor da placeholder
     Component columnImponent(String label, State<String> inputState, String placeholder){
         return new Column(new ColumnProps().spacingOf(5))
-                .c_child(new Text(label, new TextProps().fontSize(20), new TextStyler().color("#cbd5e1")))
+                .c_child(new Text(label, new TextProps().fontSize(20)))//"#cbd5e1"
                 .c_child(new Input(inputState, new InputProps().height(45)
                         .fontSize(18)
                         .placeHolder(placeholder)));
