@@ -47,11 +47,13 @@ public class Components {
 
         var icon = Component.FromJavaFxNode(FontIcon.of(ikon, 40, Color.web(color)));
 
-        return new Card(
+        return new Clickable(new Card(
                 new Column(new ColumnProps().centerHorizontally())
-                        .c_child(new Clickable(icon, onClick::run))
+                        .c_child(icon)
                         .c_child(new SpacerVertical(6))
-                        .c_child(new Text(title, new TextProps().variant(TextVariant.BODY))));
+                        .c_child(new Text(title, new TextProps().variant(TextVariant.BODY)))
+            ), onClick
+        );
     }
 
     @FunctionalInterface

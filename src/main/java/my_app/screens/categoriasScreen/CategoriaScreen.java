@@ -27,15 +27,7 @@ public class CategoriaScreen {
     State<String> btnText = State.of("+ Adicionar");
     State<CategoriaModel> categoriaSelecionada = State.of(null);
 
-    List<CategoriaModel> categorias = List.of(
-            new CategoriaModel(1L,"Eletrônicos",System.currentTimeMillis()),
-            new CategoriaModel(2L,"Vestuário",System.currentTimeMillis()),
-            new CategoriaModel(3L,"Alimentps",System.currentTimeMillis()),
-            new CategoriaModel(4L,"Revenda",System.currentTimeMillis()),
-            new CategoriaModel(5L,"Cosméticos",System.currentTimeMillis())
-    );
-
-    ObservableList<CategoriaModel> categoriasObservable = FXCollections.observableArrayList(categorias);
+    ObservableList<CategoriaModel> categoriasObservable = FXCollections.observableArrayList();
     public CategoriaScreen(Router router) {
         this.router = router;
     }
