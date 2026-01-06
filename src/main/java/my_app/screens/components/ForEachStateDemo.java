@@ -34,12 +34,28 @@ public class ForEachStateDemo {
                 .c_child(new Text("Produtos Disponíveis", new TextProps().fontSize(20).bold()))
 
                 .c_child( new Button("Adicionar Novo Produto", new ButtonProps().onClick(()->{
-                    // Agora com o método add() implementado!
+                    // Usando o método add()
                     produtosState.add(new Produto("Teste", 10));
                 })))
-                // Agora com o método items() implementado!
+                // Usando o método items() implementado!
                 .items(forEachState)
-                .c_child(new Text("Sou um footer besta"));
+                // Voltando a usar c_child() normal - VBox separado garante isolamento
+                .c_child(new Button("Remover Último", new ButtonProps().onClick(()->{
+                    // Usando o método removeLast()
+                    produtosState.removeLast();
+                })))
+                .c_child(new Button("Remover Caros (>R$ 20)", new ButtonProps().onClick(()->{
+                    // Usando o método removeIf() com cast
+                    produtosState.removeIf(produto -> {
+                        ForEachStateDemo.Produto p = (ForEachStateDemo.Produto) produto;
+                        return p.preco > 20;
+                    });
+                })))
+                .c_child(new Button("Remover 'Teste'", new ButtonProps().onClick(()->{
+                    // Usando o método remove() específico
+                    produtosState.remove(new Produto("Teste", 10));
+                })))
+                .c_child(new Text("Operações disponíveis:"));
         
         return mainColumn;
     }
