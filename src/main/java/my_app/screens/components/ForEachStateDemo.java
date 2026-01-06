@@ -51,6 +51,16 @@ public class ForEachStateDemo {
                         return p.preco > 20;
                     });
                 })))
+                .c_child(new Button("Editar 'Pão'", new ButtonProps().onClick(()->{
+                    // Usando o método replace() para editar
+                    Produto produtoEditado = new Produto("Pão Francês", 12.00);
+                    produtosState.replace(new Produto("Pão", 8.00), produtoEditado);
+                })))
+                .c_child(new Button("Editar por Índice (1)", new ButtonProps().onClick(()->{
+                    // Usando o método set(index, item) para editar por posição
+                    Produto produtoEditado = new Produto("Pão Integral", 15.00);
+                    produtosState.set(1, produtoEditado);
+                })))
                 .c_child(new Button("Remover 'Teste'", new ButtonProps().onClick(()->{
                     // Usando o método remove() específico
                     produtosState.remove(new Produto("Teste", 10));
