@@ -212,11 +212,121 @@ public class Components {
             .spacingOf(10))
             .c_child(new Row(new RowProps()
                 .width(320)
-                .centerHorizontally())
+                .centerHorizontally()
                 .r_child(new Text("Título Alinhado", new TextProps().variant(TextVariant.SUBTITLE))))
             .c_child(new Row(new RowProps()
                 .width(320)
-                .centerHorizontally())
+                .centerHorizontally()
                 .r_child(clickableButton("Botão Centralizado", () -> IO.println("Botão centralizado clicado")))));
     }
+
+    /**
+     * Exemplos de botões com variantes de tema.
+     */
+    public static Component themeButtons() {
+        return new Column(new ColumnProps()
+            .spacingOf(15)
+            .width(400))
+            .c_child(new Text("Botões com Temas", new TextProps().variant(TextVariant.TITLE)))
+            .c_child(new Row(new RowProps()
+                .spacingOf(10))
+                .r_child(new Button("Primary", new ButtonProps().primary().height(45).onClick(() -> IO.println("Primary clicked"))))
+                .r_child(new Button("Secondary", new ButtonProps().secondary().height(45).onClick(() -> IO.println("Secondary clicked"))))
+                .r_child(new Button("Success", new ButtonProps().success().height(45).onClick(() -> IO.println("Success clicked")))))
+            .c_child(new Button("Warning", new ButtonProps().warning().height(45).onClick(() -> IO.println("Warning clicked")))))
+            .c_child(new Button("Danger", new ButtonProps().danger().height(45).onClick(() -> IO.println("Danger clicked")))))
+            .c_child(new Button("Ghost", new ButtonProps().ghost().height(45).onClick(() -> IO.println("Ghost clicked")))))
+            .c_child(new Button("Disabled", new ButtonProps().disabled().height(45).onClick(() -> {})))
+            .c_child(new SpacerHorizontal(10))
+            .r_child(new Button("Custom", new ButtonProps().bgColor(theme.colors().secondary()).height(45).onClick(() -> IO.println("Custom clicked")))));
+    }
+
+    /**
+     * Exemplo de botões com variantes e larguras diferentes.
+     */
+    public static Component sizedButtons() {
+        return new Column(new ColumnProps()
+            .spacingOf(15)
+            .width(400))
+            .c_child(new Text("Botões com Tamanhos", new TextProps().variant(TextVariant.TITLE)))
+            .c_child(new Row(new RowProps()
+                .spacingOf(10))
+                .r_child(new Button("Pequeno", new ButtonProps()
+                    .primary()
+                    .fontSize(12)
+                    .height(35)
+                    .onClick(() -> IO.println("Small button clicked"))))
+                .r_child(new Button("Médio", new ButtonProps()
+                    .primary()
+                    .fontSize(14)
+                    .height(45)
+                    .onClick(() -> IO.println("Medium button clicked"))))
+                .r_child(new Button("Grande", new ButtonProps()
+                    .primary()
+                    .fontSize(16)
+                    .height(55)
+                    .onClick(() -> IO.println("Large button clicked")))))
+            .c_child(new Button("Largo", new ButtonProps()
+                    .primary()
+                    .fontSize(14)
+                    .fillWidth()
+                    .height(45)
+                    .onClick(() -> IO.println("Full width button clicked")))));
+    }
+
+    /**
+     * Exemplo de botões com icons.
+     */
+    public static Component iconButtons() {
+        return new Column(new ColumnProps()
+            .spacingOf(15)
+            .width(400))
+            .c_child(new Text("Botões com Ícones", new TextProps().variant(TextVariant.TITLE)))
+            .c_child(new Row(new RowProps()
+                .spacingOf(10))
+                .r_child(new Button("Success", new ButtonProps()
+                    .success()
+                    .height(40)
+                    .onClick(() -> IO.println("Success with icon clicked"))))
+                .r_child(new Button("Warning", new ButtonProps()
+                    .warning()
+                    .height(40)
+                    .onClick(() -> IO.println("Warning with icon clicked"))))))
+            .c_child(new Row(new RowProps()
+                .spacingOf(10))
+                .r_child(new Button("Danger", new ButtonProps()
+                    .danger()
+                    .height(40)
+                    .onClick(() -> IO.println("Danger with icon clicked"))))
+                .r_child(new Button("Ghost", new ButtonProps()
+                    .ghost()
+                    .height(40)
+                    .onClick(() -> IO.println("Ghost with icon clicked")))))));
+    }
+
+    /**
+     * Exemplo de formulário com botões temáticos.
+     */
+    public static Component formWithButtons() {
+        return new Card(new Column(new ColumnProps()
+            .paddingAll(20)
+            .spacingOf(15))
+            .c_child(new Text("Formulário Temático", new TextProps().variant(TextVariant.TITLE)))
+            .c_child(formRowWithConstraints("Nome:", new Input(megalodonte.State.of(""), 
+                new megalodonte.InputProps().width(200).placeHolder("Digite seu nome"))))
+            .c_child(formRowWithConstraints("Email:", new Input(megalodonte.State.of(""), 
+                new megalodonte.InputProps().width(200).placeHolder("Digite seu email"))))
+            .c_child(new Row(new RowProps()
+                .spacingOf(10)
+                .r_child(new Button("Cancelar", new ButtonProps()
+                    .secondary()
+                    .height(45)
+                    .onClick(() -> IO.println("Cancel clicked")))))
+                .r_child(new Button("Salvar", new ButtonProps()
+                    .primary()
+                    .height(45)
+                    .fillWidth()
+                    .onClick(() -> IO.println("Save clicked")))))));
+    }
+}
 }
