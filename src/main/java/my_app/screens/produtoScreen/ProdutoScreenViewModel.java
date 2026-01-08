@@ -11,7 +11,9 @@ import my_app.lifecycle.viewmodel.component.ViewModel;
 import my_app.services.ProdutoService;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ProdutoScreenViewModel extends ViewModel {
 
@@ -51,8 +53,8 @@ public class ProdutoScreenViewModel extends ViewModel {
         var p = new ProdutoModel();
         p.codigoBarras = codigoBarras.get();
         p.descricao = descricao.get();
-        p.precoCompra = new BigDecimal(precoCompra.get());
-        p.precoVenda = new BigDecimal(precoVenda.get());
+        p.precoCompra = parseMonetario(precoCompra.get());
+        p.precoVenda = parseMonetario(precoVenda.get());
         p.unidade = unidadeSelected.get();
         p.categoriaId = 1L;   // temporário
         p.fornecedorId = 1L;  // temporário
@@ -129,6 +131,25 @@ public class ProdutoScreenViewModel extends ViewModel {
 
     public void refreshProdutos() {
         loadProdutos();
+    }
+
+    private BigDecimal parseMonetario(String valorMonetario) {
+        if (valorMonetario == null || valorMonetario.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        
+        try {
+            // Remove "R$", espaços e pontos de milhar, substitui vírgula por ponto
+            String limpo = valorMonetario
+                    .replace("R$", "")
+                    .replace(" ", "")
+                    .replace(".", "")
+                    .replace(",", ".");
+            
+            return new BigDecimal(limpo);
+        } catch (NumberFormatException e) {
+            return BigDecimal.ZERO;
+        }
     }
 }
 
