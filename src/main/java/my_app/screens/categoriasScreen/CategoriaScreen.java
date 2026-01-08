@@ -42,7 +42,7 @@ public class CategoriaScreen {
             categoriasObservable.clear();
             categoriasObservable.addAll(categoriaRepository.listar());
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao carregar fornecedores", e);
+            throw new RuntimeException("Erro ao carregar categorias", e);
         }
     }
 
