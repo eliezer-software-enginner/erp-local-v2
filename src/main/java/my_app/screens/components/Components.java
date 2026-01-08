@@ -25,9 +25,9 @@ public class Components {
                 .c_child(new Text(message, new TextProps().variant(TextVariant.SUBTITLE), new TextStyler().color("red")));
     }
 
-    public static Component commonCustomMenus(Runnable onAdd ,Runnable onEdit, Runnable onDelete){
+    public static Row commonCustomMenus(Runnable onClickNew ,Runnable onEdit, Runnable onDelete){
         return new Row(new RowProps().spacingOf(20))
-                .r_child(MenuItem("Novo (CTRL + N)", Entypo.ADD_TO_LIST, "green", () -> executar(onAdd::run)))
+                .r_child(MenuItem("Novo (CTRL + N)", Entypo.ADD_TO_LIST, "green", () -> executar(onClickNew::run)))
                 .r_child(MenuItem("Editar", Entypo.EDIT, "blue", () -> executar(onEdit::run)))
                 .r_child(MenuItem("Excluir", Entypo.TRASH, "red", () -> executar(onDelete::run)))
                 .r_child(new SpacerHorizontal().fill())

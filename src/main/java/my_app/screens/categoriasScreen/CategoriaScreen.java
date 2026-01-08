@@ -30,13 +30,25 @@ public class CategoriaScreen {
     State<CategoriaModel> categoriaSelecionada = State.of(null);
 
     ObservableList<CategoriaModel> categoriasObservable = FXCollections.observableArrayList();
+
+    private CategoriaRepository categoriaRepository = new CategoriaRepository();
     public CategoriaScreen(Router router) {
         this.router = router;
+        loadCategorias();
+    }
+
+    private void loadCategorias() {
+        try {
+            categoriasObservable.clear();
+            categoriasObservable.addAll(categoriaRepository.listar());
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao carregar fornecedores", e);
+        }
     }
 
     private Theme theme = ThemeManager.theme();
 
-    private CategoriaRepository categoriaRepository = new CategoriaRepository();
+
 
     public Component render() {
         return new Column(new ColumnProps().paddingAll(25), new ColumnStyler().bgColor(theme.colors().background()))

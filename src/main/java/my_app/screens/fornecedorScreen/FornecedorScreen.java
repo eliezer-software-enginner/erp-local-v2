@@ -31,7 +31,7 @@ public class FornecedorScreen {
     private final Theme theme = ThemeManager.theme();
     private final FornecedorRepository fornecedorRepository = new FornecedorRepository();
 
-private final ObservableList<FornecedorModel> fornecedores = FXCollections.observableArrayList();
+    private final ObservableList<FornecedorModel> fornecedores = FXCollections.observableArrayList();
 
     public FornecedorScreen(Router router) {
         this.router = router;
@@ -51,15 +51,8 @@ private final ObservableList<FornecedorModel> fornecedores = FXCollections.obser
 
     public Component render() {
         return new Column(new ColumnProps().paddingAll(25), new ColumnStyler().bgColor(theme.colors().background()))
-                .c_child(Components.commonCustomMenus(
-                        () -> {
-                            btnText.set("+ Adicionar");
-                            nome.set("");
-                            cnpj.set("");
-                        },
-                        () -> {
-                            btnText.set("Salvar");
-                        },
+                .c_child(Components.commonCustomMenus(this::handleClickNew,
+                       this::handleClickEdit,
                         () -> {
                             // delete logic
                         }
@@ -69,6 +62,19 @@ private final ObservableList<FornecedorModel> fornecedores = FXCollections.obser
                 .c_child(new SpacerVertical(30))
                 .c_child(table());
     }
+
+    private void handleClickNew() {
+            btnText.set("+ Adicionar");
+            nome.set("");
+            cnpj.set("");
+    }
+
+    private void handleClickEdit() {
+        btnText.set("+ Adicionar");
+        nome.set("");
+        cnpj.set("");
+    }
+
 
     private final State<String> nome = new State<>("");
     private final State<String> cnpj = new State<>("");

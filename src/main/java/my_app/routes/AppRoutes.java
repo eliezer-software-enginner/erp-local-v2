@@ -22,7 +22,7 @@ public class AppRoutes {
                 new Router.Route("categoria",router-> new CategoriaScreen(router), new Router.RouteProps(1000, 700, "Gerenciamento de categorias", false)),
                 new Router.Route("fornecedor",router-> new FornecedorScreen(router), new Router.RouteProps(1000, 700, "Gerenciamento de Fornecedores", false))
         );
-        return new Router(routes, "fornecedor", stage);
+        return new Router(routes, "categoria", stage);
     }
 }
 

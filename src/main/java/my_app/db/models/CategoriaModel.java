@@ -24,6 +24,7 @@ public class CategoriaModel {
         var model  = new CategoriaModel();
         model.id = rs.getLong("id");
         model.nome = rs.getString("nome");
+        model.dataCriacao = rs.getLong("data_criacao");
        return model;
     }
 }
