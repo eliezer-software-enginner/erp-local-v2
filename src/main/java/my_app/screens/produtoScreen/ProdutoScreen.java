@@ -1,6 +1,7 @@
 package my_app.screens.produtoScreen;
 
 import javafx.scene.paint.Color;
+import javafx.scene.layout.Priority;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.Button;
@@ -10,8 +11,9 @@ import megalodonte.components.inputs.Input;
 import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.props.CardProps;
 import megalodonte.props.TextProps;
-import megalodonte.router.RouteParamsAware;
 import megalodonte.router.Router;
+import megalodonte.theme.Theme;
+import megalodonte.theme.ThemeManager;
 import my_app.screens.components.Components;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.entypo.Entypo;
@@ -26,8 +28,9 @@ import java.util.Map;
 import static my_app.screens.produtoScreen.ProdutoComponents.*;
 
 public class ProdutoScreen {
-    private Router router;
-    private ProdutoScreenViewModel vm;
+    private final Router router;
+    private final ProdutoScreenViewModel vm;
+    private final Theme theme = ThemeManager.theme();
 
     public ProdutoScreen(Router router) {
         this.router = router;
@@ -35,38 +38,134 @@ public class ProdutoScreen {
     }
 
     public Component render (){
-       // IO.println("[id]: " + id);
-        return new Column(new ColumnProps().paddingAll(15), new ColumnStyler().bgColor("#fff"))
+        return new Column(new ColumnProps().paddingAll(25), new ColumnStyler().bgColor(theme.colors().background()))
                 .c_child(Components.commonCustomMenus(this::handleClickNew, this::handleClickEdit, this::handleClickDelete))
+                .c_child(new SpacerVertical(20))
+                .c_child(createHeaderSection())
                 .c_child(new SpacerVertical(30))
-                .c_child(
-                        form()
-                )
-                .c_child(new SpacerVertical(30))
-                .c_child(new Text("Informaçoẽs", new TextProps().fontSize(30)))
-                .c_child(new Text("Dica 1: Pressione CTRL + G para gerar o código de barras",new TextProps().fontSize(24)))
-                .c_child(new Text("Dica 2: O sistema não permite gravar produtos diferentes com o mesmo código de barras!",new TextProps().fontSize(24)));
+                .c_child(createMainContent());
     }
 
     void handleClickNew(){
-
+        limparFormulario();
+        IO.println("Formulário limpo para novo produto");
     }
 
     void handleClickEdit(){
-
+        String codigo = vm.codigoBarras.get();
+        if (codigo.isEmpty()) {
+            IO.println("Digite um código de barras para buscar");
+            return;
+        }
+        
+        try {
+            executar(() -> {
+                vm.buscar();
+                IO.println("Produto carregado para edição");
+            });
+        } catch (Exception e) {
+            IO.println("Erro ao buscar produto: " + e.getMessage());
+        }
     }
 
     void handleClickDelete(){
-
+        String codigo = vm.codigoBarras.get();
+        if (codigo.isEmpty()) {
+            IO.println("Digite um código de barras para excluir");
+            return;
+        }
+        
+        try {
+            executar(() -> {
+                vm.excluir();
+                vm.refreshProdutos();
+                limparFormulario();
+                IO.println("Produto excluído com sucesso");
+            });
+        } catch (Exception e) {
+            IO.println("Erro ao excluir produto: " + e.getMessage());
+        }
     }
 
 
-    private Row form() {
-        return new Row(new RowProps().paddingAll(20)
-                .spacingOf(20), new RowStyler().borderWidth(1).borderColor("black").borderRadius(1))
-                .r_child(ContainerLeft(vm))
-                .r_child(new SpacerHorizontal().fill())
-                .r_child(ContainerRight());
+    private Component createHeaderSection() {
+        return new Card(
+                new Column(new ColumnProps().paddingAll(25))
+                        .c_child(new Text("Cadastro de Produtos", 
+                                new TextProps().fontSize(28).bold()))
+                        .c_child(new SpacerVertical(10))
+                        .c_child(new Text("Gerencie o catálogo de produtos do seu estabelecimento", 
+                                new TextProps().fontSize(16), new TextStyler().color("#6b7280"))),
+                new CardProps()
+                        .padding(0)
+                        .radius(12)
+        );
+    }
+
+    private Component createMainContent() {
+        return new Row(new RowProps().spacingOf(30))
+                .r_child(createFormSection())
+                .r_child(createTableSection());
+    }
+
+    private Component createFormSection() {
+        return new Card(
+                new Column(new ColumnProps().paddingAll(25))
+                        .c_child(new Text("Dados do Produto", 
+                                new TextProps().fontSize(20).bold()))
+                        .c_child(new SpacerVertical(20))
+                        .c_child(ContainerLeft(vm))
+                        .c_child(new SpacerVertical(25))
+                        .c_child(createActionButtons()),
+                new CardProps()
+                        .padding(0)
+                        .radius(12)
+        );
+    }
+
+    private Component createTableSection() {
+        return new Card(
+                new Column(new ColumnProps().paddingAll(25))
+                        .c_child(new Row(new RowProps().spacingOf(10))
+                                .r_child(new Text("Produtos Cadastrados", 
+                                        new TextProps().fontSize(20).bold()))
+                                .r_child(new Button("Atualizar", 
+                                        new ButtonProps()
+                                                .height(35)
+                                                .bgColor("#2563eb")
+                                                .textColor("white")
+                                                .onClick(() -> vm.refreshProdutos()))))
+                        .c_child(new SpacerVertical(15))
+                        .c_child(ProdutosTable(vm.produtos)),
+                new CardProps()
+                        .padding(0)
+                        .radius(12)
+        );
+    }
+
+    private Component createActionButtons() {
+        return new Row(new RowProps().spacingOf(10))
+                .r_child(new Button("Salvar", 
+                        new ButtonProps()
+                                .fillWidth()
+                                .height(45)
+                                .bgColor("#10b981")
+                                .textColor("white")
+                                .fontSize(16)
+                                .onClick(() -> executar(() -> {
+                                    vm.salvar();
+                                    vm.refreshProdutos();
+                                    limparFormulario();
+                                    IO.println("Produto salvo com sucesso");
+                                }))))
+                .r_child(new Button("Limpar", 
+                        new ButtonProps()
+                                .fillWidth()
+                                .height(45)
+                                .bgColor("#6b7280")
+                                .textColor("white")
+                                .fontSize(16)
+                                .onClick(this::limparFormulario)));
     }
 
 
@@ -84,11 +183,20 @@ public class ProdutoScreen {
         }
     }
 
-    private void limpar() {
+    private void limparFormulario() {
+        vm.codigoBarras.set("");
         vm.descricao.set("");
         vm.precoCompra.set("0");
         vm.precoVenda.set("0");
+        vm.margem.set("0");
+        vm.lucro.set("0");
+        vm.comissao.set("");
+        vm.garantia.set("");
+        vm.marca.set("");
+        vm.unidadeSelected.set("UN");
         vm.estoque.set("0");
+        vm.validade.set("");
         vm.observacoes.set("");
+        vm.imagem.set("/assets/produto-generico.png");
     }
 }

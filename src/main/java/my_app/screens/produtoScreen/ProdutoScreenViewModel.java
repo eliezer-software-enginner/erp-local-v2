@@ -1,9 +1,12 @@
 package my_app.screens.produtoScreen;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import megalodonte.State;
 import my_app.db.models.CategoriaModel;
 import my_app.db.models.ProdutoModel;
 import my_app.db.repositories.CategoriaRepository;
+import my_app.db.repositories.ProdutoRepository;
 import my_app.lifecycle.viewmodel.component.ViewModel;
 import my_app.services.ProdutoService;
 
@@ -13,6 +16,8 @@ import java.util.List;
 public class ProdutoScreenViewModel extends ViewModel {
 
     private final ProdutoService service = new ProdutoService();
+    private final ProdutoRepository produtoRepository = new ProdutoRepository();
+    public final ObservableList<ProdutoModel> produtos = FXCollections.observableArrayList();
     public final State<String> codigoBarras = new State<>("123456789");
     public final State<String> descricao = new State<>("");
     public final State<String> precoCompra = new State<>("0");
@@ -92,6 +97,7 @@ public class ProdutoScreenViewModel extends ViewModel {
 
     protected void onInit() {
         loadCategorias();
+        loadProdutos();
     }
 
     private void loadCategorias() {
@@ -110,6 +116,19 @@ public class ProdutoScreenViewModel extends ViewModel {
             System.err.println("Erro ao carregar categorias: " + e.getMessage());
             // Mantém lista padrão em caso de erro
         }
+    }
+
+    private void loadProdutos() {
+        try {
+            produtos.clear();
+            produtos.addAll(produtoRepository.listar());
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar produtos: " + e.getMessage());
+        }
+    }
+
+    public void refreshProdutos() {
+        loadProdutos();
     }
 }
 
