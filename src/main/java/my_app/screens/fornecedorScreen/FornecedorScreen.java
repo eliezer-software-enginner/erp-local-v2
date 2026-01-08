@@ -112,24 +112,33 @@ public class FornecedorScreen {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Coluna ID
-        TableColumn<FornecedorModel, Long> idCol = new TableColumn<>("ID");
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        TableColumn<FornecedorModel, String> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(
+                    data.getValue().id != null ? String.valueOf(data.getValue().id) : ""
+                )
+        );
         idCol.setMaxWidth(80);
 
         // Coluna Nome
         TableColumn<FornecedorModel, String> nomeCol = new TableColumn<>("Nome");
-        nomeCol.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        nomeCol.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().nome)
+        );
+        nomeCol.setPrefWidth(300);
 
         // Coluna CNPJ
         TableColumn<FornecedorModel, String> cnpjCol = new TableColumn<>("CNPJ");
-        cnpjCol.setCellValueFactory(new PropertyValueFactory<>("cpfCnpj"));
+        cnpjCol.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().cpfCnpj)
+        );
 
         // Coluna Data Criação
         TableColumn<FornecedorModel, String> dataCol = new TableColumn<>("Data Criação");
-        dataCol.setCellValueFactory(param -> {
-            if (param.getValue().dataCriacao != null) {
+        dataCol.setCellValueFactory(data -> {
+            if (data.getValue().dataCriacao != null) {
                 return new javafx.beans.property.SimpleStringProperty(
-                    new java.util.Date(param.getValue().dataCriacao).toString()
+                    new java.util.Date(data.getValue().dataCriacao).toString()
                 );
             }
             return new javafx.beans.property.SimpleStringProperty("");
