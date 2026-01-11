@@ -69,6 +69,16 @@ public final class DBInitializer {
                     )
                 """);
 
+                st.execute("""
+                    CREATE TABLE IF NOT EXISTS clientes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nome TEXT NOT NULL,
+                        cpfCnpj TEXT,
+                        celular TEXT,
+                        data_criacao INTEGER NOT NULL
+                    )
+                """);
+
             }
             
             // Inserir dados padrão na primeira execução

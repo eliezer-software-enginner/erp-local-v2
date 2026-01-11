@@ -24,12 +24,13 @@ public class Main extends Application {
         launch(args);
     }
 
-//    @Override
-//    public void init() throws Exception {
-//        super.init();
-//
-//        DBInitializer.init();
-//    }
+    @Override
+    public void init() throws Exception {
+        super.init();
+
+        //TODO: remover em produção
+        DBInitializer.init();
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {

@@ -1,0 +1,86 @@
+package my_app.db.repositories;
+
+import my_app.db.DB;
+import my_app.db.dto.ClienteDto;
+import my_app.db.dto.FornecedorDto;
+import my_app.db.models.ClienteModel;
+import my_app.db.models.FornecedorModel;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ClienteRepository extends BaseRepository<ClienteDto,ClienteModel> {
+
+    @Override
+    public ClienteModel salvar(ClienteDto dto) throws SQLException {
+        String sql = """
+        INSERT INTO clientes
+        (nome, cpfCnpj, celular, data_criacao) VALUES (?,?,?,?)
+        """;
+
+        long dataCriacao = System.currentTimeMillis();
+
+        try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, dto.nome());
+            ps.setString(2, dto.cnpj());
+            ps.setString(3, dto.telefone());
+            ps.setLong(4, dataCriacao);
+            ps.executeUpdate();
+            
+            // Recupera o ID gerado e cria nova instância
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    long idGerado = generatedKeys.getLong(1);
+                    return new ClienteModel(idGerado, dto.nome(), dto.cnpj(),dto.telefone(), dataCriacao);
+                }
+            }
+        }
+        throw new SQLException("Falha ao recuperar ID gerado");
+    }
+
+    @Override
+    public List<ClienteModel> listar() throws SQLException {
+        List<ClienteModel> lista = new ArrayList<>();
+        try (Statement st = conn().createStatement()) {
+            ResultSet rs = st.executeQuery("SELECT * FROM clientes");
+            while (rs.next()) lista.add(ClienteModel.fromResultSet(rs));
+        }
+        return lista;
+    }
+
+
+   //TODO: atualizar demais campos
+    @Override
+    public void atualizar(ClienteModel model) throws SQLException {
+        String sql = """
+        UPDATE clientes SET nome = ?, cpfCnpj = ? WHERE id = ?
+        """;
+
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
+            ps.setString(1, model.nome);
+            ps.setString(2, model.cpfCnpj);
+            ps.setLong(3, model.id);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public void excluirById(Long id) throws SQLException {
+        try (PreparedStatement ps =
+                     conn().prepareStatement("DELETE FROM clientes WHERE id = ?")) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public ClienteModel buscarById(Long id) throws SQLException {
+        String sql = "SELECT * FROM clientes WHERE id = ?";
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() ? ClienteModel.fromResultSet(rs) : null;
+        }
+    }
+}

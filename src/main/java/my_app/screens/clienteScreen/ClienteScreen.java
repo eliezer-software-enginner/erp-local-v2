@@ -13,58 +13,61 @@ import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
+import my_app.db.dto.ClienteDto;
 import my_app.db.dto.FornecedorDto;
+import my_app.db.models.CategoriaModel;
+import my_app.db.models.ClienteModel;
 import my_app.db.models.FornecedorModel;
+import my_app.db.repositories.ClienteRepository;
 import my_app.db.repositories.FornecedorRepository;
 import my_app.screens.components.Components;
 
 public class ClienteScreen {
     private final Router router;
     private final Theme theme = ThemeManager.theme();
-    private final FornecedorRepository fornecedorRepository = new FornecedorRepository();
+    private final ClienteRepository clienteRepository = new ClienteRepository();
 
-    private final ObservableList<FornecedorModel> fornecedores = FXCollections.observableArrayList();
+    private final ObservableList<ClienteModel> clientes = FXCollections.observableArrayList();
+    State<ClienteModel> clienteSelecionado = State.of(null);
 
     public ClienteScreen(Router router) {
         this.router = router;
-        loadFornecedores();
+        loadClientes();
     }
 
-    private void loadFornecedores() {
+    private void loadClientes() {
         try {
-            fornecedores.clear();
-            fornecedores.addAll(fornecedorRepository.listar());
+            clientes.clear();
+            clientes.addAll(clienteRepository.listar());
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao carregar fornecedores", e);
+            throw new RuntimeException("Erro ao carregar clientes", e);
         }
     }
 
-    
-
     public Component render() {
-        return new Column(new ColumnProps().paddingAll(25), new ColumnStyler().bgColor(theme.colors().background()))
-                .c_child(Components.commonCustomMenus(this::handleClickNew,
-                       this::handleClickEdit,
+        return new Column(new ColumnProps().paddingAll(7), new ColumnStyler().bgColor(theme.colors().background()))
+                .c_child(Components.commonCustomMenus(this::handleClickMenuNew,
+                       this::handleClickMenuEdit,
                         () -> {
                             // delete logic
                         }
                 ))
-                .c_child(new SpacerVertical(30))
+                .c_child(new SpacerVertical(10))
                 .c_child(form())
                 .c_child(new SpacerVertical(30))
                 .c_child(table());
     }
 
-    private void handleClickNew() {
+    private void handleClickMenuNew() {
             btnText.set("+ Adicionar");
             nome.set("");
             cnpj.set("");
     }
 
-    private void handleClickEdit() {
-        btnText.set("+ Adicionar");
-        nome.set("");
-        cnpj.set("");
+    private void handleClickMenuEdit() {
+        nome.set(clienteSelecionado.get().nome);
+        cnpj.set(clienteSelecionado.get().cpfCnpj);
+        btnText.set("+ Atualizar");
     }
 
 
@@ -80,11 +83,10 @@ public class ClienteScreen {
                                 .r_child(new Text("Cadastro de Cliente", new TextProps().bold().variant(TextVariant.SUBTITLE))))
                         .c_child(new SpacerVertical(20))
                         .c_child(new Row(new RowProps().bottomVertically().spacingOf(10))
-                                .r_child(InputColumn("Nome", nome))
-                                .r_child(InputColumn("CPF/CNPJ", cnpj))
-                                .r_child(InputColumn("Celular", celular))
-                                .r_child(new Button(btnText, new ButtonProps().fillWidth().height(45).bgColor("#2563eb").fontSize(20).textColor("white")
-                                        .onClick(this::handleAdd)))
+                                .r_child(Components.InputColumn("Nome", nome))
+                                .r_child(Components.InputColumn("CPF/CNPJ", cnpj))
+                                .r_child(Components.InputColumn("Celular", celular))
+                                .r_child(Components.ButtonCadastro(btnText,this::handleAdd))
                         ));
     }
 
@@ -98,11 +100,12 @@ public class ClienteScreen {
         }
 
         try {
-            var dto = new FornecedorDto(nomeValue, cnpjValue, "", "", "", System.currentTimeMillis());
-            var model = fornecedorRepository.salvar(dto);
-            fornecedores.add(model);
+            //TODO: preencher mais dados
+            var dto = new ClienteDto(nomeValue, cnpjValue, "");
+            var model = clienteRepository.salvar(dto);
+            clientes.add(model);
             
-            IO.println("Fornecedor '" + model.nome + "' cadastrado com ID: " + model.id);
+            IO.println("cliente '" + model.nome + "' cadastrado com ID: " + model.id);
             
             // Limpa formulário
             nome.set("");
@@ -114,33 +117,34 @@ public class ClienteScreen {
     }
 
     Component table() {
-        TableView<FornecedorModel> table = new TableView<>();
+        TableView<ClienteModel> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Coluna ID
-        TableColumn<FornecedorModel, String> idCol = new TableColumn<>("ID");
+        TableColumn<ClienteModel, String> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(
                     data.getValue().id != null ? String.valueOf(data.getValue().id) : ""
                 )
         );
-        idCol.setMaxWidth(80);
+        idCol.setMinWidth(60);
+        idCol.setMaxWidth(60);
 
         // Coluna Nome
-        TableColumn<FornecedorModel, String> nomeCol = new TableColumn<>("Nome");
+        TableColumn<ClienteModel, String> nomeCol = new TableColumn<>("Nome");
         nomeCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(data.getValue().nome)
         );
-        nomeCol.setPrefWidth(300);
+        //nomeCol.setPrefWidth(100);
 
         // Coluna CNPJ
-        TableColumn<FornecedorModel, String> cnpjCol = new TableColumn<>("CNPJ");
+        TableColumn<ClienteModel, String> cnpjCol = new TableColumn<>("CNPJ");
         cnpjCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(data.getValue().cpfCnpj)
         );
 
         // Coluna Data Criação
-        TableColumn<FornecedorModel, String> dataCol = new TableColumn<>("Data Criação");
+        TableColumn<ClienteModel, String> dataCol = new TableColumn<>("Data Criação");
         dataCol.setCellValueFactory(data -> {
             if (data.getValue().dataCriacao != null) {
                 return new javafx.beans.property.SimpleStringProperty(
@@ -151,14 +155,16 @@ public class ClienteScreen {
         });
 
         table.getColumns().addAll(idCol, nomeCol, cnpjCol, dataCol);
-        table.setItems(fornecedores);
+        table.setItems(clientes);
+
+        table.getSelectionModel().selectedItemProperty().addListener((_, _, newSelection) -> {
+            if (newSelection != null) {
+                IO.println("ID selecionado: " + newSelection.id);
+                clienteSelecionado.set(newSelection);
+            }
+        });
+
 
         return Component.CreateFromJavaFxNode(table);
-    }
-
-    private static Component InputColumn(String label, State<String> inputState) {
-        return new Column()
-                .c_child(new Text(label, new TextProps().variant(TextVariant.SMALL).bold()))
-                .c_child(new Input(inputState, new InputProps().variant(TextVariant.SMALL).height(40)));
     }
 }

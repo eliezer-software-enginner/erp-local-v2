@@ -20,10 +20,17 @@ public class Components {
 
     static Theme theme = ThemeManager.theme();
 
+    public static Component ButtonCadastro(State<String> textState, Runnable handleAdd){
+        return new Button(textState, new ButtonProps().fillWidth().height(35).bgColor("#2563eb")
+                .fontSize(theme.typography().small())
+                .textColor("white")
+                .onClick(handleAdd));
+    }
+
     public static Component InputColumn(String label, State<String> inputState) {
         return new Column()
-                .c_child(new Text(label, new TextProps().fontSize(22)))
-                .c_child(new Input(inputState, new InputProps().fontSize(20).height(40)));
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(new Input(inputState, new InputProps().fontSize(theme.typography().small()).height(35)));
     }
     
     public static Component errorText(String message){
@@ -43,13 +50,13 @@ public class Components {
 
     public static Component MenuItem(String title, Ikon ikon, String color, Runnable onClick){
 
-        var icon = Component.CreateFromJavaFxNode(FontIcon.of(ikon, 40, Color.web(color)));
+        var icon = Component.CreateFromJavaFxNode(FontIcon.of(ikon, 25, Color.web(color)));
 
         return new Clickable(new Card(
                 new Column(new ColumnProps().centerHorizontally())
                         .c_child(icon)
                         .c_child(new SpacerVertical(6))
-                        .c_child(new Text(title, new TextProps().variant(TextVariant.BODY)))
+                        .c_child(new Text(title, new TextProps().variant(TextVariant.SMALL)))
         ), onClick
         );
     }

@@ -90,8 +90,7 @@ public class FornecedorScreen {
                         .c_child(new Row(new RowProps().bottomVertically().spacingOf(10))
                                 .r_child(Components.InputColumn("Nome Fantasia", nome))
                                 .r_child(Components.InputColumn("CNPJ", cnpj))
-                                .r_child(new Button(btnText, new ButtonProps().fillWidth().height(45).bgColor("#2563eb").fontSize(20).textColor("white")
-                                        .onClick(this::handleAdd)))
+                                .r_child(Components.ButtonCadastro(btnText, this::handleAdd))
                         ));
     }
 
