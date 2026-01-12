@@ -66,23 +66,25 @@ public class CadastroEmpresaScreen {
                         .r_child(
                                 Components.InputColumn("Telefone/Celular", celular,"(xx)xxxxx-yyyy"))
                 )
+                .c_child(new SpacerVertical(10))
                 .c_child(Components.FormTitle("Endereço"))
                 .c_child(new Row(new RowProps().bottomVertically().spacingOf(10))
                         .r_child(
-                                Components.InputColumn("Cep", cep,"Ex: Eletrômicos"))
+                                Components.InputColumn("Cep", cep,"xxxxxxxx"))
                         .r_child(
-                                Components.InputColumn("Cidade", cidade,"(xx)xxxxx-yyyy"))
+                                Components.InputColumn("Cidade", cidade,"Ex: Paraiso"))
                         .r_child(
-                                Components.InputColumn("Bairro", bairro,"Ex: Eletrômicos"))
+                                Components.InputColumn("Bairro", bairro,"Ex: Bairro abc"))
                         .r_child(
-                                Components.InputColumn("Rua", rua,"Ex: Eletrômicos"))
+                                Components.InputColumn("Rua", rua,"Ex: rua das graças"))
                 )
+                .c_child(new SpacerVertical(10))
                 .c_child(Components.FormTitle("Dados de carnê"))
                 .c_child(new Row(new RowProps().bottomVertically().spacingOf(10))
                         .r_child(
                                 Components.InputColumn("Local de pagamento", localPagamento,"Ex: Pagável em qualquer banco ou lotérica"))
                         .r_child(
-                                Components.InputColumn("Texto de responsabilidade do cedente", textoResponsabilidade,"Ex: Após o vencimento cobrar multa..."))
+                                Components.TextAreaColumn("Texto de responsabilidade do cedente", textoResponsabilidade,"Ex: Após o vencimento cobrar multa..."))
                 )
                 .c_child(new SpacerVertical(20))
                 .c_child(Components.ButtonCadastro("Salvar",this::handleSave)))

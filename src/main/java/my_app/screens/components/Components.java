@@ -4,6 +4,7 @@ import javafx.scene.paint.Color;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
+import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.props.*;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.styles.InputStyler;
@@ -47,6 +48,20 @@ public class Components {
                         new InputStyler().
                                 borderWidth(theme.border().width())
                                 .borderColor(theme.colors().primary())
+                        )
+                );
+    }
+
+    public static Component TextAreaColumn(String label, State<String> inputState, String placeholder) {
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(new TextAreaInput(inputState,
+                                new InputProps().fontSize(theme.typography().small()).height(35)
+                                        .placeHolder(placeholder)
+                                        .height(100),
+                                new InputStyler().
+                                        borderWidth(theme.border().width())
+                                        .borderColor(theme.colors().primary())
                         )
                 );
     }
