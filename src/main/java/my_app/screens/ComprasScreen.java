@@ -2,8 +2,10 @@ package my_app.screens;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.util.StringConverter;
 import megalodonte.Show;
 import megalodonte.State;
 import megalodonte.async.Async;
@@ -11,6 +13,7 @@ import megalodonte.base.UI;
 import megalodonte.components.*;
 import megalodonte.props.ColumnProps;
 import megalodonte.props.RowProps;
+import megalodonte.props.TextProps;
 import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
@@ -25,8 +28,11 @@ import my_app.screens.components.Components;
 
 import java.sql.Array;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ComprasScreen implements ScreenComponent {
     private final Router router;
@@ -105,9 +111,36 @@ IO.println("Erro on fetch data: " + e.getMessage());
 
 
     Component form(){
+        DatePicker dt = new DatePicker(LocalDate.now());
+        dt.setEditable(false);
+
+        Locale localeBR = new Locale("pt", "BR");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", localeBR);
+
+        dt.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(LocalDate date) {
+                return date != null ? formatter.format(date) : "";
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                return (string != null && !string.isBlank())
+                        ? LocalDate.parse(string, formatter)
+                        : null;
+            }
+        });
+
+        dt.setPromptText("dd/MM/yyyy");
+
+
+        var datePickerColumn = new Column()
+                .c_child(new Text("Data de compra", new TextProps().fontSize(theme.typography().small())))
+                .c_child(Component.CreateFromJavaFxNode(dt));
 
         final var top = new Row(new RowProps().bottomVertically().spacingOf(10))
-                .r_child(Components.InputColumn("Data de compra", codigo,"Ex: 01/12/2026"))
+                //.r_child(Components.InputColumn("Data de compra", codigo,"Ex: 01/12/2026"))
+                .r_child(datePickerColumn)
                 .r_child(Components.SelectColumn("Fornecedor", fornecedores, fornecedorSelected, f-> f.nome))
                 .r_child(Components.InputColumn("N NF/Pedido compra", produtoEncontrado.map(p-> p != null? p.descricao: ""),"Ex: 12345678920"));
 
@@ -134,8 +167,11 @@ IO.println("Erro on fetch data: " + e.getMessage());
         );
     }
 
-    private void handleAdd(){
+    private void handleAdd(LocalDate localDate){
         //TODO: implementar
+
+        String dataBR = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
     }
 
     private void handleClickMenuNew() {

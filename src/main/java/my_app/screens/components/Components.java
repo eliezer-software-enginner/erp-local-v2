@@ -1,5 +1,6 @@
 package my_app.screens.components;
 
+import javafx.scene.control.DatePicker;
 import javafx.scene.paint.Color;
 import megalodonte.*;
 import megalodonte.components.*;
@@ -17,12 +18,21 @@ import org.kordamp.ikonli.antdesignicons.AntDesignIconsOutlined;
 import org.kordamp.ikonli.entypo.Entypo;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
 public class Components {
 
     static Theme theme = ThemeManager.theme();
+
+    public static Component DatePickerComponent(String label, String placeholder){
+        DatePicker dt = new DatePicker();
+
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(Component.CreateFromJavaFxNode(dt));
+    }
 
     public static Column ImageSelector(String title,State<String> imageState,
                                        ImageProps props,
