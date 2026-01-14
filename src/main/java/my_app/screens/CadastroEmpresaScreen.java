@@ -17,9 +17,8 @@ import my_app.db.repositories.EmpresaRepository;
 import my_app.screens.components.Components;
 
 import java.io.File;
-import java.nio.file.Path;
 
-public class CadastroEmpresaScreen {
+public class CadastroEmpresaScreen implements ScreenComponent {
     private final Router router;
 
     State<String> nome = State.of("");
@@ -35,12 +34,12 @@ public class CadastroEmpresaScreen {
     State<String> textoResponsabilidade = State.of("");
 
     private EmpresaRepository empresaRepository = new EmpresaRepository();
+
     public CadastroEmpresaScreen(Router router) {
         this.router = router;
-        onMount();
     }
 
-    void onMount(){
+    public void onMount(){
         fetchData();
     }
 

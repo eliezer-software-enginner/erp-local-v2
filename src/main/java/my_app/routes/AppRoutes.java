@@ -3,6 +3,7 @@ package my_app.routes;
 import javafx.stage.Stage;
 import megalodonte.router.Router;
 import my_app.screens.CadastroEmpresaScreen;
+import my_app.screens.ComprasScreen;
 import my_app.screens.authScreen.AccessScreen;
 import my_app.screens.authScreen.AutenticacaoScreen;
 import my_app.screens.HomeScreen.HomeScreen;
@@ -24,9 +25,10 @@ public class AppRoutes {
                 new Router.Route("categoria",router-> new CategoriaScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de categorias", false)),
                 new Router.Route("fornecedor",router-> new FornecedorScreen(router), new Router.RouteProps(1000, 700, "Gerenciamento de Fornecedores", false)),
                 new Router.Route("empresa",router-> new CadastroEmpresaScreen(router), new Router.RouteProps(900, 650, "Informações da empresa", false)),
+                new Router.Route("compras",router-> new ComprasScreen(router), new Router.RouteProps(1000, 650, "Compras de mercadorias", false)),
         new Router.Route("clientes",router-> new ClienteScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de clientes", false))
         );
-        return new Router(routes, "empresa", stage);
+        return new Router(routes, "compras", stage);
     }
 }
 

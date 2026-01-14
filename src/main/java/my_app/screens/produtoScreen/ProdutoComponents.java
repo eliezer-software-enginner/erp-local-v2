@@ -7,6 +7,7 @@ import megalodonte.components.inputs.Input;
 import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.props.*;
 import my_app.db.models.ProdutoModel;
+import my_app.screens.components.Components;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.entypo.Entypo;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -31,7 +32,7 @@ public class ProdutoComponents {
                                         .r_child(new Button("Gerar", new ButtonProps().height(40)))
                                 )
                                 .r_child(InputColumn("Descrição curta", vm.descricao))
-                                .r_child(SelectColumn("Unidade", vm.unidades ,vm.unidadeSelected))
+                                .r_child(Components.SelectColumn("Unidade", vm.unidades ,vm.unidadeSelected, u->u))
                                 .r_child(InputColumn("Marca", vm.marca))
                 ).c_child(new Row(rowProps)
                         .r_child(InputColumn("Preço de compra", vm.precoCompra, vm.precoCompraRaw, Entypo.CREDIT))
@@ -40,7 +41,7 @@ public class ProdutoComponents {
                         .r_child(InputColumn("Preço de venda", vm.precoVenda, vm.precoVendaRaw, Entypo.CREDIT))
                 ).c_child(new Row(rowProps)
                         .r_child(SelectColumn("Categoria",vm.categorias, vm.categoriaSelected))
-                        .r_child(SelectColumn("Fornecedor", vm.fornecedores, vm.fornecedorSelected))//fornecedor padrão
+                        .r_child(Components.SelectColumn("Fornecedor", vm.fornecedores, vm.fornecedorSelected, f->f))
                         .r_child(InputColumn("Garantia", vm.garantia))
                         .r_child(InputColumn("Validade", vm.validade))
                         .r_child(InputColumn("Comissão", vm.comissao))
@@ -70,13 +71,7 @@ public class ProdutoComponents {
                 .c_child(new TextAreaInput(inputState,new InputProps().fontSize(20).height(140)));
     }
 
-    public static Component SelectColumn(String label, List<String> list, State<String> stateSelected){
-        return new Column()
-                .c_child(new Text(label, new TextProps().fontSize(25)))
-                .c_child(new Select<String>(new SelectProps().height(40))
-                        .items(list)
-                        .value(stateSelected));
-    }
+
 
     public static Component SelectColumn(String label, State<List<String>> listState, State<String> stateSelected){
         return new Column()

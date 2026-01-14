@@ -43,6 +43,7 @@ public class ProdutoScreenViewModel extends ViewModel {
     public final State<List<String>> categorias = new State<>(List.of("Padrão"));
     public final State<String> categoriaSelected = new State<>("Padrão");
 
+    //TODO: BUSCAR FORNECEDORES DO BANCO
     public final List<String> fornecedores = List.of("Fornecedor Padrão");
     public final State<String> fornecedorSelected = new State<>("Fornecedor Padrão");
 

@@ -17,6 +17,9 @@ import org.kordamp.ikonli.antdesignicons.AntDesignIconsOutlined;
 import org.kordamp.ikonli.entypo.Entypo;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.List;
+import java.util.function.Function;
+
 public class Components {
 
     static Theme theme = ThemeManager.theme();
@@ -48,10 +51,40 @@ public class Components {
                 .onClick(handleAdd));
     }
 
-    public static Component InputColumn(String label, State<String> inputState, String placeholder) {
+    //TODO: adicionar campo editavel:false
+    public static Component FakeInputColumn(String label, String text, String placeholder) {
         return new Column()
                 .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
-                .c_child(new Input(inputState,
+                .c_child(new Input(State.of(text),
+                                new InputProps().fontSize(theme.typography().small()).height(35)
+                                        .placeHolder(placeholder),
+                                new InputStyler().
+                                        borderWidth(theme.border().width())
+                                        .borderColor(theme.colors().primary())
+                        )
+                );
+    }
+
+    public static <T> Component SelectColumn(String label, List<T> list, State<T> stateSelected, Function<T, String> display){
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(new Select<T>(new SelectProps().height(40))
+                        .items(list)
+                        .value(stateSelected)
+                        .displayText(display)
+                );
+    }
+
+    public static Component TextWithValue(String label, ReadableState<String> valueState) {
+        return new Row()
+                .r_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .r_child(new Text(valueState, new TextProps().fontSize(theme.typography().small())));
+    }
+
+    public static Component InputColumn(String label, ReadableState<String> inputState, String placeholder) {
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(new Input((State<String>) inputState,
                         new InputProps().fontSize(theme.typography().small()).height(35)
                                 .placeHolder(placeholder),
                         new InputStyler().
