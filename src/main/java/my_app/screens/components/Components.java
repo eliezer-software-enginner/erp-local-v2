@@ -5,6 +5,7 @@ import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
 import megalodonte.components.inputs.TextAreaInput;
+import megalodonte.components.inputs.OnChangeResult;
 import megalodonte.props.*;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.styles.DatePickerStyler;
@@ -115,16 +116,15 @@ public class Components {
                 .onChange(value -> {
                     String numeric = value.replaceAll("[^0-9]", "");
                     if (numeric.isEmpty()) {
-                        numeric = "0";
                         rawState.set("0");
-                        return "R$ 0,00";
+                        return OnChangeResult.of("R$ 0,00", "0");
                     }
 
                     // Atualiza o state com o valor bruto (em centavos)
                     rawState.set(numeric);
 
                     BigDecimal raw = new BigDecimal(numeric).movePointLeft(2);
-                    return BRL.format(raw);
+                    return OnChangeResult.of(BRL.format(raw), numeric);
                 })
                 .left(fonticon);
 
