@@ -93,6 +93,14 @@ public class Components {
                 );
     }
 
+    public static Column TextColumn(String label, String value) {
+        return new Column(new ColumnProps(), new ColumnStyler()
+                .borderColor(theme.colors().primary())
+                .borderWidth(theme.border().width()))
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().body()).bold()))
+                .c_child(new Text(value, new TextProps().fontSize(theme.typography().body())));
+    }
+
     public static Component TextWithValue(String label, ReadableState<String> valueState) {
         return new Row()
                 .r_child(new Text(label, new TextProps().fontSize(theme.typography().body()).bold()))

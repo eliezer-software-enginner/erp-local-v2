@@ -2,11 +2,8 @@ package my_app.screens;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.util.StringConverter;
 import megalodonte.ComputedState;
+import megalodonte.ForEachState;
 import megalodonte.Show;
 import megalodonte.State;
 import megalodonte.async.Async;
@@ -14,12 +11,10 @@ import megalodonte.base.UI;
 import megalodonte.components.*;
 import megalodonte.props.ColumnProps;
 import megalodonte.props.RowProps;
-import megalodonte.props.TextProps;
 import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
-import my_app.db.dto.CategoriaDto;
 import my_app.db.models.CategoriaModel;
 import my_app.db.models.FornecedorModel;
 import my_app.db.models.ProdutoModel;
@@ -29,13 +24,13 @@ import my_app.screens.components.Components;
 import my_app.utils.Utils;
 
 import java.math.BigDecimal;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+
+
 
 public class ComprasScreen implements ScreenComponent {
     private final Router router;
@@ -59,6 +54,8 @@ public class ComprasScreen implements ScreenComponent {
             ()-> tipoPagamentoSeleced.get().equals("A PRAZO"),
             tipoPagamentoSeleced);
 
+    State<List<Parcela>> parcelas = State.of(List.of());
+
     State<String> descontoEmDinheiro = State.of("0");
 
     // Preço de compra (armazena em centavos, ex: 123 = R$ 1,23)
@@ -72,7 +69,16 @@ public class ComprasScreen implements ScreenComponent {
     }, descontoEmDinheiro, qtd, pcCompra);
 
 
-    ComputedState<String> totalLiquido = ComputedState.of(()-> {
+    ComputedState<Double> totalLiquido = ComputedState.of(()-> {
+        int qtdValue = Integer.parseInt(qtd.get().trim().isEmpty()? "0": qtd.get());
+        double precoCompraValue = Double.parseDouble(pcCompra.get()) / 100.0;
+
+        double precoDescontoValue = Double.parseDouble(descontoEmDinheiro.get()) / 100.0;
+
+        return (qtdValue * precoCompraValue - precoDescontoValue);
+    }, descontoEmDinheiro, qtd, pcCompra);
+
+    ComputedState<String> totalLiquidoFormatted = ComputedState.of(()-> {
         int qtdValue = Integer.parseInt(qtd.get().trim().isEmpty()? "0": qtd.get());
         double precoCompraValue = Double.parseDouble(pcCompra.get()) / 100.0;
 
@@ -146,7 +152,7 @@ IO.println("Erro on fetch data: " + e.getMessage());
         final var valoresRow = new Row(new RowProps().bottomVertically().spacingOf(10))
                 .r_child(Components.TextWithValue("Valor total(bruto): ", totalBruto))
                 .r_child(Components.TextWithValue("Desconto: ", descontoEmDinheiro))
-                .r_child(Components.TextWithValue("Total geral(líquido): ", totalLiquido)
+                .r_child(Components.TextWithValue("Total geral(líquido): ", totalLiquidoFormatted)
                 );
 
 
@@ -177,20 +183,61 @@ IO.println("Erro on fetch data: " + e.getMessage());
 
 
     Component aPrazoForm() {
-        var dtPrimeiraParcela = State.of(LocalDate.now().plusMonths(1));
+        var dtPrimeiraParcela = State.of(LocalDate.now().plusMonths(1).minusDays(1));
         var qtdParcelas = State.of("1");
 
         Runnable handleGerarParcelas = ()->{
-
+           gerarParcelas(dtPrimeiraParcela.get(), Integer.parseInt(qtdParcelas.get()), totalLiquido.get());
         };
+
+        ForEachState<Parcela, Component> parcelaComponentForEachState = ForEachState.of(parcelas, this::parcelaItem);
+
         return Show.when(tipoPagamentoSelectedIsAPrazo,
-                ()-> new Row(new RowProps().spacingOf(10).bottomVertically())
-                        .r_child(Components.DatePickerColumn(dtPrimeiraParcela, "Data primeira parcela", ""))
-                        .r_child(Components.InputColumn("Quantidade de parcelas",qtdParcelas, "Ex: 1"))
-                        .r_child(Components.ButtonCadastro("Gerar parcelas", handleGerarParcelas)),
-                ()-> new Row()
+                ()-> new Column()
+                        .c_child(
+                                new Row(new RowProps().spacingOf(10).bottomVertically())
+                                .r_child(Components.DatePickerColumn(dtPrimeiraParcela, "Data primeira parcela", ""))
+                                .r_child(Components.InputColumn("Quantidade de parcelas",qtdParcelas, "Ex: 1"))
+                                .r_child(Components.ButtonCadastro("Gerar parcelas", handleGerarParcelas)))
+                        .items(parcelaComponentForEachState)
                 );
     }
+
+    Component parcelaItem(Parcela parcela){
+        return new Row()
+                .r_child(Components.TextColumn("PARCELA",String.valueOf(parcela.numero())))
+                .r_child(Components.TextColumn("VENCIMENTO",parcela.dataVencimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))))
+                .r_child(Components.TextColumn("VALOR",String.format("R$ %.2f", parcela.valor())));
+    }
+
+    record Parcela(int numero, LocalDate dataVencimento, double valor) {
+    }
+
+    private void gerarParcelas(LocalDate dataPrimeiraParcela, int quantidadeParcelas, double valorTotalLiquido) {
+        List<Parcela> novasParcelas = new ArrayList<>();
+        double valorParcela = valorTotalLiquido / quantidadeParcelas;
+        IO.println("=== GERANDO PARCELAS ===");
+        IO.println("Valor total para parcelar: R$ " + valorTotalLiquido);
+        
+        for (int i = 0; i < quantidadeParcelas; i++) {
+            LocalDate dataVencimento = dataPrimeiraParcela.plusMonths(i);
+            Parcela parcela = new Parcela(i + 1, dataVencimento, valorParcela);
+            novasParcelas.add(parcela);
+        }
+        
+        // Atualizar o state com as parcelas geradas
+        parcelas.set(novasParcelas);
+        
+        IO.println("=== PARCELAS GERADAS ===");
+        for (Parcela parcela : novasParcelas) {
+            IO.println("Parcela " + parcela.numero() + ": " + 
+                      parcela.dataVencimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + 
+                      " - Valor: R$ " + String.format("%.2f", parcela.valor()));
+        }
+        IO.println("========================");
+    }
+
+
 
     private void handleAdd(LocalDate localDate){
         //TODO: implementar
