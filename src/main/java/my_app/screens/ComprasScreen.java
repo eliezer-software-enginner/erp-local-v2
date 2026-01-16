@@ -55,6 +55,10 @@ public class ComprasScreen implements ScreenComponent {
     List<String> tiposPagamento = List.of("A VISTA","CRÉDITO", "DÉBITO", "PIX", "A PRAZO");
     State<String> tipoPagamentoSeleced = State.of(tiposPagamento.get(1));
 
+    ComputedState<Boolean> tipoPagamentoSelectedIsAPrazo = ComputedState.of(
+            ()-> tipoPagamentoSeleced.get().equals("A PRAZO"),
+            tipoPagamentoSeleced);
+
     State<String> descontoEmDinheiro = State.of("0");
 
     // Preço de compra (armazena em centavos, ex: 123 = R$ 1,23)
@@ -165,8 +169,27 @@ IO.println("Erro on fetch data: " + e.getMessage());
                                         .r_child(Components.TextAreaColumn("Observação",observacao,""))
                         )
                 .c_child(new SpacerVertical(10))
+                .c_child(aPrazoForm())
+                .c_child(new SpacerVertical(10))
                 .c_child(valoresRow)
         );
+    }
+
+
+    Component aPrazoForm() {
+        var dtPrimeiraParcela = State.of(LocalDate.now().plusMonths(1));
+        var qtdParcelas = State.of("1");
+
+        Runnable handleGerarParcelas = ()->{
+
+        };
+        return Show.when(tipoPagamentoSelectedIsAPrazo,
+                ()-> new Row(new RowProps().spacingOf(10).bottomVertically())
+                        .r_child(Components.DatePickerColumn(dtPrimeiraParcela, "Data primeira parcela", ""))
+                        .r_child(Components.InputColumn("Quantidade de parcelas",qtdParcelas, "Ex: 1"))
+                        .r_child(Components.ButtonCadastro("Gerar parcelas", handleGerarParcelas)),
+                ()-> new Row()
+                );
     }
 
     private void handleAdd(LocalDate localDate){
