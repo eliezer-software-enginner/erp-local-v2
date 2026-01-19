@@ -74,6 +74,14 @@ public class Components {
                 .onClick(handleAdd));
     }
 
+    public static Component ButtonCadastro(ComputedState<String> textState, Runnable handleAdd){
+        return new Button(textState, new ButtonProps().fillWidth().height(35).bgColor("#2563eb")
+                .fontSize(theme.typography().small())
+                .textColor("white")
+                .onClick(handleAdd));
+    }
+
+    @Deprecated(forRemoval = true)
     public static Component ButtonCadastro(State<String> textState, Runnable handleAdd){
         return new Button(textState, new ButtonProps().fillWidth().height(35).bgColor("#2563eb")
                 .fontSize(theme.typography().small())
@@ -135,6 +143,19 @@ public class Components {
         return new Column()
                 .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
                 .c_child(input);
+    }
+
+    public static Component InputColumnComFocusHandler(String label, ReadableState<String> inputState, String placeholder, Runnable focusChangeHandler) {
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(new Input((State<String>) inputState,
+                                new InputProps().fontSize(theme.typography().small()).height(35)
+                                        .placeHolder(placeholder),
+                                new InputStyler().
+                                        borderWidth(theme.border().width())
+                                        .borderColor(theme.colors().primary())
+                        ).onChangeFocus(focus-> {if (!focus)focusChangeHandler.run(); })
+                );
     }
 
     public static Component InputColumn(String label, ReadableState<String> inputState, String placeholder) {

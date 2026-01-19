@@ -3,9 +3,7 @@ package my_app.screens.categoriasScreen;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
-import megalodonte.props.TextProps;
-import megalodonte.props.TextVariant;
-import my_app.screens.components.Components;
+import megalodonte.props.InputProps;
 
 public class TestInput {
     public static void main(String[] args) {
@@ -23,7 +21,7 @@ public class TestInput {
         
         // Testar com Input com props
         Input inputComProps = new Input(nome, 
-            new megalodonte.InputProps().height(45).fontSize(18).placeHolder("Ex: Eletrônicos"));
+            new InputProps().height(45).fontSize(18).placeHolder("Ex: Eletrônicos"));
         
         System.out.println("Teste concluído");
     }

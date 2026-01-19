@@ -28,7 +28,7 @@ class CategoriaRepositoryTest {
         var dto = new CategoriaDto("cat1", System.currentTimeMillis());
         var salvo = repo.salvar(dto);
 
-        var encontrado = repo.buscarPorId(salvo.id);
+        var encontrado = repo.buscarById(salvo.id);
 
         assertNotNull(encontrado);
         assertEquals("cat1", encontrado.nome);
@@ -75,7 +75,7 @@ class CategoriaRepositoryTest {
         salvo.nome = "cat2";
         repo.atualizar(salvo);
 
-        var atualizado = repo.buscarPorId(salvo.id);
+        var atualizado = repo.buscarById(salvo.id);
         assertEquals("cat2", atualizado.nome);
     }
 
@@ -84,9 +84,9 @@ class CategoriaRepositoryTest {
         var dto = categoriaDtoFake();
         var salvo = repo.salvar(dto);
 
-        repo.excluir(salvo.id);
+        repo.excluirById(salvo.id);
 
-        assertNull(repo.buscarPorId(salvo.id));
+        assertNull(repo.buscarById(salvo.id));
     }
 
 

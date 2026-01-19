@@ -19,6 +19,7 @@ class ProdutoRepositoryTest {
     void setup() throws Exception {
         DB.reset();
         DB.getInstance("jdbc:sqlite::memory:");
+        //DB.getInstance();
         DBInitializer.init();
         repo = new ProdutoRepository();
     }

@@ -2,6 +2,7 @@ package my_app.db.repositories;
 
 import my_app.db.DB;
 import my_app.db.DBInitializer;
+import my_app.db.dto.FornecedorDto;
 import my_app.db.models.CategoriaModel;
 import my_app.db.models.FornecedorModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,15 +26,14 @@ class FornecedorRepositoryTest {
 
     @Test
     void salvar() throws SQLException {
-        var model = fornecedorFake();
-        model.nome = "Fornecedor Teste";
-        var salvo = repo.salvar(model);
+        var dto = fornecedorFake();
+        var model = repo.salvar(dto);
 
-        var encontrado = repo.buscarPorId(salvo.id);
+        var encontrado = repo.buscarPorId(model.id);
 
         assertNotNull(encontrado);
         assertEquals("Fornecedor Teste", encontrado.nome);
-        assertNotNull(salvo.id);
+        assertNotNull(encontrado.id);
     }
 
     @Test
@@ -45,13 +45,11 @@ class FornecedorRepositoryTest {
                 listaInicial.stream().anyMatch(p -> p.nome.equals("Fornecedor Padrão"))
         );
 
-        var model1 = fornecedorFake();
-        var model2 = fornecedorFake();
-        model1.nome = "forn1";
-        model2.nome = "forn2";
+        var dto1 = fornecedorFake( "forn1");
+        var dto2 = fornecedorFake( "forn2");
 
-        repo.salvar(model1);
-        repo.salvar(model2);
+        repo.salvar(dto1);
+        repo.salvar(dto2);
 
         var lista = repo.listar();
 
@@ -70,8 +68,8 @@ class FornecedorRepositoryTest {
 
     @Test
     void atualizar() throws SQLException {
-        var model = fornecedorFake();
-        repo.salvar(model);
+        var dto = fornecedorFake();
+        var model = repo.salvar(dto);
 
         model.nome = "forn2";
         repo.atualizar(model);
@@ -82,20 +80,32 @@ class FornecedorRepositoryTest {
 
     @Test
     void excluir() throws SQLException {
-        var model = fornecedorFake();
-        repo.salvar(model);
+        var dto = fornecedorFake();
+        var model = repo.salvar(dto);
 
         repo.excluir(model.id);
 
         assertNull(repo.buscarPorId(model.id));
     }
 
-    private FornecedorModel fornecedorFake() {
-        var model = new FornecedorModel();
-        model.id = null; // Deixar o banco definir o ID autoincrement
-        model.nome = "forn1";
-        model.cpfCnpj = "12345678901";
-        model.dataCriacao = System.currentTimeMillis();
-        return model;
+    private FornecedorDto fornecedorFake(String nome) {
+        var cpfCnpj = "12345678901";
+        var telefone = "5512345678910";
+        var email = "teste@teste.com";
+        var endereco = "Rua x, bairro tal, cidade lá";
+        var dataCriacao = System.currentTimeMillis();
+
+        return new FornecedorDto(nome, cpfCnpj, telefone, email,  endereco, dataCriacao);
+    }
+
+    private FornecedorDto fornecedorFake() {
+        var nome = "Fornecedor Teste";
+        var cpfCnpj = "12345678901";
+        var telefone = "5512345678910";
+        var email = "teste@teste.com";
+        var endereco = "Rua x, bairro tal, cidade lá";
+        var dataCriacao = System.currentTimeMillis();
+
+        return new FornecedorDto(nome, cpfCnpj, telefone, email,  endereco, dataCriacao);
     }
 }

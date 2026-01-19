@@ -16,32 +16,35 @@ import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
+import my_app.db.dto.CompraDto;
 import my_app.db.models.CategoriaModel;
 import my_app.db.models.FornecedorModel;
 import my_app.db.models.ProdutoModel;
 import my_app.db.repositories.CategoriaRepository;
+import my_app.db.repositories.ComprasRepository;
 import my_app.db.repositories.FornecedorRepository;
+import my_app.db.repositories.ProdutoRepository;
 import my_app.screens.components.Components;
 import my_app.utils.Utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class ComprasScreen implements ScreenComponent {
     private final Router router;
-    private CategoriaRepository categoriaRepository = new CategoriaRepository();
+    private ComprasRepository comprasRepository = new ComprasRepository();
 
     State<LocalDate> dataCompra = State.of(LocalDate.now());
     State<String> numeroNota = State.of("");
-    State<String> btnText = State.of("+ Adicionar");
 
-    ObservableList<CategoriaModel> categoriasObservable = FXCollections.observableArrayList();
+    State<Boolean> modoEdicao = State.of(false);
+
+    ComputedState<String> btnText = ComputedState.of(()-> modoEdicao.get()? "Atualizar" : "+ Adicionar", modoEdicao);
 
     State<String> codigo = State.of("");
     State<ProdutoModel> produtoEncontrado = State.of(null);
@@ -79,7 +82,6 @@ public class ComprasScreen implements ScreenComponent {
         return (qtdValue * precoCompraValue - precoDescontoValue);
     }, descontoEmDinheiro, qtd, pcCompra);
 
-    //State<String> totalLiquido = State.of("0");
     State<String> dataValidade = State.of("0");
 
     public final ObservableList<FornecedorModel> fornecedores = FXCollections.observableArrayList();
@@ -112,7 +114,7 @@ public class ComprasScreen implements ScreenComponent {
                });
 
             }catch (SQLException e){
-IO.println("Erro on fetch data: " + e.getMessage());
+                IO.println("Erro on fetch data: " + e.getMessage());
             }
 
         });
@@ -133,11 +135,35 @@ IO.println("Erro on fetch data: " + e.getMessage());
 
 
     Component form(){
+
+        Runnable searchProductOnFocusChange = ()->{
+            Async.Run(()->{
+                try {
+                    var produto =  new ProdutoRepository().buscarPorCodigoBarras(codigo.get());
+                    UI.runOnUi(()->{
+                        if(produto == null){
+                            IO.println("Produto não encontrado para o codigo: " + codigo.get());
+                            return;
+                        }
+                        IO.println("Produto encontrado");
+                        produtoEncontrado.set(produto);
+                        var valor = produtoEncontrado.get().precoCompra;
+                        BigDecimal semPonto = valor.setScale(0, RoundingMode.DOWN).multiply(BigDecimal.valueOf(100));
+                        pcCompra.set(String.valueOf(semPonto));
+                    });
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        };
+
         final var top = new Row(new RowProps().bottomVertically().spacingOf(10))
                 .r_child(Components.DatePickerColumn(dataCompra,"Data de compra 2", "dd/mm/yyyy"))
                 .r_child(Components.SelectColumn("Fornecedor", fornecedores, fornecedorSelected, f-> f.nome))
                 .r_child(Components.InputColumn("N NF/Pedido compra", numeroNota,"Ex: 12345678920"))
-                .r_child(Components.InputColumn("Código", codigo,"xxxxxxxx"));
+                .r_child(Components.InputColumnComFocusHandler("Código", codigo,"xxxxxxxx", searchProductOnFocusChange));
 
         final var valoresRow = new Row(new RowProps().bottomVertically().spacingOf(10))
                 .r_child(Components.TextWithValue("Valor total(bruto): ", totalBruto))
@@ -169,11 +195,34 @@ IO.println("Erro on fetch data: " + e.getMessage());
                 .c_child(new SpacerVertical(10))
                 .c_child(aPrazoForm())
                 .c_child(new SpacerVertical(10))
-                .c_child(valoresRow).getJavaFxNode());
+                .c_child(valoresRow)
+                .c_child(Components.ButtonCadastro(btnText, this::handleSaveOrUpdate))
+                .getJavaFxNode()
+        );
 
         return new Card(Component.CreateFromJavaFxNode(scroll));
     }
 
+    void handleSaveOrUpdate(){
+        Async.Run(()->{
+            if(modoEdicao.get()){
+                //TODO: implementar
+                return;
+            }
+            try {
+                var dto = new CompraDto(codigo.get(), pcCompra.get(),fornecedorSelected.get().id,
+                        Double.parseDouble(qtd.get()), descontoEmDinheiro.get(),
+                        tipoPagamentoSeleced.get(), observacao.get());
+               var compraSalva = comprasRepository.salvar(dto);
+               UI.runOnUi(()->{
+                   IO.println("compra foi salva!");
+               });
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+    }
 
     Component aPrazoForm() {
         var dtPrimeiraParcela = State.of(LocalDate.now().plusMonths(1).minusDays(1));
@@ -243,13 +292,13 @@ IO.println("Erro on fetch data: " + e.getMessage());
     }
 
     private void handleClickMenuNew() {
-        btnText.set("+ Adicionar");
+       modoEdicao.set(false);
         //nome.set("");
     }
 
     private void handleClickMenuEdit() {
         //  nome.set(categoriaSelecionada.get().nome);
-        btnText.set("+ Atualizar");
+       modoEdicao.set(true);
     }
 
     private void handleClickMenuDelete() {

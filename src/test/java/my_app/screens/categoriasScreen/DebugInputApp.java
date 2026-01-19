@@ -7,8 +7,8 @@ import javafx.stage.Stage;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
+import megalodonte.props.InputProps;
 import megalodonte.props.TextProps;
-import megalodonte.props.TextVariant;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 
@@ -20,7 +20,7 @@ public class DebugInputApp extends Application {
         
         // Input igual ao do CategoriaScreen
         Input input = new Input(nome, 
-            new megalodonte.InputProps().height(45).fontSize(18).placeHolder("Ex: Eletrônicos"));
+            new InputProps().height(45).fontSize(18).placeHolder("Ex: Eletrônicos"));
         
         Button button = new Button("+ Adicionar");
         button.setOnAction(e -> {
