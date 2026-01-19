@@ -1,5 +1,8 @@
 package my_app.screens.components;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import megalodonte.*;
 import megalodonte.components.*;
@@ -33,7 +36,19 @@ public class Components {
     private static final NumberFormat BRL =
             NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
+    public enum AlertType  {ERRO, SUCESSO};
 
+    public static void ShowAlertError(String message){
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle(message);
+
+        ButtonType okButton = new ButtonType("Fechar", ButtonBar.ButtonData.OK_DONE);
+
+        alert.getButtonTypes().add(okButton);
+        alert.setOnCloseRequest(event -> alert.close());
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
     //TODO: adicionar campo editavel:false
     public static Component DatePickerColumn(State<LocalDate> localDateState, String label, String placeholder) {
@@ -90,11 +105,10 @@ public class Components {
     }
 
 
-
     public static <T> Component SelectColumn(String label, List<T> list, State<T> stateSelected, Function<T, String> display){
         return new Column()
                 .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
-                .c_child(new Select<T>(new SelectProps().height(40))
+                .c_child(new Select<T>(new SelectProps().height(35))
                         .items(list)
                         .value(stateSelected)
                         .displayText(display)

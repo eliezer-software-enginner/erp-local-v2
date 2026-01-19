@@ -1,30 +1,22 @@
 package my_app.screens.produtoScreen;
 
-import javafx.scene.paint.Color;
-import javafx.scene.layout.Priority;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ScrollPane;
 import megalodonte.*;
+import megalodonte.async.Async;
+import megalodonte.base.UI;
 import megalodonte.components.*;
 import megalodonte.components.Button;
 import megalodonte.components.Component;
-import megalodonte.components.Image;
-import megalodonte.components.inputs.Input;
-import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.props.*;
 import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.styles.TextStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
+import megalodonte.utils.related.TextVariant;
 import my_app.screens.components.Components;
-import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.entypo.Entypo;
-import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import static my_app.screens.produtoScreen.ProdutoComponents.*;
 
@@ -39,13 +31,52 @@ public class ProdutoScreen {
     }
 
     public Component render (){
-        return new Column(new ColumnProps().paddingAll(25), new ColumnStyler().bgColor(theme.colors().background()))
+        var scroll = new ScrollPane();
+        scroll.setPrefHeight(700);
+        scroll.setContent(createMainContent().getJavaFxNode());
+
+        return new Column(new ColumnProps().paddingAll(5), new ColumnStyler().bgColor(theme.colors().background()))
                 .c_child(Components.commonCustomMenus(this::handleClickNew, this::handleClickEdit, this::handleClickDelete))
                 .c_child(new SpacerVertical(20))
                 .c_child(createHeaderSection())
                 .c_child(new SpacerVertical(30))
-                .c_child(createMainContent());
+                .c_child(Component.CreateFromJavaFxNode(scroll));
     }
+
+    private Component createHeaderSection() {
+        return new Card(
+                new Column(new ColumnProps().paddingAll(5))
+                        .c_child(Components.FormTitle("Cadastro de Produtos"))
+                        .c_child(new SpacerVertical(10))
+                        .c_child(new Text("Gerencie o catálogo de produtos do seu estabelecimento",
+                                new TextProps().variant(TextVariant.BODY), new TextStyler().color("#6b7280"))),
+                new CardProps()
+                        .padding(0)
+                        .radius(12)
+        );
+    }
+
+    private Component createMainContent() {
+        return new Column(new ColumnProps().spacingOf(30))
+                .c_child(createFormSection())
+                .c_child(createTableSection());
+    }
+
+    private Component createFormSection() {
+        return new Card(
+                new Column(new ColumnProps().paddingAll(5))
+                        .c_child(new Text("Dados do Produto",
+                                new TextProps().variant(TextVariant.BODY).bold()))
+                        .c_child(new SpacerVertical(20))
+                        .c_child(ContainerLeft(vm))
+                        .c_child(new SpacerVertical(25))
+                        .c_child(createActionButtons()),
+                new CardProps()
+                        .padding(0)
+                        .radius(12)
+        );
+    }
+
 
     void handleClickNew(){
         limparFormulario();
@@ -75,7 +106,6 @@ public class ProdutoScreen {
         }
         
         try {
-
                 vm.excluir();
                 vm.refreshProdutos();
                 limparFormulario();
@@ -84,42 +114,6 @@ public class ProdutoScreen {
         } catch (Exception e) {
             IO.println("Erro ao excluir produto: " + e.getMessage());
         }
-    }
-
-
-    private Component createHeaderSection() {
-        return new Card(
-                new Column(new ColumnProps().paddingAll(25))
-                        .c_child(new Text("Cadastro de Produtos", 
-                                new TextProps().fontSize(28).bold()))
-                        .c_child(new SpacerVertical(10))
-                        .c_child(new Text("Gerencie o catálogo de produtos do seu estabelecimento", 
-                                new TextProps().fontSize(16), new TextStyler().color("#6b7280"))),
-                new CardProps()
-                        .padding(0)
-                        .radius(12)
-        );
-    }
-
-    private Component createMainContent() {
-        return new Row(new RowProps().spacingOf(30))
-                .r_child(createFormSection())
-                .r_child(createTableSection());
-    }
-
-    private Component createFormSection() {
-        return new Card(
-                new Column(new ColumnProps().paddingAll(25))
-                        .c_child(new Text("Dados do Produto", 
-                                new TextProps().fontSize(20).bold()))
-                        .c_child(new SpacerVertical(20))
-                        .c_child(ContainerLeft(vm))
-                        .c_child(new SpacerVertical(25))
-                        .c_child(createActionButtons()),
-                new CardProps()
-                        .padding(0)
-                        .radius(12)
-        );
     }
 
     private Component createTableSection() {
@@ -144,18 +138,18 @@ public class ProdutoScreen {
 
     private Component createActionButtons() {
         return new Row(new RowProps().spacingOf(10))
-                .r_child(new Button("Salvar", 
+                .r_child(new Button(vm.btnText,
                         new ButtonProps()
                                 .fillWidth()
-                                .height(45)
+                                .height(35)
                                 .bgColor("#10b981")
                                 .textColor("white")
                                 .fontSize(16)
-                                .onClick(() -> handleSalvar())))
+                                .onClick(this::handleSalvarOrUpdate)))
                 .r_child(new Button("Limpar", 
                         new ButtonProps()
                                 .fillWidth()
-                                .height(45)
+                                .height(35)
                                 .bgColor("#6b7280")
                                 .textColor("white")
                                 .fontSize(16)
@@ -163,15 +157,23 @@ public class ProdutoScreen {
                 );
     }
 
-    private void handleSalvar() {
-        try{
-            vm.salvar();
-            vm.refreshProdutos();
-            limparFormulario();
-            IO.println("Produto salvo com sucesso");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    private void handleSalvarOrUpdate() {
+        Async.Run(()->{
+            try{
+                vm.salvar();
+                vm.refreshProdutos();
+
+                UI.runOnUi(()->{
+                    IO.println("Produto salvo com sucesso");
+                    limparFormulario();
+                });
+
+            }catch (Exception e){
+                e.printStackTrace();
+                UI.runOnUi(()-> Components.ShowAlertError(e.getMessage()));
+            }
+        });
+
     }
 
 
@@ -186,8 +188,6 @@ public class ProdutoScreen {
         vm.descricao.set("");
         vm.precoCompra.set("0");
         vm.precoVenda.set("0");
-        vm.precoCompraRaw.set("0");
-        vm.precoVendaRaw.set("0");
         vm.margem.set("0");
         vm.lucro.set("0");
         vm.comissao.set("");

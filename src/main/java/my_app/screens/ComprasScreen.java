@@ -150,6 +150,7 @@ public class ComprasScreen implements ScreenComponent {
                         var valor = produtoEncontrado.get().precoCompra;
                         BigDecimal semPonto = valor.setScale(0, RoundingMode.DOWN).multiply(BigDecimal.valueOf(100));
                         pcCompra.set(String.valueOf(semPonto));
+                       // pcCompra.set(valor);
                     });
 
                 } catch (SQLException e) {

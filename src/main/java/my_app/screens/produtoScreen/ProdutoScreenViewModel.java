@@ -2,6 +2,7 @@ package my_app.screens.produtoScreen;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import megalodonte.ComputedState;
 import megalodonte.State;
 import my_app.db.models.CategoriaModel;
 import my_app.db.models.ProdutoModel;
@@ -21,13 +22,9 @@ public class ProdutoScreenViewModel extends ViewModel {
     private final ProdutoRepository produtoRepository = new ProdutoRepository();
     public final ObservableList<ProdutoModel> produtos = FXCollections.observableArrayList();
     public final State<String> codigoBarras = new State<>("123456789");
-    public final State<String> descricao = new State<>("");
+    public final State<String> descricao = new State<>("teste");
     public final State<String> precoCompra = new State<>("0");
     public final State<String> precoVenda = new State<>("0");
-    
-    // Raw values in cents (para cálculos)
-    public final State<String> precoCompraRaw = new State<>("0");
-    public final State<String> precoVendaRaw = new State<>("0");
 
     // depois vira ComputedState
     public final State<String> margem = new State<>("0");
@@ -53,13 +50,18 @@ public class ProdutoScreenViewModel extends ViewModel {
 
     public final State<String> imagem = new State<>("/assets/produto-generico.png");
 
+    public final State<Boolean> modoEdicao = State.of(false);
+    public final ComputedState<String> btnText = ComputedState.of(()-> modoEdicao.get()? "Atualizar": "+ Adicionar", modoEdicao);
+
     public ProdutoModel toProduto() {
         var p = new ProdutoModel();
         p.codigoBarras = codigoBarras.get();
         p.descricao = descricao.get();
         // Converte de centavos para reais
-        p.precoCompra = new BigDecimal(precoCompraRaw.get()).movePointLeft(2);
-        p.precoVenda = new BigDecimal(precoVendaRaw.get()).movePointLeft(2);
+       // p.precoCompra = new BigDecimal(precoCompraRaw.get()).movePointLeft(2);
+        //p.precoVenda = new BigDecimal(precoVendaRaw.get()).movePointLeft(2);
+        p.precoCompra = new BigDecimal(precoCompra.get()).movePointLeft(2);
+        p.precoVenda = new BigDecimal(precoVenda.get()).movePointLeft(2);
         p.unidade = unidadeSelected.get();
         p.categoriaId = 1L;   // temporário
         p.fornecedorId = 1L;  // temporário
@@ -71,12 +73,11 @@ public class ProdutoScreenViewModel extends ViewModel {
 
     public void carregar(ProdutoModel p) {
         descricao.set(p.descricao);
-        precoCompra.set(p.precoCompra.toString());
-        precoVenda.set(p.precoVenda.toString());
+        //convertando pra centavos
+        precoCompra.set(p.precoCompra.multiply(new BigDecimal("100")).toString());
+        precoVenda.set(p.precoVenda.multiply(new BigDecimal("100")).toString());
         
         // Converte reais para centavos para o raw state
-        precoCompraRaw.set(p.precoCompra.multiply(new BigDecimal("100")).toString());
-        precoVendaRaw.set(p.precoVenda.multiply(new BigDecimal("100")).toString());
         unidadeSelected.set(p.unidade);
         categoriaSelected.set(String.valueOf(p.categoriaId));
         fornecedorSelected.set(String.valueOf(p.fornecedorId));
@@ -86,6 +87,11 @@ public class ProdutoScreenViewModel extends ViewModel {
     }
 
     public void salvar() throws Exception {
+        if(modoEdicao.get()){
+            //TODO: implementar
+            return;
+        }
+
         service.salvar(toProduto());
     }
 

@@ -6,6 +6,7 @@ import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
 import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.props.*;
+import megalodonte.styles.RowStyler;
 import my_app.db.models.ProdutoModel;
 import my_app.screens.components.Components;
 import org.kordamp.ikonli.Ikon;
@@ -28,27 +29,28 @@ public class ProdutoComponents {
                 .c_child(
                         new Row(rowProps)
                                 .r_child(new Row(new RowProps().bottomVertically())
-                                        .r_child(InputColumn("SKU(Código de barras)", vm.codigoBarras))
-                                        .r_child(new Button("Gerar", new ButtonProps().height(40)))
+                                        .r_child(Components.InputColumn("SKU(Código de barras)", vm.codigoBarras,""))
+                                        .r_child(new Button("Gerar", new ButtonProps().height(37)
+                                                .textColor("#FFF")))
                                 )
-                                .r_child(InputColumn("Descrição curta", vm.descricao))
-                                .r_child(Components.SelectColumn("Unidade", vm.unidades ,vm.unidadeSelected, u->u))
-                                .r_child(InputColumn("Marca", vm.marca))
+                                .r_child(Components.InputColumn("Descrição curta", vm.descricao,""))
+                                .r_child(Components.SelectColumn("Unidade", vm.unidades ,vm.unidadeSelected, it->it))
+                                .r_child(Components.InputColumn("Marca", vm.marca,""))
                 ).c_child(new Row(rowProps)
                         .r_child(Components.InputColumnCurrency("Preço de compra", vm.precoCompra))
-                        .r_child(InputColumn("Margem %", vm.margem))
-                        .r_child(InputColumn("Lucro", vm.lucro,Entypo.CREDIT))
+                        .r_child(Components.InputColumn("Margem %", vm.margem,""))
+//                        .r_child(Components.InputColumn("Lucro", vm.lucro,Entypo.CREDIT))
                         .r_child(Components.InputColumnCurrency("Preço de venda", vm.precoVenda))
                 ).c_child(new Row(rowProps)
-                        .r_child(SelectColumn("Categoria",vm.categorias, vm.categoriaSelected))
-                        .r_child(Components.SelectColumn("Fornecedor", vm.fornecedores, vm.fornecedorSelected, f->f))
-                        .r_child(InputColumn("Garantia", vm.garantia))
-                        .r_child(InputColumn("Validade", vm.validade))
-                        .r_child(InputColumn("Comissão", vm.comissao))
+                        .r_child(Components.SelectColumn("Categoria",vm.categorias.get(), vm.categoriaSelected, it->it))
+                        .r_child(Components.SelectColumn("Fornecedor", vm.fornecedores, vm.fornecedorSelected, it->it))
+                        .r_child(Components.InputColumn("Garantia", vm.garantia,""))
+                        .r_child(Components.InputColumn("Validade", vm.validade,""))
+                        .r_child(Components.InputColumn("Comissão", vm.comissao,""))
                 )
                 .c_child(new Row(rowProps)
-                        .r_child(TextAreaColumn("Observações", vm.observacoes))
-                        .r_child(InputColumn("Estoque", vm.estoque))//fornecedor padrão
+                        .r_child(Components.TextAreaColumn("Observações", vm.observacoes,""))
+                        .r_child(Components.InputColumn("Estoque", vm.estoque,""))//fornecedor padrão
                 );
     }
     public static Component ContainerRight(){
@@ -63,40 +65,6 @@ public class ProdutoComponents {
                         .c_child(new Button("Inserir imagem", new ButtonProps().fontSize(20).bgColor("#A6B1E1"))),
                 new CardProps().height(300).padding(20)
         );
-    }
-
-    public static Component TextAreaColumn(String label, State<String> inputState){
-        return new Column()
-                .c_child(new Text(label, new TextProps().fontSize(22)))
-                .c_child(new TextAreaInput(inputState,new InputProps().fontSize(20).height(140)));
-    }
-
-
-
-    public static Component SelectColumn(String label, State<List<String>> listState, State<String> stateSelected){
-        return new Column()
-                .c_child(new Text(label, new TextProps().fontSize(25)))
-                .c_child(new Select<String>(new SelectProps().height(40))
-                        .items(listState.get())
-                        .value(stateSelected));
-    }
-
-
-
-    public static Component InputColumn(String label, State<String> inputState, Ikon icon){
-        var fonticon = FontIcon.of(icon, 15, Color.web("green"));
-        var inputProps = new InputProps().fontSize(22).height(40);
-        var input = new Input(inputState, inputProps);
-
-        return new Column()
-                .c_child(new Text(label, new TextProps().fontSize(22)))
-                .c_child(input.left(fonticon));
-    }
-
-    public static Component InputColumn(String label, State<String> inputState){
-        return new Column()
-                .c_child(new Text(label, new TextProps().fontSize(22)))
-                .c_child(new Input(inputState,new InputProps().fontSize(20).height(40)));
     }
 
     public static Component ProdutosTable(ObservableList<ProdutoModel> produtos) {
@@ -122,7 +90,7 @@ public class ProdutoComponents {
         precoCompraCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(
                     data.getValue().precoCompra != null ? 
-                    NumberFormat.getCurrencyInstance(new Locale("pt", "BR")).format(data.getValue().precoCompra) : 
+                    NumberFormat.getCurrencyInstance(new Locale("pt", "BR")).format(data.getValue().precoCompra) :
                     "R$ 0,00"
                 )
         );
@@ -133,7 +101,9 @@ public class ProdutoComponents {
         precoVendaCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(
                     data.getValue().precoVenda != null ? 
-                    NumberFormat.getCurrencyInstance(new Locale("pt", "BR")).format(data.getValue().precoVenda) : 
+                    NumberFormat.getCurrencyInstance(new Locale("pt", "BR"))
+                            .format(
+                                    data.getValue().precoVenda) :
                     "R$ 0,00"
                 )
         );

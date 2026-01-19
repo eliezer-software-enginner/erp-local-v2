@@ -1,10 +1,9 @@
-package my_app.screens.HomeScreen;
+package my_app.screens;
 
 import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.props.ColumnProps;
 import megalodonte.props.GridFlowProps;
@@ -12,6 +11,7 @@ import megalodonte.props.ImageProps;
 import megalodonte.props.TextProps;
 import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
+import megalodonte.utils.related.TextVariant;
 
 import java.util.List;
 
@@ -34,10 +34,18 @@ public class HomeScreen {
     private Node menuBar(){
         var menuBar = new MenuBar();
         var menu = new Menu("Preferências");
+        var menuCadastros = new Menu("Cadastros");
+
+        MenuItem menuItemCadFornecedores = new MenuItem("Fornecedores",null);
+        menuItemCadFornecedores.setOnAction(ev->  router.spawnWindow("fornecedores"));
+        MenuItem menuItemClientes = new MenuItem("Clientes",null);
+        menuItemClientes.setOnAction(ev-> router.spawnWindow("clientes"));
+
+        menuCadastros.getItems().addAll(menuItemCadFornecedores, menuItemClientes);
        // var itemPreferences = new MenuItem("Preferências");
        // menu.getItems().add(itemPreferences);
 
-        menuBar.getMenus().add(menu);
+        menuBar.getMenus().addAll(menu, menuCadastros);
         return menuBar;
     }
 
@@ -46,7 +54,7 @@ public class HomeScreen {
     List<CardItem> cardItemList = List.of(
             new CardItem("/assets/venda.png", "Venda (F3)","Tela de vendas","cad-produto"),
             new CardItem("/assets/ordem_servico.png", "Ordem de serviço (F5)","Tela de vendas",null),
-            new CardItem("/assets/produtos.png", "Produtos (F3)","Tela de produtos","cad-produtos"),
+            new CardItem("/assets/produtos.png", "Produtos (F3)","Gerencie seus produtos","produtos"),
             new CardItem("/assets/clientes.png", "Ordem de serviço (F5)","Tela de vendas",null),
             new CardItem("/assets/contas_a_receber.png", "Venda (F3)","Tela de vendas",null),
             new CardItem("/assets/pdv.png", "Ordem de serviço (F5)","Tela de vendas",null),
@@ -56,9 +64,14 @@ public class HomeScreen {
             new CardItem("/assets/relatorio.png", "Ordem de serviço (F5)","Tela de vendas",null)
     );
     Component CardColumn(CardItem cardItem){
-        return new Column(new ColumnProps().centerHorizontally().onClick(()-> router.spawnWindow(cardItem.destination)), new ColumnStyler().bgColor("#fff").borderColor("black").borderWidth(1))
-                .c_child(new Image(cardItem.img, new ImageProps().size(100)))
-                .c_child(new Text(cardItem.title, new TextProps().fontSize(18).bold()))
-                .c_child(new Text(cardItem.desc,  new TextProps().fontSize(16)));
+       return new Clickable(
+               new Card(
+                new Column(new ColumnProps().centerHorizontally(), new ColumnStyler().bgColor("#fff"))
+                        .c_child(new Image(cardItem.img, new ImageProps().size(60)))
+                        .c_child(new Text(cardItem.title, new TextProps().variant(TextVariant.BODY).bold()))
+                        .c_child(new Text(cardItem.desc,  new TextProps().variant(TextVariant.SMALL)))
+                ),
+               ()-> router.spawnWindow(cardItem.destination));
+
     }
 }
