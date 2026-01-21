@@ -131,9 +131,8 @@ public class ProdutoScreen {
                         Components.ShowPopup(router, "Produto excluído com sucesso");
                     });
 
-
                 } catch (Exception e) {
-                    IO.println("Erro ao excluir produto: " + e.getMessage());
+                    Components.ShowAlertError("Erro ao excluir produto: " + e.getMessage());
                 }
             });
         });
@@ -189,7 +188,7 @@ public class ProdutoScreen {
                 vm.refreshProdutos();
 
                 UI.runOnUi(() -> {
-                    IO.println("Produto salvo com sucesso");
+                    Components.ShowPopup(router, "Produto cadastrado com sucesso");
                     limparFormulario();
                 });
 

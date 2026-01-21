@@ -24,8 +24,8 @@ public class ProdutoScreenViewModel extends ViewModel {
     private final ProdutoService service = new ProdutoService();
     private final ProdutoRepository produtoRepository = new ProdutoRepository();
     public final ObservableList<ProdutoModel> produtos = FXCollections.observableArrayList();
-    public final State<String> codigoBarras = new State<>("123456789");
-    public final State<String> descricao = new State<>("teste");
+    public final State<String> codigoBarras = new State<>("");
+    public final State<String> descricao = new State<>("");
     public final State<String> precoCompra = new State<>("0");
     public final State<String> precoVenda = new State<>("0");
 
@@ -34,8 +34,8 @@ public class ProdutoScreenViewModel extends ViewModel {
     public final State<String> lucro = new State<>("0");
 
     public final State<String> comissao = new State<>("");
-    public final State<String> garantia = new State<>("2 meses");
-    public final State<String> marca = new State<>("nike");
+    public final State<String> garantia = new State<>("");
+    public final State<String> marca = new State<>("");
 
     public final List<String> unidades = List.of("UN","KG","ml");
     public final State<String> unidadeSelected = new State<>("UN");
@@ -47,8 +47,8 @@ public class ProdutoScreenViewModel extends ViewModel {
     public final List<String> fornecedores = List.of("Fornecedor Padrão");
     public final State<String> fornecedorSelected = new State<>("Fornecedor Padrão");
 
-    public final State<String> observacoes = new State<>("nada ...");
-    public final State<String> estoque = new State<>("10");
+    public final State<String> observacoes = new State<>("");
+    public final State<String> estoque = new State<>("");
     public final State<String> validade = new State<>("");
 
     public final State<String> imagem = new State<>("/assets/produto-generico.png");

@@ -22,13 +22,20 @@ public class ProdutoComponents {
 
     public static Component ContainerLeft(ProdutoScreenViewModel vm) {
         var rowProps = new RowProps().spacingOf(10);
+
+        Runnable handleGerarCodigoBarras = ()->{
+           final var codigo = Utils.gerarCodigoBarrasEAN13();
+           vm.codigoBarras.set(codigo);
+        };
+
         return new Column(new ColumnProps().spacingOf(20))
                 .c_child(
                         new Row(rowProps)
                                 .r_child(new Row(new RowProps().bottomVertically())
                                         .r_child(Components.InputColumn("SKU(Código de barras)", vm.codigoBarras, ""))
                                         .r_child(new Button("Gerar", new ButtonProps().height(37)
-                                                .textColor("#FFF")))
+                                                .textColor("#FFF")
+                                                .onClick(handleGerarCodigoBarras)))
                                 )
                                 .r_child(Components.InputColumn("Descrição curta", vm.descricao, ""))
                                 .r_child(Components.SelectColumn("Unidade", vm.unidades, vm.unidadeSelected, it -> it))
