@@ -71,6 +71,28 @@ public class ProdutoModel implements ModelBase<ProdutoDto> {
 
     @Override
     public ProdutoModel fromIdAndDto(Long id, ProdutoDto dto) {
-        return null;
+        var p = new ProdutoModel();
+        p.id = id;
+        p.codigoBarras = dto.codigoBarras;
+        p.descricao = dto.descricao;
+        p.precoCompra = dto.precoCompra;
+        p.precoVenda = dto.precoVenda;
+        p.unidade = dto.unidade;
+        p.marca = dto.marca;
+        p.categoriaId = dto.categoriaId;
+        p.fornecedorId = dto.fornecedorId;
+        p.estoque = dto.estoque;
+        p.observacoes = dto.observacoes;
+        p.imagem = dto.imagem;
+        p.validade = dto.validade;
+        p.comissao = dto.comissao;
+        p.garantia = dto.garantia;
+        
+        // campo derivado (runtime)
+        if (p.precoCompra != null && p.precoVenda != null) {
+            p.lucro = p.precoVenda.subtract(p.precoCompra);
+        }
+        
+        return p;
     }
 }

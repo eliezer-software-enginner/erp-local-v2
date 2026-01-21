@@ -4,12 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import megalodonte.ComputedState;
 import megalodonte.State;
+import megalodonte.async.Async;
+import megalodonte.base.UI;
+import megalodonte.router.Router;
 import my_app.db.dto.ProdutoDto;
 import my_app.db.models.CategoriaModel;
+import my_app.db.models.FornecedorModel;
 import my_app.db.models.ProdutoModel;
 import my_app.db.repositories.CategoriaRepository;
+import my_app.db.repositories.FornecedorRepository;
 import my_app.db.repositories.ProdutoRepository;
 import my_app.lifecycle.viewmodel.component.ViewModel;
+import my_app.screens.components.Components;
 import my_app.services.ProdutoService;
 import my_app.utils.Utils;
 
@@ -37,15 +43,15 @@ public class ProdutoScreenViewModel extends ViewModel {
     public final State<String> garantia = new State<>("");
     public final State<String> marca = new State<>("");
 
-    public final List<String> unidades = List.of("UN","KG","ml");
+    public final List<String> unidades = List.of("UN", "KG", "ml");
     public final State<String> unidadeSelected = new State<>("UN");
 
-    public final State<List<String>> categorias = new State<>(List.of("Padrão"));
-    public final State<String> categoriaSelected = new State<>("Padrão");
+    public final State<List<CategoriaModel>> categorias = new State<>(List.of());
+    public final State<CategoriaModel> categoriaSelected = new State<>(null);
 
     //TODO: BUSCAR FORNECEDORES DO BANCO
-    public final List<String> fornecedores = List.of("Fornecedor Padrão");
-    public final State<String> fornecedorSelected = new State<>("Fornecedor Padrão");
+    public final State<List<FornecedorModel>> fornecedores = State.of(List.of());
+    public final State<FornecedorModel> fornecedorSelected = new State<>(null);
 
     public final State<String> observacoes = new State<>("");
     public final State<String> estoque = new State<>("");
@@ -54,7 +60,7 @@ public class ProdutoScreenViewModel extends ViewModel {
     public final State<String> imagem = new State<>("/assets/produto-generico.png");
 
     public final State<Boolean> modoEdicao = State.of(false);
-    public final ComputedState<String> btnText = ComputedState.of(()-> modoEdicao.get()? "Atualizar": "+ Adicionar", modoEdicao);
+    public final ComputedState<String> btnText = ComputedState.of(() -> modoEdicao.get() ? "Atualizar" : "+ Adicionar", modoEdicao);
     public final State<ProdutoModel> produtoSelected = State.of(null);
 
     public ProdutoDto toProduto() {
@@ -66,8 +72,8 @@ public class ProdutoScreenViewModel extends ViewModel {
         p.precoCompra = Utils.deCentavosParaReal(precoCompra.get());
         p.precoVenda = Utils.deCentavosParaReal(precoVenda.get());
         p.unidade = unidadeSelected.get();
-        p.categoriaId = 1L;   // temporário
-        p.fornecedorId = 1L;  // temporário
+        p.categoriaId = categoriaSelected.get() == null ? 1L : categoriaSelected.get().id;
+        p.fornecedorId = fornecedorSelected.get() == null ? 1L : fornecedorSelected.get().id;
         p.estoque = Utils.deCentavosParaReal(estoque.get());
         p.observacoes = observacoes.get();
         p.imagem = imagem.get();
@@ -75,85 +81,86 @@ public class ProdutoScreenViewModel extends ViewModel {
         return p;
     }
 
-    public void carregar(ProdutoModel p) {
-        codigoBarras.set(p.codigoBarras);
-        descricao.set(p.descricao);
-        //convertando pra centavos
-        precoCompra.set(Utils.deRealParaCentavos(p.precoCompra));
-        precoVenda.set(Utils.deRealParaCentavos(p.precoVenda));
-        
-        // Converte reais para centavos para o raw state
-        unidadeSelected.set(p.unidade);
-        //TODO: rever carregamento da categoria
-        //categoriaSelected.set(p.categoria.id.toString());
-        fornecedorSelected.set(String.valueOf(p.fornecedorId));
-        estoque.set(String.valueOf(p.estoque));
-        observacoes.set(p.observacoes);
-        imagem.set(p.imagem);
-        marca.set(p.marca);
-    }
-
-    public void salvar() throws Exception {
-        if(modoEdicao.get()){
+    public void salvarOuAtualizar(Router router) {
+        if (modoEdicao.get()) {
             //TODO: implementar
             return;
         }
 
-        service.salvar(toProduto());
+        var dto = toProduto();
+        Async.Run(() -> {
+            try {
+                var produtoModel = service.salvar(dto);
+                produtos.add(produtoModel);
+                UI.runOnUi(() -> {
+                    Components.ShowPopup(router, "Produto cadastrado com sucesso");
+                    limparFormulario();
+                });
+            } catch (Exception e) {
+                UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
+            }
+        });
+
     }
 
-    public void atualizar() throws Exception {
+
+    public void limparFormulario() {
+        codigoBarras.set("");
+        descricao.set("");
+        precoCompra.set("0");
+        precoVenda.set("0");
+        margem.set("0");
+        lucro.set("0");
+        comissao.set("");
+        garantia.set("");
+        marca.set("");
+        unidadeSelected.set("UN");
+        estoque.set("0");
+        validade.set("");
+        observacoes.set("");
+        imagem.set("/assets/produto-generico.png");
+    }
+
+    public void atualizar(Router router) {
         var dto = toProduto();
-        service.atualizar(new ProdutoModel().fromIdAndDto(produtoSelected.get().id, dto));
+
+        Async.Run(() -> {
+            try {
+                service.atualizar(new ProdutoModel().fromIdAndDto(produtoSelected.get().id, dto));
+                UI.runOnUi(() -> Components.ShowPopup(router, "Produto atualizado com sucesso!"));
+            } catch (Exception e) {
+                UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
+            }
+        });
+
     }
 
     public void excluir() throws Exception {
-        service.excluir(produtoSelected.get().id);
+        Long id = produtoSelected.get().id;
+        service.excluir(id);
+        produtos.removeIf(it -> it.id.equals(id));
     }
 
-    public void buscar() throws Exception {
-        var p = service.buscar(codigoBarras.get());
-        if (p != null) carregar(p);
-    }
+    public void loadInicial() {
+        Async.Run(() -> {
+            try {
+                var produtos = produtoRepository.listar();
+                var fornecedores = new FornecedorRepository().listar();
+                var categorias = new CategoriaRepository().listar();
 
-    public ProdutoScreenViewModel() {
-        onInit();
-    }
+                UI.runOnUi(() -> {
+                    this.produtos.setAll(produtos);
 
-    protected void onInit() {
-        loadCategorias();
-        loadProdutos();
-    }
+                    this.categorias.set(categorias);
+                    this.categoriaSelected.set(categorias.isEmpty() ? null : categorias.getFirst());
 
-    private void loadCategorias() {
-        try {
-            CategoriaRepository repo = new CategoriaRepository();
-            List<CategoriaModel> categoriasModel = repo.listar();
-            List<String> nomesCategorias = categoriasModel.stream()
-                    .map(c -> c.nome)
-                    .toList();
-            
-            if (!nomesCategorias.isEmpty()) {
-                categorias.set(nomesCategorias);
-                categoriaSelected.set(nomesCategorias.get(0)); // Seleciona primeira
+                    this.fornecedores.set(fornecedores);
+                    this.fornecedorSelected.set(fornecedores.isEmpty() ? null : fornecedores.getFirst());
+                });
+            } catch (Exception e) {
+                UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
             }
-        } catch (Exception e) {
-            System.err.println("Erro ao carregar categorias: " + e.getMessage());
-            // Mantém lista padrão em caso de erro
-        }
-    }
-
-    private void loadProdutos() {
-        try {
-            produtos.clear();
-            produtos.addAll(produtoRepository.listar());
-        } catch (Exception e) {
-            System.err.println("Erro ao carregar produtos: " + e.getMessage());
-        }
-    }
-
-    public void refreshProdutos() {
-        loadProdutos();
+        });
     }
 }
 

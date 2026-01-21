@@ -90,8 +90,15 @@ public class Utils {
      * @param centavos
      * @return
      */
-    public static BigDecimal deCentavosParaReal(String centavos){
-        return new BigDecimal(centavos).movePointLeft(2);
+public static BigDecimal deCentavosParaReal(String centavos){
+        if (centavos == null || centavos.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        try {
+            return new BigDecimal(centavos).movePointLeft(2);
+        } catch (NumberFormatException e) {
+            return BigDecimal.ZERO;
+        }
     }
 
 

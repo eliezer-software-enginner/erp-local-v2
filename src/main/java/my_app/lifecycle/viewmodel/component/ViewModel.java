@@ -1,6 +1,9 @@
 package my_app.lifecycle.viewmodel.component;
 
 public abstract class ViewModel {
+    public ViewModel(){
+        onInit();
+    }
 
     protected void onInit() {
         // ciclo de vida futuro

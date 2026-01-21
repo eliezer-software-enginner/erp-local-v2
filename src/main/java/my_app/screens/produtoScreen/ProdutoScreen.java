@@ -20,12 +20,14 @@ import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
 import my_app.db.models.ProdutoModel;
+import my_app.db.repositories.CategoriaRepository;
+import my_app.db.repositories.FornecedorRepository;
 import my_app.screens.components.Components;
 
 
 import static my_app.screens.produtoScreen.ProdutoComponents.*;
 
-public class ProdutoScreen {
+public class ProdutoScreen implements ScreenComponent {
     private final Router router;
     private final ProdutoScreenViewModel vm;
     private final Theme theme = ThemeManager.theme();
@@ -33,6 +35,11 @@ public class ProdutoScreen {
     public ProdutoScreen(Router router) {
         this.router = router;
         this.vm = new ProdutoScreenViewModel();
+    }
+
+    @Override
+    public void onMount() {
+        vm.loadInicial();
     }
 
     public Component render() {
@@ -69,16 +76,16 @@ public class ProdutoScreen {
     }
 
     private Component createFormSection() {
-        Runnable handleChangeImage = ()->{
-           var stage = this.router.getCurrentActiveStage();
+        Runnable handleChangeImage = () -> {
+            var stage = this.router.getCurrentActiveStage();
 
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Escolha a imagem");
-            fileChooser.getExtensionFilters().add( new FileChooser.ExtensionFilter("imagens",
-                    "*.png","*.jpg", "*.jpeg"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("imagens",
+                    "*.png", "*.jpg", "*.jpeg"));
             var file = fileChooser.showOpenDialog(stage);
 
-            if(file != null){
+            if (file != null) {
                 IO.print("caminho: " + file.toPath().toUri());
                 vm.imagem.set(file.toPath().toUri().toString());
             }
@@ -102,13 +109,13 @@ public class ProdutoScreen {
 
 
     void handleClickNew() {
-        limparFormulario();
+        vm.limparFormulario();
         IO.println("Formulário limpo para novo produto");
     }
 
     void handleClickEdit() {
         var produtoSelected = vm.produtoSelected.get();
-        if(produtoSelected==null)return;
+        if (produtoSelected == null) return;
 
         vm.modoEdicao.set(true);
         if (vm.modoEdicao.get()) {
@@ -118,16 +125,16 @@ public class ProdutoScreen {
 
     void handleClickDelete() {
         var produtoSelected = vm.produtoSelected.get();
-        if(produtoSelected==null)return;
+        if (produtoSelected == null) return;
 
-        var bodyMessage = "Tem certeza que deseja excluir o produto: %s com código: %s?".formatted(produtoSelected.descricao,produtoSelected.codigoBarras);
-        Components.ShowAlertAdvice(bodyMessage, ()->{
-            Async.Run(()->{
+        var bodyMessage = "Tem certeza que deseja excluir o produto: %s com código: %s?".formatted(produtoSelected.descricao, produtoSelected.codigoBarras);
+        Components.ShowAlertAdvice(bodyMessage, () -> {
+            Async.Run(() -> {
                 try {
                     vm.excluir();
-                    vm.refreshProdutos();
-                    UI.runOnUi(()->{
-                        limparFormulario();
+                    //vm.refreshProdutos();
+                    UI.runOnUi(() -> {
+                        vm.limparFormulario();
                         Components.ShowPopup(router, "Produto excluído com sucesso");
                     });
 
@@ -151,7 +158,7 @@ public class ProdutoScreen {
                                                 .height(35)
                                                 .bgColor("#2563eb")
                                                 .textColor("white")
-                                                .onClick(() -> vm.refreshProdutos()))))
+                                                .onClick(() -> vm.atualizar(this.router)))))
                         .c_child(new SpacerVertical(15))
                         .c_child(ProdutosTable(vm.produtos, vm)),
                 new CardProps()
@@ -169,7 +176,7 @@ public class ProdutoScreen {
                                 .bgColor("#10b981")
                                 .textColor("white")
                                 .fontSize(16)
-                                .onClick(this::handleSalvarOrUpdate)))
+                                .onClick(()->vm.salvarOuAtualizar(router))))
                 .r_child(new Button("Limpar",
                         new ButtonProps()
                                 .fillWidth()
@@ -177,27 +184,8 @@ public class ProdutoScreen {
                                 .bgColor("#6b7280")
                                 .textColor("white")
                                 .fontSize(16)
-                                .onClick(this::limparFormulario))
+                                .onClick(vm::limparFormulario))
                 );
-    }
-
-    private void handleSalvarOrUpdate() {
-        Async.Run(() -> {
-            try {
-                vm.salvar();
-                vm.refreshProdutos();
-
-                UI.runOnUi(() -> {
-                    Components.ShowPopup(router, "Produto cadastrado com sucesso");
-                    limparFormulario();
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
-            }
-        });
-
     }
 
     private void fillInputs(ProdutoModel model) {
@@ -217,22 +205,6 @@ public class ProdutoScreen {
         vm.imagem.set(model.imagem);
     }
 
-    private void limparFormulario() {
-        vm.codigoBarras.set("");
-        vm.descricao.set("");
-        vm.precoCompra.set("0");
-        vm.precoVenda.set("0");
-        vm.margem.set("0");
-        vm.lucro.set("0");
-        vm.comissao.set("");
-        vm.garantia.set("");
-        vm.marca.set("");
-        vm.unidadeSelected.set("UN");
-        vm.estoque.set("0");
-        vm.validade.set("");
-        vm.observacoes.set("");
-        vm.imagem.set("/assets/produto-generico.png");
-    }
 
     @FunctionalInterface
     interface Action {

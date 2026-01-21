@@ -4,12 +4,10 @@ import my_app.db.dto.ProdutoDto;
 import my_app.db.models.ProdutoModel;
 import my_app.db.repositories.ProdutoRepository;
 
-import java.math.BigDecimal;
-
 public class ProdutoService {
     private final ProdutoRepository repo = new ProdutoRepository();
 
-    public void salvar(ProdutoDto p) throws Exception {
+    public ProdutoModel salvar(ProdutoDto p) throws Exception {
         if(p.codigoBarras.trim().isEmpty()) throw new RuntimeException("Adicione código ao produto");
 
         if (repo.buscarPorCodigoBarras(p.codigoBarras) != null) {
@@ -22,7 +20,7 @@ public class ProdutoService {
 //        if(p.precoVenda.trim().isEmpty()) throw new RuntimeException("Adicione preço de venda");
         if(p.fornecedorId <= 0) throw new RuntimeException("Fornecedor não encontrado");
 
-        repo.salvar(p);
+        return repo.salvar(p);
     }
 
     public void atualizar(ProdutoModel p) throws Exception {

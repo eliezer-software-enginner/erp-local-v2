@@ -1,15 +1,36 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>atualizar</w>
       <w>bairro</w>
       <w>barras</w>
+      <w>categorias</w>
       <w>celular</w>
       <w>cidade</w>
       <w>codigo</w>
+      <w>comissao</w>
+      <w>descricao</w>
+      <w>estoque</w>
+      <w>fornecedor</w>
+      <w>fornecedores</w>
+      <w>garantia</w>
+      <w>generico</w>
       <w>gerar</w>
+      <w>imagem</w>
+      <w>inicial</w>
+      <w>lucro</w>
+      <w>margem</w>
+      <w>modoEdicao</w>
+      <w>observacoes</w>
       <w>parcela</w>
+      <w>precoCompra</w>
+      <w>precoVenda</w>
       <w>produto</w>
+      <w>produtos</w>
       <w>texto</w>
+      <w>unidade</w>
+      <w>unidades</w>
+      <w>validade</w>
       <w>vencimento</w>
     </words>
   </dictionary>

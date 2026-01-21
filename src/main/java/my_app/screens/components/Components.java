@@ -154,6 +154,17 @@ public class Components {
                 .onClick(handleAdd));
     }
 
+    public static <T> Component SelectColumn(String label, State<List<T>> listState, State<T> stateSelected, Function<T, String> display) {
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(new Select<T>(new SelectProps().height(35))
+                        .items(listState)
+                        .value(stateSelected)
+                        .displayText(display)
+                );
+    }
+
+    @Deprecated
     public static <T> Component SelectColumn(String label, List<T> list, State<T> stateSelected, Function<T, String> display) {
         return new Column()
                 .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
