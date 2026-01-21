@@ -208,8 +208,9 @@ public class Components {
                         return OnChangeResult.of("R$ 0,00", "0");
                     }
 
-                    BigDecimal raw = new BigDecimal(numeric).movePointLeft(2);
-                    return OnChangeResult.of(BRL.format(raw), numeric);
+                    // Converte centavos para BigDecimal do valor real
+                    BigDecimal realValue = new BigDecimal(numeric).movePointLeft(2);
+                    return OnChangeResult.of(BRL.format(realValue), numeric);
                 })
                 .lockCursorToEnd()
                 .left(fonticon);

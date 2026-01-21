@@ -19,11 +19,7 @@ import my_app.screens.components.Components;
 import my_app.services.ProdutoService;
 import my_app.utils.Utils;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class ProdutoScreenViewModel extends ViewModel {
 
@@ -82,25 +78,35 @@ public class ProdutoScreenViewModel extends ViewModel {
     }
 
     public void salvarOuAtualizar(Router router) {
-        if (modoEdicao.get()) {
-            //TODO: implementar
-            return;
-        }
-
         var dto = toProduto();
-        Async.Run(() -> {
-            try {
-                var produtoModel = service.salvar(dto);
-                produtos.add(produtoModel);
-                UI.runOnUi(() -> {
-                    Components.ShowPopup(router, "Produto cadastrado com sucesso");
-                    limparFormulario();
-                });
-            } catch (Exception e) {
-                UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
-            }
-        });
 
+        if (modoEdicao.get()) {
+            Async.Run(() -> {
+                try {
+                    service.atualizar(new ProdutoModel().fromIdAndDto(produtoSelected.get().id, dto));
+                    var produtos = produtoRepository.listar();
+                    UI.runOnUi(() -> {
+                        this.produtos.setAll(produtos);
+                        Components.ShowPopup(router, "Produto atualizado com sucesso!");
+                    });
+                } catch (Exception e) {
+                    UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
+                }
+            });
+        }else{
+            Async.Run(() -> {
+                try {
+                    var produtoModel = service.salvar(dto);
+                    produtos.add(produtoModel);
+                    UI.runOnUi(() -> {
+                        Components.ShowPopup(router, "Produto cadastrado com sucesso");
+                        limparFormulario();
+                    });
+                } catch (Exception e) {
+                    UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
+                }
+            });
+        }
     }
 
 
@@ -121,19 +127,6 @@ public class ProdutoScreenViewModel extends ViewModel {
         imagem.set("/assets/produto-generico.png");
     }
 
-    public void atualizar(Router router) {
-        var dto = toProduto();
-
-        Async.Run(() -> {
-            try {
-                service.atualizar(new ProdutoModel().fromIdAndDto(produtoSelected.get().id, dto));
-                UI.runOnUi(() -> Components.ShowPopup(router, "Produto atualizado com sucesso!"));
-            } catch (Exception e) {
-                UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));
-            }
-        });
-
-    }
 
     public void excluir() throws Exception {
         Long id = produtoSelected.get().id;

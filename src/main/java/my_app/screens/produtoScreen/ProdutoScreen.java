@@ -23,6 +23,7 @@ import my_app.db.models.ProdutoModel;
 import my_app.db.repositories.CategoriaRepository;
 import my_app.db.repositories.FornecedorRepository;
 import my_app.screens.components.Components;
+import my_app.utils.Utils;
 
 
 import static my_app.screens.produtoScreen.ProdutoComponents.*;
@@ -143,8 +144,6 @@ public class ProdutoScreen implements ScreenComponent {
                 }
             });
         });
-
-
     }
 
     private Component createTableSection() {
@@ -153,12 +152,7 @@ public class ProdutoScreen implements ScreenComponent {
                         .c_child(new Row(new RowProps().spacingOf(10))
                                 .r_child(new Text("Produtos Cadastrados",
                                         new TextProps().fontSize(20).bold()))
-                                .r_child(new Button("Atualizar",
-                                        new ButtonProps()
-                                                .height(35)
-                                                .bgColor("#2563eb")
-                                                .textColor("white")
-                                                .onClick(() -> vm.atualizar(this.router)))))
+                        )
                         .c_child(new SpacerVertical(15))
                         .c_child(ProdutosTable(vm.produtos, vm)),
                 new CardProps()
@@ -191,15 +185,15 @@ public class ProdutoScreen implements ScreenComponent {
     private void fillInputs(ProdutoModel model) {
         vm.codigoBarras.set(model.codigoBarras);
         vm.descricao.set(model.descricao);
-        vm.precoCompra.set(model.precoCompra.toPlainString());
-        vm.precoVenda.set(model.precoVenda.toPlainString());
+        vm.precoCompra.set(Utils.deRealParaCentavos( model.precoCompra));
+        vm.precoVenda.set(Utils.deRealParaCentavos( model.precoVenda));
         //vm.margem.set(model.);
         //vm.lucro.set("0");
         vm.comissao.set(model.comissao);
         vm.garantia.set(model.garantia);
         vm.marca.set(model.marca);
         vm.unidadeSelected.set(model.unidade);
-        vm.estoque.set(model.estoque.toPlainString());
+        vm.estoque.set(Utils.deRealParaCentavos(model.estoque));
         vm.validade.set(model.validade);
         vm.observacoes.set(model.observacoes);
         vm.imagem.set(model.imagem);

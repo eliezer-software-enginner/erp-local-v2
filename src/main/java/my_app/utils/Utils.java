@@ -102,12 +102,13 @@ public static BigDecimal deCentavosParaReal(String centavos){
     }
 
 
-    /**
-     * Transforma o valor em Real persitido no banco para centavos para utilizar nos inputs
-     * @param real valor em Real recuperado do banco
-     * @return valor em centavos para exibição nos inputs
+/**
+     * Transforma o valor em Real persistido no banco para centavos para utilizar nos inputs
+     * @param real valor em Real recuperado do banco (ex: 10.00)
+     * @return valor em centavos para exibição nos inputs (ex: "1000")
      */
     public static String deRealParaCentavos(BigDecimal real){
-        return real.multiply(new BigDecimal("100")).toPlainString();
+        if (real == null) return "0";
+        return real.multiply(new BigDecimal("100")).intValue() + "";
     }
 }
