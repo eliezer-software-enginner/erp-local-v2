@@ -1,9 +1,15 @@
 package my_app.db.dto;
 
-public record FornecedorDto(String nome, String cnpj, String telefone, String email, String endereco, Long dataCriacao) {
-    public FornecedorDto {
-        if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome não pode ser nulo ou vazio");
-        }
-    }
-}
+public record FornecedorDto(
+        String nome,
+        String cpfCnpj,
+        String celular,
+        String email,
+        String inscricaoEstadual,
+        String ufSelected,
+        String cidade,
+        String bairro,
+        String rua,
+        String numero,
+        String observacao
+) {}

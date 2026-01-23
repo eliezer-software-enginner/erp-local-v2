@@ -1,14 +1,15 @@
 package my_app.screens.components;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import megalodonte.*;
 import megalodonte.components.*;
+import megalodonte.components.Button;
+import megalodonte.components.DatePicker;
 import megalodonte.components.inputs.Input;
 import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.components.inputs.OnChangeResult;
@@ -35,9 +36,21 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static my_app.utils.Utils.formatPhone;
+
 public class Components {
 
     static Theme theme = ThemeManager.theme();
+
+    public static Component ScrollPaneDefault(Component child){
+        var scroll = new ScrollPane();
+        scroll.setContent(child.getJavaFxNode());
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent;-fx-border-color: transparent;");
+
+        return Component.CreateFromJavaFxNode(scroll);
+    }
 
     public static void ShowPopup(Router router, String message) {
         Popup popup = new Popup();
@@ -160,7 +173,6 @@ public class Components {
                 );
     }
 
-    @Deprecated
     public static <T> Component SelectColumn(String label, List<T> list, State<T> stateSelected, Function<T, String> display) {
         return new Column()
                 .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
@@ -185,6 +197,62 @@ public class Components {
                 .r_child(new Text(valueState, new TextProps().fontSize(theme.typography().body())));
     }
 
+    public static Component InputColumnPhone(String label, State<String> inputState) {
+        var inputProps = new InputProps().fontSize(theme.typography().small())
+                .height(35).placeHolder("(00) 00000-0000");
+
+        var inputStyler = new InputStyler()
+                .borderWidth(theme.border().width())
+                .borderColor(theme.colors().primary());
+
+        var input = new Input(inputState, inputProps, inputStyler)
+                .onInitialize(value -> {
+                    String formatted = formatPhone(value);
+                    return OnChangeResult.of(formatted, value);
+                })
+                .onChange(value -> {
+                    String numeric = value.replaceAll("[^0-9]", "");
+
+                    // Limita a 11 dígitos (padrão BR com DDD)
+                    if (numeric.length() > 11) {
+                        numeric = numeric.substring(0, 11);
+                    }
+
+                    String formatted = formatPhone(numeric);
+                    return OnChangeResult.of(formatted, numeric);
+                })
+                .lockCursorToEnd();
+
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(input);
+    }
+
+
+
+    public static Component InputColumnNumeric(String label, State<String> inputState,  String placeholder) {
+        var inputProps = new InputProps().fontSize(theme.typography().small())
+                .height(35).placeHolder(placeholder);
+
+        var inputStyler = new InputStyler().
+                borderWidth(theme.border().width())
+                .borderColor(theme.colors().primary());
+
+        var input = new Input(inputState, inputProps, inputStyler)
+                .onChange(value -> {
+                    String numeric = value.replaceAll("[^0-9]", "");
+                    if (numeric.isEmpty()) {
+                        return OnChangeResult.of("", "");
+                    }
+
+                    return OnChangeResult.of(numeric, numeric);
+                })
+                .lockCursorToEnd();
+
+        return new Column()
+                .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
+                .c_child(input);
+    }
 
     private static final NumberFormat BRL =
             NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));

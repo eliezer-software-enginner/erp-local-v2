@@ -19,16 +19,16 @@ public class AppRoutes {
         var routes = Set.of(
                 new Router.Route("auth", router -> new AutenticacaoScreen(router), new Router.RouteProps(900, 550,null, false)),
                 new Router.Route("access", router -> new AccessScreen(router), new Router.RouteProps(900, 550,null, false)),
-                new Router.Route("home", router -> new HomeScreen(router), new Router.RouteProps(900, 550,null, true)),
+                new Router.Route("home", router -> new HomeScreen(router), new Router.RouteProps(1050, 550,null, true)),
                 //new Router.Route("cad-produtos/${id}",router-> new ProdutoScreen(router), new Router.RouteProps(1500, 900,"Cadastro de produtos", false)),
                 new Router.Route("produtos",router-> new ProdutoScreen(router), new Router.RouteProps(970, 650,"Cadastro de produtos", true)),
-                new Router.Route("categoria",router-> new CategoriaScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de categorias", false)),
+                new Router.Route("categorias",router-> new CategoriaScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de categorias", false)),
                 new Router.Route("fornecedores",router-> new FornecedorScreen(router), new Router.RouteProps(900, 650, "Gerenciamento de Fornecedores", false)),
                 new Router.Route("empresa",router-> new CadastroEmpresaScreen(router), new Router.RouteProps(900, 650, "Informações da empresa", false)),
                 new Router.Route("compras",router-> new ComprasScreen(router), new Router.RouteProps(1000, 650, "Compras de mercadorias", false)),
         new Router.Route("clientes",router-> new ClienteScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de clientes", false))
         );
-        return new Router(routes, "categoria", stage);
+        return new Router(routes, "fornecedores", stage);
     }
 }
 

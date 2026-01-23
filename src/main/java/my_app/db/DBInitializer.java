@@ -55,10 +55,19 @@ public final class DBInitializer {
                 """);
 
                 st.execute("""
-                    CREATE TABLE IF NOT EXISTS fornecedor (
+                    CREATE TABLE IF NOT EXISTS fornecedores (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         nome TEXT NOT NULL UNIQUE,
-                        cpfCnpj TEXT,
+                        cpf_cnpj TEXT,
+                        celular TEXT,
+                        email TEXT,
+                        inscricao_estadual TEXT,
+                        uf_selected TEXT,
+                        cidade TEXT,
+                        bairro TEXT,
+                        rua TEXT,
+                        numero TEXT,
+                        observacao TEXT,
                         data_criacao INTEGER NOT NULL
                     )
                 """);
@@ -154,7 +163,7 @@ public final class DBInitializer {
     }
     
     private static boolean existeFornecedorPadrao(Connection conn) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM fornecedor WHERE nome = ?";
+        String sql = "SELECT COUNT(*) FROM fornecedores WHERE nome = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "Fornecedor Padrão");
             try (ResultSet rs = ps.executeQuery()) {
@@ -195,7 +204,7 @@ public final class DBInitializer {
     }
     
     private static void inserirFornecedorPadrao(Connection conn) throws SQLException {
-        String sql = "INSERT INTO fornecedor (nome, data_criacao) VALUES (?, ?)";
+        String sql = "INSERT INTO fornecedores (nome, data_criacao) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "Fornecedor Padrão");
             ps.setLong(2, System.currentTimeMillis());

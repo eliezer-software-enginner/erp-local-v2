@@ -5,6 +5,9 @@ import my_app.db.models.ModelBase;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -110,5 +113,69 @@ public static BigDecimal deCentavosParaReal(String centavos){
     public static String deRealParaCentavos(BigDecimal real){
         if (real == null) return "0";
         return real.multiply(new BigDecimal("100")).intValue() + "";
+    }
+
+    // Validação simples de E-mail
+    public static boolean isValidEmail(String email) {
+        return email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
+    }
+
+    // Validação de CNPJ (Remove formatação e verifica se tem 14 dígitos)
+// Para uma validação rigorosa (cálculo de dígitos), recomenda-se uma lib ou algoritmo completo.
+    public static boolean isValidCnpj(String cnpj) {
+        String cleanCnpj = cnpj.replaceAll("[^0-9]", "");
+        return cleanCnpj.length() == 14;
+    }
+
+    // Valida se o telefone tem 10 ou 11 dígitos numéricos
+    public static boolean isValidPhone(String phone) {
+        String cleanPhone = phone.replaceAll("[^0-9]", "");
+        return cleanPhone.length() >= 10 && cleanPhone.length() <= 11;
+    }
+    /**
+     * Aplica a máscara (XX) XXXXX-XXXX ou (XX) XXXX-XXXX dinamicamente
+     */
+    public static String formatPhone(String numeric) {
+        if (numeric == null || numeric.isEmpty()) return "";
+
+        StringBuilder sb = new StringBuilder();
+        int len = numeric.length();
+
+        if (len > 0) sb.append("(");
+        if (len <= 2) {
+            sb.append(numeric);
+        } else {
+            sb.append(numeric.substring(0, 2)).append(") ");
+            String rest = numeric.substring(2);
+
+            if (rest.length() <= 4) {
+                sb.append(rest);
+            } else if (rest.length() == 5) {
+                // Formato celular (5 dígitos no primeiro bloco)
+                sb.append(rest);
+            } else if (rest.length() <= 8) {
+                // Formato Fixo: (XX) XXXX-XXXX
+                sb.append(rest.substring(0, 4)).append("-").append(rest.substring(4));
+            } else {
+                // Formato Celular: (XX) XXXXX-XXXX
+                sb.append(rest.substring(0, 5)).append("-").append(rest.substring(5));
+            }
+        }
+        return sb.toString();
+    }
+
+    private static final DateTimeFormatter BR_FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    /**
+     * Converte um timestamp Long para String formatada em dd/MM/yyyy HH:mm
+     */
+    public static String formatDateTime(Long timestamp) {
+        if (timestamp == null || timestamp == 0) return "";
+
+        return Instant.ofEpochMilli(timestamp)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(BR_FORMATTER);
     }
 }
