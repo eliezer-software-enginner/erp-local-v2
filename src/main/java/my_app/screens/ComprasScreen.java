@@ -17,10 +17,9 @@ import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import my_app.db.dto.CompraDto;
-import my_app.db.models.CategoriaModel;
+import my_app.db.models.CompraModel;
 import my_app.db.models.FornecedorModel;
 import my_app.db.models.ProdutoModel;
-import my_app.db.repositories.CategoriaRepository;
 import my_app.db.repositories.ComprasRepository;
 import my_app.db.repositories.FornecedorRepository;
 import my_app.db.repositories.ProdutoRepository;
@@ -84,8 +83,10 @@ public class ComprasScreen implements ScreenComponent {
 
     State<String> dataValidade = State.of("0");
 
-    public final ObservableList<FornecedorModel> fornecedores = FXCollections.observableArrayList();
-    public final State<FornecedorModel> fornecedorSelected = State.of(null);
+    ObservableList<FornecedorModel> fornecedores = FXCollections.observableArrayList();
+    State<FornecedorModel> fornecedorSelected = State.of(null);
+
+    State<CompraModel> compraSelected = State.of(null);
 
 
     public ComprasScreen(Router router) {
@@ -128,7 +129,8 @@ public class ComprasScreen implements ScreenComponent {
     public Component render() {
         return new Column(new ColumnProps().paddingAll(5), new ColumnStyler().bgColor(theme.colors().background()))
                 .c_child(Components.commonCustomMenus(
-                      this::handleClickMenuNew,this::handleClickMenuEdit, this::handleClickMenuDelete))
+                      this::handleClickMenuNew,this::handleClickMenuEdit, this::handleClickMenuDelete,
+                        this::handleClickMenuCopy))
                 .c_child(new SpacerVertical(10))
                 .c_child(form());
     }
@@ -212,7 +214,7 @@ public class ComprasScreen implements ScreenComponent {
             }
             try {
                 var dto = new CompraDto(codigo.get(), pcCompra.get(),fornecedorSelected.get().id,
-                        Double.parseDouble(qtd.get()), descontoEmDinheiro.get(),
+                        new BigDecimal(qtd.get()), descontoEmDinheiro.get(),
                         tipoPagamentoSeleced.get(), observacao.get());
                var compraSalva = comprasRepository.salvar(dto);
                UI.runOnUi(()->{
@@ -304,6 +306,29 @@ public class ComprasScreen implements ScreenComponent {
 
     private void handleClickMenuDelete() {
         //TODO: implementar
+    }
+
+    private void handleClickMenuCopy(){
+        modoEdicao.set(false);
+
+        final var compra = compraSelected.get();
+        if(compra!=null){
+            dataCompra.set(compra.dataCompra);
+            numeroNota.set(compra.numeroNota);
+            codigo.set(compra.produtoCod);
+            //TODO: produtoEncontrado
+            qtd.set(String.valueOf(compra.quantidade));
+            observacao.set(compra.observacao);
+            tipoPagamentoSeleced.set(compra.tipoPagamento);
+            //TODO: parcelas
+            pcCompra.set(compra.precoDeCompra);
+            //TODO: totalBruto
+            dataValidade.set(compra.dataValidade);
+            fornecedorSelected.set(compra.fornecedor);
+        }
+
+
+
     }
 
 

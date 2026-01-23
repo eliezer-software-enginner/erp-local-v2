@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ProdutoModel implements ModelBase<ProdutoDto> {
+public class ProdutoModel extends ModelBase<ProdutoDto> {
         public Long id;
         //TODO: CODIGO DE BARRAS DEVERIA SER UMA TABELA, ONDE ELE É UNICO POR PRODUTO
 

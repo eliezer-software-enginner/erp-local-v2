@@ -5,7 +5,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Popup;
-import javafx.stage.Stage;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.Button;
@@ -22,7 +21,6 @@ import megalodonte.styles.TextStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
-import my_app.screens.produtoScreen.ProdutoScreenViewModel;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.antdesignicons.AntDesignIconsOutlined;
 import org.kordamp.ikonli.entypo.Entypo;
@@ -41,6 +39,27 @@ import static my_app.utils.Utils.formatPhone;
 public class Components {
 
     static Theme theme = ThemeManager.theme();
+
+    public static Component actionButtons(ComputedState<String> btnText, Runnable onClick, Runnable onClearForm) {
+        return new Row(new RowProps().spacingOf(10))
+                .r_child(new Button(btnText,
+                        new ButtonProps()
+                                .fillWidth()
+                                .height(35)
+                                .bgColor("#10b981")
+                                .textColor("white")
+                                .fontSize(16)
+                                .onClick(onClick)))
+                .r_child(new Button("Limpar",
+                        new ButtonProps()
+                                .fillWidth()
+                                .height(35)
+                                .bgColor("#6b7280")
+                                .textColor("white")
+                                .fontSize(16)
+                                .onClick(onClearForm))
+                );
+    }
 
     public static Component ScrollPaneDefault(Component child){
         var scroll = new ScrollPane();
@@ -341,11 +360,13 @@ public class Components {
                 .c_child(new Text(message, new TextProps().variant(TextVariant.SUBTITLE), new TextStyler().color("red")));
     }
 
-    public static Row commonCustomMenus(Runnable onClickNew, Runnable onEdit, Runnable onDelete) {
+
+    public static Row commonCustomMenus(Runnable onClickNew, Runnable onEdit, Runnable onDelete, Runnable onClone) {
         return new Row(new RowProps().spacingOf(20))
                 .r_child(MenuItem("Novo (CTRL + N)", Entypo.ADD_TO_LIST, "green", () -> executar(onClickNew::run)))
                 .r_child(MenuItem("Editar", Entypo.EDIT, "blue", () -> executar(onEdit::run)))
                 .r_child(MenuItem("Excluir", Entypo.TRASH, "red", () -> executar(onDelete::run)))
+                .r_child(MenuItem("Clonar", Entypo.COPY, "black", () -> executar(onClone::run)))
                 .r_child(new SpacerHorizontal().fill())
                 //.r_child(MenuItem("Sair", Entypo.REPLY, "red", () -> router.closeSpawn("cad-produtos/"+id)));
                 ;

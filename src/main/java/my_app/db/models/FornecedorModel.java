@@ -5,7 +5,7 @@ import my_app.db.dto.FornecedorDto;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class FornecedorModel implements ModelBase<FornecedorDto> {
+public class FornecedorModel extends ModelBase<FornecedorDto> {
     public Long id;
     public String nome;
     public String cpfCnpj;

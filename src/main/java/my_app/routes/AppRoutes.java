@@ -9,7 +9,7 @@ import my_app.screens.authScreen.AutenticacaoScreen;
 import my_app.screens.HomeScreen;
 import my_app.screens.categoriasScreen.CategoriaScreen;
 import my_app.screens.clienteScreen.ClienteScreen;
-import my_app.screens.fornecedorScreen.FornecedorScreen;
+import my_app.screens.FornecedorScreen;
 import my_app.screens.produtoScreen.ProdutoScreen;
 
 import java.util.Set;
@@ -26,9 +26,9 @@ public class AppRoutes {
                 new Router.Route("fornecedores",router-> new FornecedorScreen(router), new Router.RouteProps(900, 650, "Gerenciamento de Fornecedores", false)),
                 new Router.Route("empresa",router-> new CadastroEmpresaScreen(router), new Router.RouteProps(900, 650, "Informações da empresa", false)),
                 new Router.Route("compras",router-> new ComprasScreen(router), new Router.RouteProps(1000, 650, "Compras de mercadorias", false)),
-        new Router.Route("clientes",router-> new ClienteScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de clientes", false))
+        new Router.Route("clientes",router-> new ClienteScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de clientes", true))
         );
-        return new Router(routes, "fornecedores", stage);
+        return new Router(routes, "clientes", stage);
     }
 }
 

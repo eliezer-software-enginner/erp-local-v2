@@ -24,7 +24,7 @@ public class ComprasRepository extends BaseRepository<CompraDto, CompraModel> {
         try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, dto.produtoCod());
             ps.setLong(2, dto.fornecedorId());
-            ps.setDouble(3, dto.quantidade());
+            ps.setBigDecimal(3, dto.quantidade());
             ps.setString(4, dto.descontoEmReais());
             ps.setString(5, dto.tipoPagamento());
             ps.setString(6, dto.observacao());
@@ -62,7 +62,7 @@ public class ComprasRepository extends BaseRepository<CompraDto, CompraModel> {
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
             ps.setString(1, model.produtoCod);
             ps.setLong(2, model.fornecedorId);
-            ps.setDouble(3, model.quantidade);
+            ps.setBigDecimal(3, model.quantidade);
             ps.setString(4, model.descontoEmReais);
             ps.setString(5, model.tipoPagamento);
             ps.setString(6, model.observacao);

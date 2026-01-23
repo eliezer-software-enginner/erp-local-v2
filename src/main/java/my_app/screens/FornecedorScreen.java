@@ -1,22 +1,13 @@
-package my_app.screens.fornecedorScreen;
+package my_app.screens;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import megalodonte.*;
 import megalodonte.async.Async;
 import megalodonte.base.UI;
 import megalodonte.components.*;
-import megalodonte.components.inputs.Input;
 import megalodonte.props.*;
 import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
@@ -24,18 +15,17 @@ import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
 import my_app.db.dto.FornecedorDto;
-import my_app.db.models.CategoriaModel;
 import my_app.db.models.FornecedorModel;
 import my_app.db.repositories.FornecedorRepository;
 import my_app.screens.components.Components;
 import my_app.utils.Utils;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 import static my_app.utils.Utils.*;
 
-public class FornecedorScreen {
+public class FornecedorScreen implements ScreenComponent, ContratoTelaCrud {
     private final Router router;
     private final Theme theme = ThemeManager.theme();
     private final FornecedorRepository fornecedorRepository = new FornecedorRepository();
@@ -98,17 +88,14 @@ public class FornecedorScreen {
           .c_child(table());
 
         return new Column(new ColumnProps().paddingAll(10), new ColumnStyler().bgColor(theme.colors().background()))
-                .c_child(Components.commonCustomMenus(this::clearForm,
-                       this::handleClickMenuEdit,
-                       this::handleClickMenuDelete
-                ))
+                .c_child(commonCustomMenus())
                 .c_child(new SpacerVertical(10))
                 .c_child(Components.ScrollPaneDefault(mainContent));
     }
 
 
-
-    Component form() {
+    @Override
+    public Component form() {
         return new Card(
                 new Column(new ColumnProps().paddingAll(20))
                         .c_child(new Row(new RowProps().centerHorizontally())
@@ -134,12 +121,11 @@ public class FornecedorScreen {
                         .c_child(new LineHorizontal())
                         .c_child(Components.TextAreaColumn("Observação", observacao,""))
                         .c_child(Components.ButtonCadastro(btnText, this::handleAddOrUpdate))
-
-
         );
     }
 
-    private void handleClickMenuEdit() {
+    @Override
+    public void handleClickMenuEdit() {
         final var forn = fornecedorSelected.get();
         if(forn != null){
             editMode.set(true);
@@ -157,7 +143,8 @@ public class FornecedorScreen {
         }
     }
 
-    private void handleClickMenuDelete() {
+    @Override
+    public void handleClickMenuDelete() {
         final var forn = fornecedorSelected.get();
         if(forn != null){
             editMode.set(false);
@@ -175,12 +162,16 @@ public class FornecedorScreen {
                     }
                 });
             });
-
-
         }
     }
 
-    private void clearForm(){
+    @Override
+    public void handleClickMenuClone() {
+
+    }
+
+    @Override
+    public void clearForm(){
         editMode.set(false);
         nome.set("");
         cnpj.set("");
@@ -195,7 +186,8 @@ public class FornecedorScreen {
         observacao.set("");
     }
 
-    private void handleAddOrUpdate() {
+    @Override
+    public void handleAddOrUpdate() {
         String nomeValue = nome.get().trim();
         String cnpjValue = cnpj.get().trim();
         String celularValue = celular.get().trim();
@@ -296,7 +288,8 @@ public class FornecedorScreen {
 
     }
 
-    Component table() {
+    @Override
+    public Component table() {
         TableView<FornecedorModel> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 

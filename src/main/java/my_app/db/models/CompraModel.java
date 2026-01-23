@@ -2,18 +2,24 @@ package my_app.db.models;
 
 import my_app.db.dto.CompraDto;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
-public class CompraModel implements ModelBase<CompraDto> {
-    public Long id;
+public class CompraModel extends ModelBase<CompraDto> {
     public String produtoCod;
     public Long fornecedorId;
-    public double quantidade;
+    public BigDecimal quantidade;
     public String descontoEmReais;
     public String tipoPagamento;
     public String observacao;
-    public Long dataCriacao;
+    public LocalDate dataCompra;
+    public String numeroNota;
+    public String precoDeCompra;
+    public String dataValidade;
+
+    public FornecedorModel fornecedor;
 
     public CompraModel() {}
 
@@ -23,7 +29,7 @@ public class CompraModel implements ModelBase<CompraDto> {
         model.id = rs.getLong("id");
         model.produtoCod = rs.getString("produto_cod");
         model.fornecedorId = rs.getLong("fornecedor_id");
-        model.quantidade = rs.getInt("quantidade");
+        model.quantidade = rs.getBigDecimal("quantidade");
         model.descontoEmReais = rs.getString("desconto_em_reais");
         model.tipoPagamento = rs.getString("tipo_pagamento");
         model.observacao = rs.getString("observacao");

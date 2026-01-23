@@ -1,6 +1,5 @@
 package my_app.screens.produtoScreen;
 
-import javafx.scene.control.Alert;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -14,21 +13,19 @@ import megalodonte.components.Component;
 import megalodonte.props.*;
 import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
-import megalodonte.styles.RowStyler;
 import megalodonte.styles.TextStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
 import my_app.db.models.ProdutoModel;
-import my_app.db.repositories.CategoriaRepository;
-import my_app.db.repositories.FornecedorRepository;
+import my_app.screens.ContratoTelaCrud;
 import my_app.screens.components.Components;
 import my_app.utils.Utils;
 
 
 import static my_app.screens.produtoScreen.ProdutoComponents.*;
 
-public class ProdutoScreen implements ScreenComponent {
+public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
     private final Router router;
     private final ProdutoScreenViewModel vm;
     private final Theme theme = ThemeManager.theme();
@@ -50,7 +47,7 @@ public class ProdutoScreen implements ScreenComponent {
         scroll.setContent(createMainContent().getJavaFxNode());
 
         return new Column(new ColumnProps().paddingAll(15), new ColumnStyler().bgColor(theme.colors().background()))
-                .c_child(Components.commonCustomMenus(this::handleClickNew, this::handleClickEdit, this::handleClickDelete))
+                .c_child(commonCustomMenus())
                 .c_child(new SpacerVertical(20))
                 .c_child(createHeaderSection())
                 .c_child(new SpacerVertical(30))
@@ -101,7 +98,7 @@ public class ProdutoScreen implements ScreenComponent {
                                 .r_child(ProdutoComponents.ContainerLeft(vm))
                                 .r_child(Components.CardImageSelector(vm.imagem, handleChangeImage)))
                         .c_child(new SpacerVertical(25))
-                        .c_child(createActionButtons()),
+                        .c_child(Components.actionButtons(vm.btnText,()->vm.salvarOuAtualizar(router), this::clearForm)),
                 new CardProps()
                         .padding(0)
                         .radius(12)
@@ -109,9 +106,45 @@ public class ProdutoScreen implements ScreenComponent {
     }
 
 
-    void handleClickNew() {
+    @Override
+    public void handleClickNew() {
         vm.limparFormulario();
         IO.println("Formulário limpo para novo produto");
+    }
+
+    @Override
+    public void handleClickMenuEdit() {
+
+    }
+
+    @Override
+    public void handleClickMenuDelete() {
+
+    }
+
+    @Override
+    public void handleClickMenuClone() {
+
+    }
+
+    @Override
+    public void handleAddOrUpdate() {
+
+    }
+
+    @Override
+    public void clearForm() {
+        this.vm.limparFormulario();
+    }
+
+    @Override
+    public Component table() {
+        return null;
+    }
+
+    @Override
+    public Component form() {
+        return null;
     }
 
     void handleClickEdit() {

@@ -17,11 +17,12 @@ import megalodonte.theme.ThemeManager;
 import my_app.db.dto.CategoriaDto;
 import my_app.db.models.CategoriaModel;
 import my_app.db.repositories.CategoriaRepository;
+import my_app.screens.ContratoTelaCrud;
 import my_app.screens.components.Components;
 
 import java.sql.SQLException;
 
-public class CategoriaScreen {
+public class CategoriaScreen implements ScreenComponent, ContratoTelaCrud {
     private final Router router;
     private final Theme theme = ThemeManager.theme();
     State<String> nome = State.of("");
@@ -54,26 +55,22 @@ public class CategoriaScreen {
 
     public Component render() {
         return new Column(new ColumnProps().paddingAll(5), new ColumnStyler().bgColor(theme.colors().background()))
-                .c_child(Components.commonCustomMenus(
-                        this::handleClickMenuNew, this::handleClickMenuEdit, this::handleClickMenuDelete))
+                .c_child(commonCustomMenus())
                 .c_child(new SpacerVertical(10))
                 .c_child(form())
                 .c_child(new SpacerVertical(20))
                 .c_child(table());
     }
 
-    private void handleClickMenuNew() {
-        modoEdicao.set(false);
-        nome.set("");
-    }
-
-    private void handleClickMenuEdit() {
+    @Override
+    public void handleClickMenuEdit() {
         modoEdicao.set(true);
         if(categoriaSelecionada.get() != null)
             nome.set(categoriaSelecionada.get().nome);
     }
 
-    private void handleClickMenuDelete() {
+    @Override
+    public void handleClickMenuDelete() {
         if (categoriaSelecionada != null) {
             Async.Run(() -> {
                 try {
@@ -91,7 +88,13 @@ public class CategoriaScreen {
         }
     }
 
-    Component form() {
+    @Override
+    public void handleClickMenuClone() {
+
+    }
+
+    @Override
+    public Component form() {
         return new Card(new Column()
                 .c_child(Components.FormTitle("Cadastrar Nova Categoria"))
                 .c_child(new SpacerVertical(20))
@@ -102,7 +105,8 @@ public class CategoriaScreen {
                 ));
     }
 
-    private void handleAddOrUpdate() {
+    @Override
+    public void handleAddOrUpdate() {
         String value = nome.get().trim();
 
         if(value.isEmpty()){
@@ -147,7 +151,13 @@ public class CategoriaScreen {
 
     }
 
-    Component table() {
+    @Override
+    public void clearForm() {
+
+    }
+
+    @Override
+    public Component table() {
         TableView<CategoriaModel> table = new TableView<>();
 
         // ===== COLUNA: NOME =====

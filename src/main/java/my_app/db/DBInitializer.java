@@ -86,8 +86,9 @@ public final class DBInitializer {
                     CREATE TABLE IF NOT EXISTS clientes (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         nome TEXT NOT NULL,
-                        cpfCnpj TEXT,
+                        cpf_cnpj TEXT,
                         celular TEXT,
+                        email TEXT,
                         data_criacao INTEGER NOT NULL
                     )
                 """);
@@ -140,6 +141,10 @@ public final class DBInitializer {
         if(!existeEmpresaPadrao(conn)){
             inserirEmpresaPadrao(conn);
         }
+
+        if(!existeClientePadrao(conn)){
+            inserirClientePadrao(conn);
+        }
     }
 
     private static boolean existeLoginPadrao(Connection conn) throws SQLException {
@@ -174,6 +179,16 @@ public final class DBInitializer {
 
     private static boolean existeEmpresaPadrao(Connection conn) throws SQLException {
         String sql = "SELECT COUNT(*) FROM empresas WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, 1);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    private static boolean existeClientePadrao(Connection conn) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM clientes WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, 1);
             try (ResultSet rs = ps.executeQuery()) {
@@ -219,6 +234,18 @@ public final class DBInitializer {
             ps.setString(2, "1234");
             ps.setString(3, "admin");
             ps.setLong(4, System.currentTimeMillis());
+            ps.executeUpdate();
+        }
+    }
+
+    private static void inserirClientePadrao(Connection conn) throws SQLException {
+        String sql = "INSERT INTO clientes (nome, cpf_cnpj, celular, email, data_criacao) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "CLIENTE PADRÃO");
+            ps.setString(2, "");
+            ps.setString(3, "");
+            ps.setString(4, "");
+            ps.setLong(5, System.currentTimeMillis());
             ps.executeUpdate();
         }
     }

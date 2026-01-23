@@ -4,27 +4,25 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import megalodonte.ComputedState;
 import megalodonte.State;
+import megalodonte.async.Async;
+import megalodonte.base.UI;
 import megalodonte.components.*;
-import megalodonte.components.inputs.Input;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
-import megalodonte.utils.related.TextVariant;
 import my_app.db.dto.ClienteDto;
-import my_app.db.dto.FornecedorDto;
-import my_app.db.models.CategoriaModel;
 import my_app.db.models.ClienteModel;
-import my_app.db.models.FornecedorModel;
 import my_app.db.repositories.ClienteRepository;
-import my_app.db.repositories.FornecedorRepository;
+import my_app.screens.ContratoTelaCrud;
 import my_app.screens.components.Components;
+import my_app.utils.Utils;
 
-import java.sql.SQLException;
+import static my_app.utils.Utils.*;
 
-public class ClienteScreen {
+public class ClienteScreen implements ScreenComponent, ContratoTelaCrud {
     private final Router router;
     private final Theme theme = ThemeManager.theme();
     private final ClienteRepository clienteRepository = new ClienteRepository();
@@ -32,8 +30,21 @@ public class ClienteScreen {
     private final ObservableList<ClienteModel> clientes = FXCollections.observableArrayList();
     State<ClienteModel> clienteSelecionado = State.of(null);
 
+    private final State<String> nome = new State<>("");
+    private final State<String> cnpj = new State<>("");
+    private final State<String> celular = new State<>("");
+    private final State<String> email = new State<>("");
+
+    State<Boolean> editMode = State.of(false);
+
+    ComputedState<String> btnText = ComputedState.of( ()-> editMode.get()? "Atualizar": "+ Adicionar", editMode);
+
     public ClienteScreen(Router router) {
         this.router = router;
+    }
+
+    @Override
+    public void onMount() {
         loadClientes();
     }
 
@@ -47,89 +58,166 @@ public class ClienteScreen {
     }
 
     public Component render() {
-        return new Column(new ColumnProps().paddingAll(7), new ColumnStyler().bgColor(theme.colors().background()))
-                .c_child(Components.commonCustomMenus(this::handleClickMenuNew,
-                       this::handleClickMenuEdit,
-                       this::handleClickMenuDelete
-                ))
-                .c_child(new SpacerVertical(10))
-                .c_child(form())
-                .c_child(new SpacerVertical(30))
-                .c_child(table());
+        return mainView();
     }
 
-    private void handleClickMenuNew() {
-            btnText.set("+ Adicionar");
-            nome.set("");
-            cnpj.set("");
-    }
-
-    private void handleClickMenuEdit() {
-        nome.set(clienteSelecionado.get().nome);
-        cnpj.set(clienteSelecionado.get().cpfCnpj);
-        btnText.set("+ Atualizar");
-    }
-
-    private void handleClickMenuDelete() {
-        if(clienteSelecionado != null){
-            try{
-                clienteRepository.excluirById(clienteSelecionado.get().id);
-                IO.println("cliente excluido com sucesso");
-                clientes.removeIf(clienteModel -> clienteModel.id.equals(clienteSelecionado.get().id));
-            }catch (SQLException e){
-                e.printStackTrace();
-            }
-
-        }
-
-    }
-
-
-    private final State<String> nome = new State<>("");
-    private final State<String> cnpj = new State<>("");
-    private final State<String> celular = new State<>("");
-    private final State<String> btnText = new State<>("+ Adicionar");
-
-    Component form() {
+    @Override
+    public Component form() {
         return new Card(
                 new Column(new ColumnProps().paddingAll(20))
                         .c_child(Components.FormTitle("Cadastrar cliente"))
                         .c_child(new SpacerVertical(20))
                         .c_child(new Row(new RowProps().bottomVertically().spacingOf(10))
                                 .r_child(Components.InputColumn("Nome", nome, "Ex: João"))
-                                .r_child(Components.InputColumn("CPF/CNPJ", cnpj,"xx..."))
-                                .r_child(Components.InputColumn("Celular", celular,"(xx)xxxxx-yyyy"))
-                                .r_child(Components.ButtonCadastro(btnText,this::handleAdd))
-                        ));
+                                .r_child(Components.InputColumnNumeric("CPF/CNPJ", cnpj,"xx..."))
+                                .r_child(Components.InputColumnPhone("Celular", celular))
+                                .r_child(Components.InputColumn("Email", email,""))
+                        )
+                        .c_child(new SpacerVertical(20))
+                        .c_child(Components.actionButtons(btnText, this::handleAddOrUpdate, this::clearForm)));
     }
 
-    private void handleAdd() {
+    @Override
+    public void handleClickMenuEdit() {
+        final var data = clienteSelecionado.get();
+        if(data != null){
+            editMode.set(true);
+            nome.set(data.nome);
+            cnpj.set(data.cpfCnpj);
+            celular.set(data.celular);
+            email.set(data.email);
+        }
+    }
+
+    @Override
+    public void handleClickMenuDelete() {
+        final var forn = clienteSelecionado.get();
+        if(forn != null){
+            editMode.set(false);
+
+            Components.ShowAlertAdvice("Deseja excluir cliente  " + forn.nome, ()->{
+                Async.Run(()->{
+                    try{
+                        clienteRepository.excluirById(forn.id);
+                        UI.runOnUi(()->{
+                            clientes.removeIf(it-> it.id.equals(forn.id));
+                            Components.ShowPopup(router, "Cliente excluido com sucesso");
+                        });
+                    }catch (Exception e){
+                        UI.runOnUi(()->Components.ShowAlertError("Erro ao tentar excluir: " + e.getMessage()));
+                    }
+                });
+            });
+        }
+    }
+
+    @Override
+    public void handleClickMenuClone() {
+        editMode.set(false);
+
+        final var data = clienteSelecionado.get();
+        if(data != null){
+            nome.set(data.nome);
+            cnpj.set(data.cpfCnpj);
+            celular.set(data.celular);
+            email.set(data.email);
+        }
+    }
+
+    @Override
+    public void handleAddOrUpdate() {
         String nomeValue = nome.get().trim();
         String cnpjValue = cnpj.get().trim();
+        String celularValue = celular.get().trim();
+        String emailValue = email.get().trim();
 
         if (nomeValue.isEmpty()) {
-            IO.println("Nome é obrigatório");
+            Components.ShowAlertError("Nome é obrigatório");
             return;
         }
 
-        try {
-            //TODO: preencher mais dados
-            var dto = new ClienteDto(nomeValue, cnpjValue, "");
-            var model = clienteRepository.salvar(dto);
-            clientes.add(model);
-            
-            IO.println("cliente '" + model.nome + "' cadastrado com ID: " + model.id);
-            
-            // Limpa formulário
-            nome.set("");
-            cnpj.set("");
-            
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (!cnpjValue.isEmpty() && !isValidCnpj(cnpjValue)) {
+            Components.ShowAlertError("CNPJ inválido (deve conter 14 dígitos) e tem: " + cnpjValue.length() + " dígitos");
+            return;
+        }
+
+        // 3. Validação de E-mail (se preenchido)
+        if (!emailValue.isEmpty() && !isValidEmail(emailValue)) {
+            Components.ShowAlertError("Formato de e-mail inválido");
+            return;
+        }
+
+        // 4. Validação de Telefone/Celular
+        if (!celularValue.isEmpty() && !isValidPhone(celularValue)) {
+            Components.ShowAlertError("Telefone inválido (informe DDD + Número)");
+            return;
+        }
+
+        if(editMode.get() && clienteSelecionado.get() == null) return;
+
+        if(editMode.get()){
+            Async.Run(()->{
+                try {
+                    // 1. Criamos a Model com os novos dados mantendo o ID e Data de Criação originais
+                    var selecionado = clienteSelecionado.get();
+                    var modelAtualizada = new ClienteModel().fromIdAndDto(selecionado.id, new ClienteDto(
+                            nomeValue, cnpjValue, celularValue, emailValue
+                    ));
+
+                    // 2. Atualiza no Banco de Dados
+                    clienteRepository.atualizar(modelAtualizada);
+
+                    UI.runOnUi(() -> {
+                        // 3. Atualiza na ObservableList
+                        int index = clientes.indexOf(selecionado);
+                        if (index != -1) {
+                            clientes.set(index, modelAtualizada);
+                        }
+
+                        Components.ShowPopup(router, "Cliente atualizado com sucesso");
+                        clearForm();
+                    });
+
+                } catch (Exception e) {
+                    UI.runOnUi(()-> Components.ShowAlertError(e.getMessage()));
+                }
+            });
+        }else{
+            Async.Run(()->{
+                try {
+                    var dto = new ClienteDto(
+                            nomeValue,
+                            cnpjValue,
+                            celularValue,
+                            emailValue
+                    );
+
+                    var model = clienteRepository.salvar(dto);
+
+                    UI.runOnUi(()-> {
+                        clientes.add(model);
+                        Components.ShowPopup(router, "Cliente cadastrado com sucesso");
+                        clearForm();
+                    });
+
+                } catch (Exception e) {
+                    UI.runOnUi(()-> Components.ShowAlertError(e.getMessage()));
+                }
+            });
         }
     }
 
-    Component table() {
+    @Override
+    public void clearForm() {
+        nome.set("");
+        cnpj.set("");
+        celular.set("");
+        email.set("");
+    }
+
+
+    @Override
+    public Component  table() {
         TableView<ClienteModel> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -161,8 +249,7 @@ public class ClienteScreen {
         dataCol.setCellValueFactory(data -> {
             if (data.getValue().dataCriacao != null) {
                 return new javafx.beans.property.SimpleStringProperty(
-                    new java.util.Date(data.getValue().dataCriacao).toString()
-                );
+                    Utils.formatDateTime(data.getValue().dataCriacao));
             }
             return new javafx.beans.property.SimpleStringProperty("");
         });

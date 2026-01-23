@@ -16,7 +16,7 @@ public class ClienteRepository extends BaseRepository<ClienteDto,ClienteModel> {
     public ClienteModel salvar(ClienteDto dto) throws SQLException {
         String sql = """
         INSERT INTO clientes
-        (nome, cpfCnpj, celular, data_criacao) VALUES (?,?,?,?)
+        (nome, cpf_cnpj, celular, data_criacao, email) VALUES (?,?,?,?,?)
         """;
 
         long dataCriacao = System.currentTimeMillis();
@@ -26,13 +26,14 @@ public class ClienteRepository extends BaseRepository<ClienteDto,ClienteModel> {
             ps.setString(2, dto.cnpj());
             ps.setString(3, dto.telefone());
             ps.setLong(4, dataCriacao);
+            ps.setString(5, dto.email());
             ps.executeUpdate();
             
             // Recupera o ID gerado e cria nova instância
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     long idGerado = generatedKeys.getLong(1);
-                    return new ClienteModel(idGerado, dto.nome(), dto.cnpj(),dto.telefone(), dataCriacao);
+                    return new ClienteModel().fromIdAndDto(idGerado, dto);
                 }
             }
         }
@@ -44,7 +45,7 @@ public class ClienteRepository extends BaseRepository<ClienteDto,ClienteModel> {
         List<ClienteModel> lista = new ArrayList<>();
         try (Statement st = conn().createStatement()) {
             ResultSet rs = st.executeQuery("SELECT * FROM clientes");
-            while (rs.next()) lista.add(ClienteModel.fromResultSet(rs));
+            while (rs.next()) lista.add(new ClienteModel().fromResultSet(rs));
         }
         return lista;
     }
@@ -54,13 +55,15 @@ public class ClienteRepository extends BaseRepository<ClienteDto,ClienteModel> {
     @Override
     public void atualizar(ClienteModel model) throws SQLException {
         String sql = """
-        UPDATE clientes SET nome = ?, cpfCnpj = ? WHERE id = ?
+        UPDATE clientes SET nome = ?, cpf_cnpj = ?, email = ?, celular = ? WHERE id = ?
         """;
 
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
             ps.setString(1, model.nome);
             ps.setString(2, model.cpfCnpj);
-            ps.setLong(3, model.id);
+            ps.setString(3, model.email);
+            ps.setString(4, model.celular);
+            ps.setLong(5, model.id);
             ps.executeUpdate();
         }
     }
@@ -80,7 +83,7 @@ public class ClienteRepository extends BaseRepository<ClienteDto,ClienteModel> {
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
-            return rs.next() ? ClienteModel.fromResultSet(rs) : null;
+            return rs.next() ? new ClienteModel().fromResultSet(rs) : null;
         }
     }
 }

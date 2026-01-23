@@ -9,6 +9,10 @@
       <w>cidade</w>
       <w>codigo</w>
       <w>comissao</w>
+      <w>compra</w>
+      <w>contrato</w>
+      <w>criacao</w>
+      <w>desconto</w>
       <w>descricao</w>
       <w>estoque</w>
       <w>fornecedor</w>
@@ -21,13 +25,18 @@
       <w>lucro</w>
       <w>margem</w>
       <w>modoEdicao</w>
+      <w>observacao</w>
       <w>observacoes</w>
+      <w>pagamento</w>
       <w>parcela</w>
       <w>precoCompra</w>
       <w>precoVenda</w>
       <w>produto</w>
       <w>produtos</w>
+      <w>quantidade</w>
+      <w>reais</w>
       <w>texto</w>
+      <w>tipo</w>
       <w>unidade</w>
       <w>unidades</w>
       <w>validade</w>
