@@ -89,6 +89,10 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
         return (qtdValue * precoCompraValue - precoDescontoValue);
     }, descontoEmDinheiro, qtd, pcCompra);
 
+    ComputedState<String> descontoComputed = ComputedState.of(() -> Utils.toBRLCurrency(Utils.deCentavosParaReal(descontoEmDinheiro.get())),
+            descontoEmDinheiro);
+
+
     State<LocalDate> dataValidade = State.of(null);
 
     ObservableList<FornecedorModel> fornecedores = FXCollections.observableArrayList();
@@ -97,6 +101,9 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
     State<CompraModel> compraSelected = State.of(null);
     private ComprasRepository comprasRepository = new ComprasRepository();
     private final ObservableList<CompraModel> compras = FXCollections.observableArrayList();
+
+    State<List<String>> opcoesDeControleDeEstoque = State.of(List.of("Sim", "Não"));
+    State<String> opcaoDeControleDeEstoqueSelected = State.of(opcoesDeControleDeEstoque.get().getFirst());
 
 
     public ComprasScreen(Router router) {
@@ -155,13 +162,13 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
 
         final var top = new Row(new RowProps().bottomVertically().spacingOf(10))
                 .r_child(Components.DatePickerColumn(dataCompra, "Data de compra 2", "dd/mm/yyyy"))
-                .r_child(Components.SelectColumn("Fornecedor", fornecedores, fornecedorSelected, f -> f.nome))
+                .r_child(Components.SelectColumn("Fornecedor", fornecedores, fornecedorSelected, f -> f.nome, true))
                 .r_child(Components.InputColumn("N NF/Pedido compra", numeroNota, "Ex: 12345678920"))
                 .r_child(Components.InputColumnComFocusHandler("Código", codigo, "xxxxxxxx", searchProductOnFocusChange));
 
         final var valoresRow = new Row(new RowProps().bottomVertically().spacingOf(10))
                 .r_child(Components.TextWithValue("Valor total(bruto): ", totalBruto))
-                .r_child(Components.TextWithValue("Desconto: ", descontoEmDinheiro))
+                .r_child(Components.TextWithValue("Desconto: ", descontoComputed))
                 .r_child(Components.TextWithValue("Total geral(líquido): ", totalLiquido.map(it -> Utils.toBRLCurrency(BigDecimal.valueOf(it))))
                 );
 
@@ -179,8 +186,10 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
                         )
                         .c_child(new SpacerVertical(10))
                         .c_child(
-                                new Row(new RowProps().spacingOf(10)).r_child(Components.SelectColumn("Tipo de pagamento", tiposPagamento, tipoPagamentoSeleced, it -> it))
+                                new Row(new RowProps().spacingOf(10))
+                                        .r_child(Components.SelectColumn("Tipo de pagamento", tiposPagamento, tipoPagamentoSeleced, it -> it))
                                         .r_child(Components.TextAreaColumn("Observação", observacao, ""))
+                                        .r_child(Components.SelectColumn("Refletir no estoque?", opcoesDeControleDeEstoque, opcaoDeControleDeEstoqueSelected, it -> it))
                         )
                         .c_child(new SpacerVertical(10))
                         .c_child(aPrazoForm())
@@ -332,6 +341,50 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
     @Override
     public void handleClickMenuEdit() {
         modoEdicao.set(true);
+
+        final var data = compraSelected.get();
+        if (data != null) {
+            dataCompra.set(DateUtils.millisParaLocalDate(data.dataCompra));
+            numeroNota.set(data.numeroNota);
+
+            final var codProduto = data.produtoCod;
+            codigo.set(codProduto);
+
+            // Ao clonar, não precisamos buscar o produto async, já temos todos os dados
+            produtoEncontrado.set(null); // Limpa estado anterior
+
+            // Buscar fornecedor pelo ID para clonagem de forma assíncrona
+            // Garantir que a lista de fornecedores está carregada antes de selecionar
+            Async.Run(() -> {
+                try {
+                    // Se a lista estiver vazia, carregá-la primeiro
+                    if (fornecedores.isEmpty()) {
+                        var fornecedorModelList = new FornecedorRepository().listar();
+                        UI.runOnUi(() -> fornecedores.addAll(fornecedorModelList));
+                    }
+
+                    // Buscar o fornecedor específico
+                    var fornecedor = new FornecedorRepository().buscarById(data.fornecedorId);
+                    UI.runOnUi(() -> {
+                        fornecedorSelected.set(fornecedor);
+                        // Atualizar também o fornecedor no modelo da lista para refresh da tabela
+                        data.fornecedor = fornecedor;
+                    });
+                } catch (SQLException e) {
+                    IO.println("Erro ao buscar fornecedor: " + e.getMessage());
+                }
+            });
+
+            qtd.set(data.quantidade.stripTrailingZeros().toPlainString());
+            observacao.set(data.observacao);
+            tipoPagamentoSeleced.set(data.tipoPagamento);
+            pcCompra.set(Utils.deRealParaCentavos(data.precoDeCompra));
+            if (data.dataValidade != null) {
+                dataValidade.set(DateUtils.millisParaLocalDate(data.dataValidade));
+            } else {
+                dataValidade.set(null);
+            }
+        }
     }
 
     @Override
@@ -421,11 +474,12 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
                                     observacao.get(),
                                     DateUtils.localDateParaMillis(dataCompra.get()),
                                     numeroNota.get(),
-                                    DateUtils.localDateParaMillis(dataValidade.get())
+                                    dataValidade.get()!= null? DateUtils.localDateParaMillis(dataValidade.get()): null
                             ));
                     try {
                         comprasRepository.atualizar(modelAtualizada);
                         Utils.updateItemOnObservableList(compras, selecionado, modelAtualizada);
+                        Components.ShowPopup(router, "Sua compra de mercadoria foi atualizada com sucesso!");
                     } catch (SQLException e) {
                         UI.runOnUi(()->Components.ShowAlertError("Erro ao atualizar compra: " + e.getMessage()));
                     }
