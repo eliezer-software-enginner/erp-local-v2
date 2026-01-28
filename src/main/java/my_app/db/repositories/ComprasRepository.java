@@ -16,19 +16,23 @@ public class ComprasRepository extends BaseRepository<CompraDto, CompraModel> {
     public CompraModel salvar(CompraDto dto) throws SQLException {
         String sql = """
         INSERT INTO compras 
-        (produto_cod, fornecedor_id, quantidade, desconto_em_reais, tipo_pagamento, 
-         observacao, data_criacao) 
-         VALUES (?,?,?,?,?,?,?)
+        (produto_cod, fornecedor_id, quantidade, preco_compra, desconto_em_reais, tipo_pagamento, 
+         observacao, data_compra, numero_nota, data_validade, data_criacao) 
+         VALUES (?,?,?,?,?,?,?,?,?,?,?)
         """;
 
         try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, dto.produtoCod());
             ps.setLong(2, dto.fornecedorId());
             ps.setBigDecimal(3, dto.quantidade());
-            ps.setString(4, dto.descontoEmReais());
-            ps.setString(5, dto.tipoPagamento());
-            ps.setString(6, dto.observacao());
-            ps.setLong(7,  System.currentTimeMillis());
+            ps.setString(4, dto.precoCompra());
+            ps.setString(5, dto.descontoEmReais());
+            ps.setString(6, dto.tipoPagamento());
+            ps.setString(7, dto.observacao());
+            ps.setString(8, null); // data_compra - will be handled in model
+            ps.setString(9, null); // numero_nota - will be handled in model
+            ps.setString(10, null); // data_validade - will be handled in model
+            ps.setLong(11, System.currentTimeMillis());
             ps.executeUpdate();
             
             // Recupera o ID gerado e cria nova instância
@@ -55,7 +59,8 @@ public class ComprasRepository extends BaseRepository<CompraDto, CompraModel> {
     public void atualizar(CompraModel model) throws SQLException {
         String sql = """
         UPDATE compras SET produto_cod = ?, fornecedor_id = ?, quantidade = ?,
-        desconto_em_reais = ?, tipo_pagamento = ?, observacao = ?
+        preco_compra = ?, desconto_em_reais = ?, tipo_pagamento = ?, observacao = ?,
+        data_compra = ?, numero_nota = ?, data_validade = ?
         WHERE id = ?
         """;
 
@@ -63,10 +68,14 @@ public class ComprasRepository extends BaseRepository<CompraDto, CompraModel> {
             ps.setString(1, model.produtoCod);
             ps.setLong(2, model.fornecedorId);
             ps.setBigDecimal(3, model.quantidade);
-            ps.setString(4, model.descontoEmReais);
-            ps.setString(5, model.tipoPagamento);
-            ps.setString(6, model.observacao);
-            ps.setLong(7, model.id);
+            ps.setString(4, model.precoDeCompra);
+            ps.setString(5, model.descontoEmReais);
+            ps.setString(6, model.tipoPagamento);
+            ps.setString(7, model.observacao);
+            ps.setString(8, model.dataCompra != null ? model.dataCompra.toString() : null);
+            ps.setString(9, model.numeroNota);
+            ps.setString(10, model.dataValidade != null ? model.dataValidade.toString() : null);
+            ps.setLong(11, model.id);
             ps.executeUpdate();
         }
     }

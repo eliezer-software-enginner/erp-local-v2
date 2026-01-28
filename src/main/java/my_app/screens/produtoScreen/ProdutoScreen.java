@@ -1,14 +1,9 @@
 package my_app.screens.produtoScreen;
 
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import megalodonte.*;
 import megalodonte.async.Async;
 import megalodonte.base.UI;
 import megalodonte.components.*;
-import megalodonte.components.Button;
 import megalodonte.components.Component;
 import megalodonte.props.*;
 import megalodonte.router.Router;
@@ -41,17 +36,12 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
     }
 
     public Component render() {
-        var scroll = new ScrollPane();
-        VBox.setVgrow(scroll, Priority.ALWAYS);
-        scroll.setStyle("-fx-background-color: transparent;-fx-border-color: transparent;");
-        scroll.setContent(createMainContent().getJavaFxNode());
-
         return new Column(new ColumnProps().paddingAll(15), new ColumnStyler().bgColor(theme.colors().background()))
                 .c_child(commonCustomMenus())
                 .c_child(new SpacerVertical(20))
                 .c_child(createHeaderSection())
                 .c_child(new SpacerVertical(30))
-                .c_child(Component.CreateFromJavaFxNode(scroll));
+                .c_child(new Scroll(createMainContent()));
     }
 
     private Component createHeaderSection() {
@@ -192,27 +182,6 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
                         .padding(0)
                         .radius(12)
         );
-    }
-
-    private Component createActionButtons() {
-        return new Row(new RowProps().spacingOf(10))
-                .r_child(new Button(vm.btnText,
-                        new ButtonProps()
-                                .fillWidth()
-                                .height(35)
-                                .bgColor("#10b981")
-                                .textColor("white")
-                                .fontSize(16)
-                                .onClick(()->vm.salvarOuAtualizar(router))))
-                .r_child(new Button("Limpar",
-                        new ButtonProps()
-                                .fillWidth()
-                                .height(35)
-                                .bgColor("#6b7280")
-                                .textColor("white")
-                                .fontSize(16)
-                                .onClick(vm::limparFormulario))
-                );
     }
 
     private void fillInputs(ProdutoModel model) {

@@ -1,9 +1,5 @@
 package my_app.screens;
 
-import javafx.scene.Node;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import megalodonte.components.*;
 import megalodonte.props.ColumnProps;
 import megalodonte.props.GridFlowProps;
@@ -12,6 +8,7 @@ import megalodonte.props.TextProps;
 import megalodonte.router.Router;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.utils.related.TextVariant;
+import my_app.screens.components.Components;
 
 import java.util.List;
 
@@ -24,36 +21,27 @@ public class HomeScreen {
     }
 
     public Component render (){
+        GridFlow items = new GridFlow(new GridFlowProps().tileSize(200, 220).centerHorizontally().spacingOf(16))
+                .items(cardItemList, this::CardColumn);
+
+
         return new Column(new ColumnProps(), new ColumnStyler().bgColor("#fff"))
-                .c_child(Component.CreateFromJavaFxNode(menuBar()))
-                .c_child(new GridFlow(new GridFlowProps().tileSize(200, 220).centerHorizontally().spacingOf(16))
-                        .items(cardItemList,this::CardColumn)
+                .c_child(menuBar())
+                .c_child(new Scroll(items)
                 );
     }
 
-    private Node menuBar(){
-        var menuBar = new MenuBar();
-        var menu = new Menu("Preferências");
-        var menuCadastros = new Menu("Cadastros");
-        var menuGerencial = new Menu("Gerencial");
-
-        MenuItem menuItemCadFornecedores = new MenuItem("Fornecedores",null);
-        menuItemCadFornecedores.setOnAction(ev->  router.spawnWindow("fornecedores"));
-        MenuItem menuItemClientes = new MenuItem("Clientes",null);
-        menuItemClientes.setOnAction(ev-> router.spawnWindow("clientes"));
-        MenuItem menuItemCategorias = new MenuItem("Categorias",null);
-        menuItemCategorias.setOnAction(ev-> router.spawnWindow("categorias"));
-
-        menuCadastros.getItems().addAll(menuItemCadFornecedores, menuItemClientes, menuItemCategorias);
-        //------------Gerencial
-        MenuItem menuItemEmpresa = new MenuItem("Empresa",null);
-        menuItemEmpresa.setOnAction(ev-> router.spawnWindow("empresa"));
-        menuGerencial.getItems().addAll(menuItemEmpresa);
-       // var itemPreferences = new MenuItem("Preferências");
-       // menu.getItems().add(itemPreferences);
-
-        menuBar.getMenus().addAll(menu, menuCadastros, menuGerencial);
-        return menuBar;
+    private Component menuBar(){
+        return new MenuBar()
+                .menu(new Menu("Preferências"))
+                .menu(new Menu("Cadastros")
+                        .item("Fornecedores", ()-> router.spawnWindow("fornecedores"))
+                        .item("Clientes", ()-> router.spawnWindow("clientes"))
+                        .item("Categorias", ()-> router.spawnWindow("categorias"))
+                )
+                .menu(new Menu("Gerencial")
+                        .item("Empresa", ()-> router.spawnWindow("empresa"))
+                );
     }
 
 

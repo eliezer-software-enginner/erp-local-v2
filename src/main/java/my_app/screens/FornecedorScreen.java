@@ -67,6 +67,7 @@ public class FornecedorScreen implements ScreenComponent, ContratoTelaCrud {
         loadFornecedores();
     }
 
+
     private void loadFornecedores() {
         Async.Run(()->{
             try {
