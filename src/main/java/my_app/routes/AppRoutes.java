@@ -10,6 +10,7 @@ import my_app.screens.HomeScreen;
 import my_app.screens.categoriasScreen.CategoriaScreen;
 import my_app.screens.clienteScreen.ClienteScreen;
 import my_app.screens.FornecedorScreen;
+import my_app.screens.comprasAPagarScreen.ComprasAPagarScreen;
 import my_app.screens.produtoScreen.ProdutoScreen;
 
 import java.util.Set;
@@ -31,9 +32,10 @@ public class AppRoutes {
                //ok
                 new Router.Route("compras",router-> new ComprasScreen(router), new Router.RouteProps(1000, 650, "Compras de mercadorias", true)),
                 //ok
-                new Router.Route("clientes",router-> new ClienteScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de clientes", true))
+                new Router.Route("clientes",router-> new ClienteScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de clientes", true)),
+                new Router.Route("contas-a-pagar",router-> new ComprasAPagarScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de clientes", true))
         );
-        return new Router(routes, "auth", stage);
+        return new Router(routes, "compras", stage);
     }
 }
 
