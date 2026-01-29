@@ -17,9 +17,9 @@ public class ComprasRepository extends BaseRepository<CompraDto, CompraModel> {
         String sql = """
         INSERT INTO compras 
         (produto_cod, fornecedor_id, quantidade, preco_compra, desconto_em_reais, tipo_pagamento, 
-         observacao, data_compra, numero_nota, data_validade, quantidade_anterior, 
-         estoque_apos_compra, refletir_estoque, data_criacao) 
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+         observacao, data_criacao, data_compra, numero_nota, data_validade, quantidade_anterior, 
+         estoque_apos_compra, refletir_estoque) 
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """;
 
         try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -30,17 +30,17 @@ public class ComprasRepository extends BaseRepository<CompraDto, CompraModel> {
             ps.setBigDecimal(5, dto.descontoEmReais());
             ps.setString(6, dto.tipoPagamento());
             ps.setString(7, dto.observacao());
-            ps.setLong(8, dto.dataCompra());
-            ps.setString(9, dto.numeroNota());
+            ps.setLong(8, System.currentTimeMillis());
+            ps.setLong(9, dto.dataCompra());
+            ps.setString(10, dto.numeroNota());
             if (dto.dataValidade() != null) {
-                ps.setLong(10, dto.dataValidade());
+                ps.setLong(11, dto.dataValidade());
             } else {
-                ps.setNull(10, java.sql.Types.BIGINT);
+                ps.setNull(11, java.sql.Types.BIGINT);
             }
-            ps.setBigDecimal(11, dto.quantidadeAnterior());
-            ps.setBigDecimal(12, dto.estoqueAposCompra());
-            ps.setString(13, dto.refletirEstoque());
-            ps.setLong(14, System.currentTimeMillis());
+            ps.setBigDecimal(12, dto.quantidadeAnterior());
+            ps.setBigDecimal(13, dto.estoqueAposCompra());
+            ps.setString(14, dto.refletirEstoque());
             ps.executeUpdate();
             
             // Recupera o ID gerado e cria nova instância

@@ -606,7 +606,7 @@ var dto = new CompraDto(codigo.get(),
                             List<ContasPagarService.Parcela> parcelasParaService = parcelas.get().stream()
                                 .map(p -> new ContasPagarService.Parcela(
                                     p.numero(), 
-                                    p.dataVencimento().toEpochDay() * 86400000L, // Convert to milliseconds
+                                    DateUtils.localDateParaMillis(p.dataVencimento()), // Convert to milliseconds
                                     BigDecimal.valueOf(p.valor())
                                 ))
                                 .toList();
