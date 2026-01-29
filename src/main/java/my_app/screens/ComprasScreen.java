@@ -626,6 +626,7 @@ var dto = new CompraDto(codigo.get(),
                         Components.ShowPopup(router, "Sua compra de mercadoria foi salva com sucesso!");
                     });
                 } catch (SQLException e) {
+                    IO.println("Erro ao salvar compra: " + e.getMessage());
                     UI.runOnUi(()->Components.ShowAlertError("Erro ao salvar compra: " + e.getMessage()));
                 }
             }
