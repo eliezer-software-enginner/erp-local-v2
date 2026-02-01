@@ -20,6 +20,7 @@ import my_app.db.repositories.ProdutoRepository;
 import my_app.domain.ContratoTelaCrud;
 import my_app.domain.Parcela;
 import my_app.screens.components.Components;
+import my_app.services.CompraMercadoriaService;
 import my_app.services.ContasPagarService;
 
 import java.math.BigDecimal;
@@ -82,8 +83,9 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
     State<CompraModel> compraSelected = State.of(null);
     State<List<String>> opcoesDeControleDeEstoque = State.of(List.of("Sim", "Não"));
     State<String> opcaoDeControleDeEstoqueSelected = State.of(opcoesDeControleDeEstoque.get().getFirst());
-    private ComprasRepository comprasRepository = new ComprasRepository();
-    private ProdutoRepository produtoRepository = new ProdutoRepository();
+    private final ComprasRepository comprasRepository;
+    private final ProdutoRepository produtoRepository;
+    private CompraMercadoriaService compraMercadoriaService;
 
     public ComprasScreen(Router router) {
         this.router = router;
@@ -91,6 +93,10 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
         // Configura listeners para atualizar estoque visual
         qtd.subscribe(novaQtd -> atualizarEstoqueVisual());
         opcaoDeControleDeEstoqueSelected.subscribe(novaOpcao -> atualizarEstoqueVisual());
+
+        comprasRepository = new ComprasRepository();
+        produtoRepository = new ProdutoRepository();
+        compraMercadoriaService = new CompraMercadoriaService(comprasRepository, produtoRepository);
     }
 
     @Override
@@ -229,12 +235,10 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
         });
     }
 
-
     @Override
     public Component table() {
-
-        var simpleTable = new SimpleTable<CompraModel>();
-        simpleTable.fromData(compras)
+        return new SimpleTable<CompraModel>()
+                .fromData(compras)
                 .header()
                 .columns()
                 .column("ID", it -> it.id, (double) 90)
@@ -245,8 +249,6 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
                 .column("Data de criação", it -> DateUtils.millisToBrazilianDateTime(it.dataCriacao))
                 .build()
                 .onItemSelectChange(it -> compraSelected.set(it));
-
-        return simpleTable;
     }
 
     @Override
@@ -389,7 +391,8 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
         final var dtValidade = dataValidade.get() != null ?
                 DateUtils.localDateParaMillis(dataValidade.get()) : null;
 
-        final var dto = new CompraDto(codigo.get(),
+        final var dto = new CompraDto(
+                codigo.get(),
                 Utils.deCentavosParaReal(pcCompra.get()),
                 fornecedorSelected.get().id,
                 new BigDecimal(qtd.get()),
@@ -402,57 +405,45 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
                 new BigDecimal(totalLiquido.get())
         );
 
+        compraMercadoriaService.deveAtualizarEstoque = opcaoDeControleDeEstoqueSelected.get().equalsIgnoreCase("Sim");
+
         Async.Run(() -> {
             if (modoEdicao.get()) {
                 final var selecionado = compraSelected.get();
-                if (selecionado != null) {
-                    CompraModel modelAtualizada = new CompraModel().fromIdAndDto(selecionado.id, dto);
-                    try {
-                        comprasRepository.atualizar(modelAtualizada);
-                        compras.updateIf(it -> it.id.equals(selecionado.id), it -> modelAtualizada);
+                if(selecionado == null) return;
 
-                        // Atualiza o estoque com base na diferença entre as quantidades
-                        BigDecimal novaQuantidade = modelAtualizada.quantidade;
-                        BigDecimal quantidadeAnterior = selecionado.quantidade;
-                        atualizarEstoqueProduto(modelAtualizada.produtoCod, novaQuantidade, true, quantidadeAnterior);
-                        UI.runOnUi(()->  Components.ShowPopup(router, "Sua compra de mercadoria foi atualizada com sucesso!"));
-                    } catch (SQLException e) {
-                        UI.runOnUi(() -> Components.ShowAlertError("Erro ao atualizar compra: " + e.getMessage()));
-                    }
-                }
+                CompraModel modelAtualizada = new CompraModel().fromIdAndDto(selecionado.id, dto);
+                compraMercadoriaService.atualizarOrThrow(modelAtualizada, message->   UI.runOnUi(() -> Components.ShowAlertError("Erro ao atualizar compra: " + message)));
+
+                UI.runOnUi(()-> {
+                    Components.ShowPopup(router, "Sua compra de mercadoria foi atualizada com sucesso!");
+                    compras.updateIf(it -> it.id.equals(selecionado.id), it -> modelAtualizada);
+                });
             } else {
-                try {
-                    var compraSalva = comprasRepository.salvar(dto);
-                    // Gerar contas a pagar se for a prazo
-                    if ("A PRAZO".equals(tipoPagamentoSeleced.get()) && !parcelas.get().isEmpty()) {
-                        try {
-                            ContasPagarService contasPagarService = new ContasPagarService();
-                            List<Parcela> parcelasParaService = parcelas.get().stream()
-                                    .map(p -> new Parcela(
-                                            p.numero(),
-                                            p.dataVencimento(), // Convert to milliseconds
-                                            p.valor()
-                                    ))
-                                    .toList();
-                            contasPagarService.gerarContasDeCompra(compraSalva, parcelasParaService);
-                        } catch (SQLException e) {
-                            UI.runOnUi(() -> Components.ShowAlertError("Erro ao gerar contas a pagar: " + e.getMessage()));
-                            return;
-                        }
+                final var compraSalva = compraMercadoriaService.salvarOrThrow(dto, message ->  UI.runOnUi(() -> Components.ShowAlertError("Erro ao salvar compra de mercadoria: " + message)));
+                // Gerar contas a pagar se for a prazo
+                if ("A PRAZO".equals(tipoPagamentoSeleced.get()) && !parcelas.get().isEmpty()) {
+                    try {
+                        ContasPagarService contasPagarService = new ContasPagarService();
+                        List<Parcela> parcelasParaService = parcelas.get().stream()
+                                .map(p -> new Parcela(
+                                        p.numero(),
+                                        p.dataVencimento(),
+                                        p.valor()
+                                ))
+                                .toList();
+                        contasPagarService.gerarContasDeCompra(compraSalva, parcelasParaService);
+                    } catch (SQLException e) {
+                        UI.runOnUi(() -> Components.ShowAlertError("Erro ao gerar contas a pagar: " + e.getMessage()));
+                        return;
                     }
-
-                    // Atualiza o estoque do produto
-                    atualizarEstoqueProduto(dto.produtoCod(), dto.quantidade(), false, null);
-
-                    UI.runOnUi(() -> {
-                        IO.println("compra foi salva!");
-                        compras.add(compraSalva);
-                        Components.ShowPopup(router, "Sua compra de mercadoria foi salva com sucesso!");
-                    });
-                } catch (SQLException e) {
-                    IO.println("Erro ao salvar compra: " + e.getMessage());
-                    UI.runOnUi(() -> Components.ShowAlertError("Erro ao salvar compra: " + e.getMessage()));
                 }
+
+                UI.runOnUi(() -> {
+                    IO.println("compra foi salva!");
+                    compras.add(compraSalva);
+                    Components.ShowPopup(router, "Sua compra de mercadoria foi salva com sucesso!");
+                });
             }
         });
     }
@@ -473,50 +464,6 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
         opcaoDeControleDeEstoqueSelected.set("Não"); // Reset para padrão seguro
         estoqueAnterior.set("0");
         estoqueAtual.set("0");
-    }
-
-    /**
-     * Atualiza o estoque do produto baseado na operação de compra
-     *
-     * @param codigoBarras       Código de barras do produto
-     * @param quantidade         Quantidade da compra
-     * @param isEdicao           Se true, precisa calcular a diferença (nova quantidade - quantidade anterior)
-     * @param quantidadeAnterior Quantidade anterior da compra (usada apenas em edição)
-     */
-    void atualizarEstoqueProduto(String codigoBarras, BigDecimal quantidade, boolean isEdicao, BigDecimal quantidadeAnterior) {
-        if (!"Sim".equals(opcaoDeControleDeEstoqueSelected.get())) {
-            IO.println("Controle de estoque desativado para esta operação");
-            return;
-        }
-
-        Async.Run(() -> {
-            try {
-                BigDecimal quantidadeParaAtualizar;
-
-                if (isEdicao) {
-                    // Em edição, calcula a diferença: novo valor - valor anterior
-                    quantidadeParaAtualizar = quantidade.subtract(quantidadeAnterior);
-                    IO.println("Atualizando estoque (edição): " + codigoBarras +
-                            " | Qtd anterior: " + quantidadeAnterior +
-                            " | Nova qtd: " + quantidade +
-                            " | Diferença: " + quantidadeParaAtualizar);
-                } else {
-                    // Em adição, usa a quantidade diretamente
-                    quantidadeParaAtualizar = quantidade;
-                    IO.println("Adicionando ao estoque: " + codigoBarras + " | Quantidade: " + quantidade);
-                }
-
-                if (quantidadeParaAtualizar.compareTo(BigDecimal.ZERO) != 0) {
-                    produtoRepository.atualizarEstoque(codigoBarras, quantidadeParaAtualizar);
-                    IO.println("Estoque atualizado com sucesso para o produto: " + codigoBarras);
-                } else {
-                    IO.println("Sem alteração de estoque necessária para o produto: " + codigoBarras);
-                }
-            } catch (SQLException e) {
-                IO.println("Erro ao atualizar estoque do produto " + codigoBarras + ": " + e.getMessage());
-                UI.runOnUi(() -> Components.ShowAlertError("Erro ao atualizar estoque: " + e.getMessage()));
-            }
-        });
     }
 
     /**

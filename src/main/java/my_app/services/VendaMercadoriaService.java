@@ -19,9 +19,9 @@ public final class VendaMercadoriaService {
 
     public VendaModel salvarOrThrow(VendaDto vendaDto, Consumer<String> handleErrorMessage) throws RuntimeException{
         try {
-            var compraSalva = vendaRepository.salvar(vendaDto);
+            var venda = vendaRepository.salvar(vendaDto);
             produtoRepository.decrementarEstoque(vendaDto.produtoId(), vendaDto.quantidade());
-            return compraSalva;
+            return venda;
         } catch (SQLException e) {
             handleErrorMessage.accept(e.getMessage());
             return null;
