@@ -2,9 +2,6 @@ package my_app.screens;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import megalodonte.*;
 import megalodonte.async.Async;
 import megalodonte.base.UI;
@@ -12,36 +9,27 @@ import megalodonte.components.*;
 import megalodonte.props.ColumnProps;
 import megalodonte.props.RowProps;
 import megalodonte.router.Router;
-import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import my_app.db.dto.CompraDto;
-import my_app.db.dto.FornecedorDto;
 import my_app.db.models.*;
-import my_app.db.repositories.CategoriaRepository;
 import my_app.db.repositories.ComprasRepository;
 import my_app.db.repositories.ContasPagarRepository;
 import my_app.db.repositories.FornecedorRepository;
 import my_app.db.repositories.ProdutoRepository;
+import my_app.domain.ContratoTelaCrud;
 import my_app.domain.Parcela;
 import my_app.screens.components.Components;
 import my_app.services.ContasPagarService;
 
 import java.math.BigDecimal;
-import java.time.ZoneId;
 import java.util.List;
 
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 //TODO: finalizar implementações
 //TODO: lista de compras para exibir na tabela

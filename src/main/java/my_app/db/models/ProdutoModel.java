@@ -66,6 +66,8 @@ public class ProdutoModel extends ModelBase<ProdutoDto> {
             if (p.precoCompra != null && p.precoVenda != null) {
                 p.lucro = p.precoVenda.subtract(p.precoCompra);
             }
+
+            p.dataCriacao = rs.getLong("data_criacao");
             return p;
         }
 

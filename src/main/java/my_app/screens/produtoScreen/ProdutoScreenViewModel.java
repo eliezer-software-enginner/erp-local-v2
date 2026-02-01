@@ -20,6 +20,7 @@ import my_app.screens.components.Components;
 import my_app.services.ProdutoService;
 import my_app.utils.Utils;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class ProdutoScreenViewModel extends ViewModel {
@@ -53,6 +54,7 @@ public class ProdutoScreenViewModel extends ViewModel {
     public final State<String> observacoes = new State<>("");
     public final State<String> estoque = new State<>("");
     public final State<String> validade = new State<>("");
+    public final State<LocalDate> dtCriacao = State.of(null);
 
     public final State<String> imagem = new State<>("/assets/produto-generico.png");
 
@@ -138,18 +140,27 @@ public class ProdutoScreenViewModel extends ViewModel {
     public void loadInicial() {
         Async.Run(() -> {
             try {
-                var produtos = produtoRepository.listar();
+                var produtosList = produtoRepository.listar();
                 var fornecedores = new FornecedorRepository().listar();
                 var categorias = new CategoriaRepository().listar();
 
                 UI.runOnUi(() -> {
-                    this.produtos.addAll(produtos);
+                    this.produtos.addAll(produtosList);
 
                     this.categorias.set(categorias);
                     this.categoriaSelected.set(categorias.isEmpty() ? null : categorias.getFirst());
 
                     this.fornecedores.set(fornecedores);
                     this.fornecedorSelected.set(fornecedores.isEmpty() ? null : fornecedores.getFirst());
+
+                    for(var p :produtosList){
+                        var categoria = categorias.stream()
+                                .filter(it-> it.id.equals(p.id))
+                                .findFirst()
+                                .orElse(null);
+
+                        p.categoria = categoria;
+                    }
                 });
             } catch (Exception e) {
                 UI.runOnUi(() -> Components.ShowAlertError(e.getMessage()));

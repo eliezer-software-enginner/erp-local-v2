@@ -16,8 +16,8 @@ public class VendaRepository extends BaseRepository<VendaDto, VendaModel> {
         String sql = """
                 INSERT INTO vendas 
                 (produto_id, cliente_id, quantidade, preco_unitario, desconto, 
-                 valor_total, forma_pagamento, observacao, data_criacao)
-                VALUES (?,?,?,?,?,?,?,?,?)
+                 valor_total, forma_pagamento, observacao, data_criacao, total_liquido)
+                VALUES (?,?,?,?,?,?,?,?,?,?)
                 """;
 
         try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -30,6 +30,7 @@ public class VendaRepository extends BaseRepository<VendaDto, VendaModel> {
             ps.setString(7, dto.formaPagamento());
             ps.setString(8, dto.observacao());
             ps.setLong(9, System.currentTimeMillis());
+            ps.setBigDecimal(10, dto.totalLiquido());
             ps.executeUpdate();
 
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
@@ -112,7 +113,7 @@ public class VendaRepository extends BaseRepository<VendaDto, VendaModel> {
         String sql = """
                     UPDATE vendas SET
                       quantidade = ?, preco_unitario = ?, desconto = ?,
-                      valor_total = ?, forma_pagamento = ?, observacao = ?
+                      valor_total = ?, forma_pagamento = ?, observacao = ?, total_liquido = ?
                     WHERE id = ?
                 """;
 
@@ -124,6 +125,7 @@ public class VendaRepository extends BaseRepository<VendaDto, VendaModel> {
             ps.setString(5, model.formaPagamento);
             ps.setString(6, model.observacao);
             ps.setLong(7, model.id);
+            ps.setBigDecimal(8, model.totalLiquido);
             ps.executeUpdate();
         }
     }

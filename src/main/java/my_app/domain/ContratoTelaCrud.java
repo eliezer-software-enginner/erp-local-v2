@@ -1,4 +1,4 @@
-package my_app.screens;
+package my_app.domain;
 
 import megalodonte.components.Column;
 import megalodonte.components.Component;

@@ -159,6 +159,7 @@ public final class DBInitializer {
                         cliente_id INTEGER NOT NULL,
                         quantidade REAL NOT NULL,
                         preco_unitario REAL NOT NULL,
+                        total_liquido REAL NOT NULL,
                         desconto REAL DEFAULT 0,
                         valor_total REAL NOT NULL,
                         forma_pagamento TEXT,

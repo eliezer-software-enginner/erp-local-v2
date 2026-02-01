@@ -124,7 +124,12 @@ public class ProdutoRepository extends BaseRepository<ProdutoDto, ProdutoModel> 
 
     @Override
     protected ProdutoModel buscarById(Long id) throws SQLException {
-        return null;
+        String sql = "SELECT * FROM produtos WHERE id = ?";
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() ? new ProdutoModel().fromResultSet(rs) : null;
+        }
     }
 
     /**
@@ -179,6 +184,52 @@ public class ProdutoRepository extends BaseRepository<ProdutoDto, ProdutoModel> 
             
             if (rowsAffected == 0) {
                 throw new SQLException("Falha ao definir estoque. Produto não encontrado: " + codigoBarras);
+            }
+        }
+    }
+
+    public void incrementarEstoque(Long prodId, BigDecimal quantidade) throws SQLException {
+        if (quantidade.compareTo(BigDecimal.ZERO) < 0) {
+            throw new SQLException("Estoque não pode ser negativo: " + quantidade);
+        }
+
+        var produto = this.buscarById(prodId);
+        if(produto == null) throw new NullPointerException("Produto não encontrado para o ID: " + prodId.doubleValue());
+
+        var estoqueAtual = produto.estoque;
+        var novoEstoque = estoqueAtual.add(quantidade);
+
+        String sql = "UPDATE produtos SET estoque = ? WHERE id = ?";
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
+            ps.setBigDecimal(1, novoEstoque);
+            ps.setLong(2, prodId);
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException("Falha ao definir estoque. Produto não encontrado: " + prodId.doubleValue());
+            }
+        }
+    }
+
+    public void decrementarEstoque(Long prodId, BigDecimal quantidade) throws SQLException {
+        if (quantidade.compareTo(BigDecimal.ZERO) < 0) {
+            throw new SQLException("Estoque não pode ser negativo: " + quantidade);
+        }
+
+        var produto = this.buscarById(prodId);
+        if(produto == null) throw new NullPointerException("Produto não encontrado para o ID: " + prodId.doubleValue());
+
+        var estoqueAtual = produto.estoque;
+        var novoEstoque = estoqueAtual.subtract(quantidade);
+
+        String sql = "UPDATE produtos SET estoque = ? WHERE id = ?";
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
+            ps.setBigDecimal(1, novoEstoque);
+            ps.setLong(2, prodId);
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException("Falha ao definir estoque. Produto não encontrado: " + prodId.doubleValue());
             }
         }
     }

@@ -13,13 +13,10 @@ import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
 import my_app.db.models.ProdutoModel;
-import my_app.screens.ContratoTelaCrud;
+import my_app.domain.ContratoTelaCrud;
 import my_app.screens.components.Components;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
-
-
-import static my_app.screens.produtoScreen.ProdutoComponents.*;
 
 public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
     private final Router router;

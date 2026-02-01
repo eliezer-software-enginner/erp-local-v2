@@ -10,19 +10,18 @@ import megalodonte.base.UI;
 import megalodonte.components.*;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
 import my_app.db.dto.FornecedorDto;
 import my_app.db.models.FornecedorModel;
 import my_app.db.repositories.FornecedorRepository;
+import my_app.domain.ContratoTelaCrud;
 import my_app.screens.components.Components;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static my_app.utils.Utils.*;
 

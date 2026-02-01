@@ -12,6 +12,7 @@ public class VendaModel extends ModelBase<VendaDto> {
     public Long clienteId;
     public BigDecimal quantidade;
     public BigDecimal precoUnitario;
+    public BigDecimal totalLiquido;
     public BigDecimal desconto;
     public BigDecimal valorTotal;
     public String formaPagamento;
@@ -34,6 +35,7 @@ public class VendaModel extends ModelBase<VendaDto> {
         v.valorTotal = rs.getBigDecimal("valor_total");
         v.formaPagamento = rs.getString("forma_pagamento");
         v.observacao = rs.getString("observacao");
+        v.totalLiquido = rs.getBigDecimal("total_liquido");
         v.dataCriacao = rs.getLong("data_criacao");
         return v;
     }
@@ -50,6 +52,7 @@ public class VendaModel extends ModelBase<VendaDto> {
         v.valorTotal = dto.valorTotal();
         v.formaPagamento = dto.formaPagamento();
         v.observacao = dto.observacao();
+        v.totalLiquido = dto.totalLiquido();
         v.dataCriacao = System.currentTimeMillis();
         return v;
     }

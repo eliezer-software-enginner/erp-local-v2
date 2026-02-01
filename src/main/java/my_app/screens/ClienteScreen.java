@@ -13,9 +13,9 @@ import megalodonte.theme.ThemeManager;
 import my_app.db.dto.ClienteDto;
 import my_app.db.models.ClienteModel;
 import my_app.db.repositories.ClienteRepository;
+import my_app.domain.ContratoTelaCrud;
 import my_app.screens.components.Components;
 import my_app.utils.DateUtils;
-import my_app.utils.Utils;
 
 import java.util.List;
 

@@ -12,19 +12,17 @@ import megalodonte.theme.ThemeManager;
 import my_app.db.dto.VendaDto;
 import my_app.db.models.*;
 import my_app.db.repositories.*;
+import my_app.domain.ContratoTelaCrud;
 import my_app.domain.Parcela;
 import my_app.screens.components.Components;
+import my_app.services.VendaMercadoriaService;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-
-import static my_app.domain.Parcela.gerarParcelas;
 
 public class VendaMercadoriaScreen implements ScreenComponent, ContratoTelaCrud {
     public final ListState<VendaModel> vendas = ListState.of(List.of());
@@ -71,13 +69,19 @@ public class VendaMercadoriaScreen implements ScreenComponent, ContratoTelaCrud 
     ListState<ClienteModel> clientes = ListState.of(List.of());
     State<ClienteModel> clienteSelected = State.of(null);
     State<VendaModel> vendaSelected = State.of(null);
-    private VendaRepository vendaRepository = new VendaRepository();
-    private ProdutoRepository produtoRepository = new ProdutoRepository();
+
+    private final VendaRepository vendaRepository;
+    private final ProdutoRepository produtoRepository;
+
+    private final VendaMercadoriaService vendaService;
 
     public VendaMercadoriaScreen(Router router) {
         this.router = router;
         // Configura listeners para atualizar estoque visual
         qtd.subscribe(novaQtd -> atualizarEstoqueVisual());
+        produtoRepository = new ProdutoRepository();
+        vendaRepository = new VendaRepository();
+        vendaService = new VendaMercadoriaService(vendaRepository, produtoRepository);
     }
 
     @Override
@@ -271,11 +275,6 @@ public class VendaMercadoriaScreen implements ScreenComponent, ContratoTelaCrud 
             return;
         }
 
-        final var selecionado = vendaSelected.get();
-        if (selecionado != null) {
-            return;
-        }
-
         var dto = new VendaDto(
                 produtoEncontrado.get().id,
                 clienteSelected.get().id,
@@ -284,30 +283,26 @@ public class VendaMercadoriaScreen implements ScreenComponent, ContratoTelaCrud 
                 Utils.deCentavosParaReal(descontoEmDinheiro.get()),
                 Utils.deCentavosParaReal(String.valueOf(totalLiquido.get())),
                 tipoPagamentoSeleced.get(),
-                observacao.get()
+                observacao.get(),
+                new BigDecimal(totalLiquido.get())
         );
-        
+
+
         Async.Run(() -> {
             if (modoEdicao.get()) {
-                    var modelAtualizada = new VendaModel().fromIdAndDto(selecionado.id, dto);
-                    try {
-                        vendaRepository.atualizar(modelAtualizada);
-                        vendas.updateIf(it-> it.id.equals(selecionado.id), it-> modelAtualizada);
-                        Components.ShowPopup(router, "Sua venda de mercadoria foi atualizada com sucesso!");
-                    } catch (SQLException e) {
-                        UI.runOnUi(() -> Components.ShowAlertError("Erro ao atualizar venda: " + e.getMessage()));
-                    }
+                final var selecionado = vendaSelected.get();
+                if (selecionado == null) return;
+
+                var modelAtualizada = new VendaModel().fromIdAndDto(selecionado.id, dto);
+                vendaService.atualizarOrThrow(modelAtualizada, message -> UI.runOnUi(() -> Components.ShowAlertError("Erro ao atualizar venda: " + message)));
+                vendas.updateIf(it -> it.id.equals(selecionado.id), it -> modelAtualizada);
+                Components.ShowPopup(router, "Sua venda de mercadoria foi atualizada com sucesso!");
             } else {
-                try {
-                    var compraSalva = vendaRepository.salvar(dto);
-                    UI.runOnUi(() -> {
-                        vendas.add(compraSalva);
-                        Components.ShowPopup(router, "Sua venda de mercadoria foi salva com sucesso!");
-                    });
-                } catch (SQLException e) {
-                    IO.println("Erro ao salvar venda: " + e.getMessage());
-                    UI.runOnUi(() -> Components.ShowAlertError("Erro ao salvar venda: " + e.getMessage()));
-                }
+                var venda = vendaService.salvarOrThrow(dto, message -> UI.runOnUi(() -> Components.ShowAlertError("Erro ao salvar venda: " + message)));
+                UI.runOnUi(() -> {
+                    vendas.add(venda);
+                    Components.ShowPopup(router, "Sua venda de mercadoria foi salva com sucesso!");
+                });
             }
         });
     }

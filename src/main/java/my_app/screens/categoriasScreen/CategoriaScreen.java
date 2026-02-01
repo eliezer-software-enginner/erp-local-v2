@@ -11,16 +11,14 @@ import megalodonte.base.UI;
 import megalodonte.components.*;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import my_app.db.dto.CategoriaDto;
 import my_app.db.models.CategoriaModel;
 import my_app.db.repositories.CategoriaRepository;
-import my_app.screens.ContratoTelaCrud;
+import my_app.domain.ContratoTelaCrud;
 import my_app.screens.components.Components;
 import my_app.utils.DateUtils;
-import my_app.utils.Utils;
 
 import java.sql.SQLException;
 

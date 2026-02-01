@@ -1,7 +1,6 @@
 package my_app.screens.comprasAPagarScreen;
 
 import javafx.scene.control.*;
-import javafx.collections.ObservableList;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.Button;
@@ -16,14 +15,12 @@ import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
 import my_app.db.models.ContasPagarModel;
-import my_app.db.models.FornecedorModel;
-import my_app.screens.ContratoTelaCrud;
+import my_app.domain.ContratoTelaCrud;
 import my_app.screens.components.Components;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
 
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 
 public class ComprasAPagarScreen implements ScreenComponent, ContratoTelaCrud {
