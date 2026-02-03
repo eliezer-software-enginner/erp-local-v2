@@ -25,8 +25,8 @@ public class ContaAreceberModel extends ModelBase<ContaAreceberDto> {
     public String observacao;
 
     // Related objects (not stored in database)
-    public FornecedorModel fornecedor;
-    public CompraModel compra;
+    public ClienteModel cliente;
+    public VendaModel venda;
 
     @Override
     public ContaAreceberModel fromResultSet(ResultSet rs) throws SQLException {
@@ -40,9 +40,9 @@ public class ContaAreceberModel extends ModelBase<ContaAreceberDto> {
         model.dataRecebimento = rs.getLong("data_recebimento");
         if (rs.wasNull()) model.dataRecebimento = null;
         model.status = rs.getString("status");
-        model.clienteId = rs.getLong("fornecedor_id");
+        model.clienteId = rs.getLong("cliente_id");
         if (rs.wasNull()) model.clienteId = null;
-        model.vendaId = rs.getLong("compra_id");
+        model.vendaId = rs.getLong("venda_id");
         if (rs.wasNull()) model.vendaId = null;
         model.numeroDocumento = rs.getString("numero_documento");
         model.tipoDocumento = rs.getString("tipo_documento");

@@ -70,7 +70,7 @@ public class ContasAReceberService {
         repo.excluirById(id);
     }
 
-    public void registrarPagamento(Long id, BigDecimal valorRecebido) throws SQLException {
+    public void registrarRecebimento(Long id, BigDecimal valorRecebido) throws SQLException {
         if (valorRecebido == null || valorRecebido.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalStateException("Valor recebido deve ser maior que zero");
         }
