@@ -1,4 +1,4 @@
-package my_app.screens.categoriasScreen;
+package my_app.screens;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

@@ -1,18 +1,19 @@
 package my_app.db.repositories;
 
-import my_app.db.dto.CategoriaDto;
-import my_app.db.models.CategoriaModel;
+import my_app.db.dto.TecnicoDto;
+import my_app.db.models.TecnicoModel;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoriaRepository extends BaseRepository<CategoriaDto, CategoriaModel> {
-
-    // CREATE
-    public CategoriaModel salvar(CategoriaDto dto) throws SQLException {
+public class TecnicoRepository extends BaseRepository<TecnicoDto, TecnicoModel> {
+    public TecnicoModel salvar(TecnicoDto dto) throws SQLException {
         String sql = """
-        INSERT INTO categoria
+        INSERT INTO tecnicos
         (nome, data_criacao) VALUES (?,?)
         """;
 
@@ -27,26 +28,26 @@ public class CategoriaRepository extends BaseRepository<CategoriaDto, CategoriaM
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     long idGerado = generatedKeys.getLong(1);
-                    return new CategoriaModel(idGerado, dto.nome(), dataCriacao);
+                    return new TecnicoModel().fromIdAndDtoAndMillis(idGerado, dto, dataCriacao);
                 }
             }
         }
         throw new SQLException("Falha ao recuperar ID gerado");
     }
 
-    public List<CategoriaModel> listar() throws SQLException {
-        List<CategoriaModel> lista = new ArrayList<>();
+    public List<TecnicoModel> listar() throws SQLException {
+        List<TecnicoModel> lista = new ArrayList<>();
         try (Statement st = conn().createStatement()) {
-            ResultSet rs = st.executeQuery("SELECT * FROM categoria");
-            while (rs.next()) lista.add(CategoriaModel.fromResultSet(rs));
+            ResultSet rs = st.executeQuery("SELECT * FROM tecnicos");
+            while (rs.next()) lista.add(new TecnicoModel().fromResultSet(rs));
         }
         return lista;
     }
 
     // UPDATE
-    public void atualizar(CategoriaModel model) throws SQLException {
+    public void atualizar(TecnicoModel model) throws SQLException {
         String sql = """
-        UPDATE categoria SET nome = ? WHERE id = ?
+        UPDATE tecnicos SET nome = ? WHERE id = ?
         """;
 
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -58,19 +59,19 @@ public class CategoriaRepository extends BaseRepository<CategoriaDto, CategoriaM
 
     public void excluirById(Long id) throws SQLException {
         try (PreparedStatement ps =
-                     conn().prepareStatement("DELETE FROM categoria WHERE id = ?")) {
+                     conn().prepareStatement("DELETE FROM tecnicos WHERE id = ?")) {
             ps.setLong(1, id);
             ps.executeUpdate();
         }
     }
 
     @Override
-    protected CategoriaModel buscarById(Long id) throws SQLException {
-        String sql = "SELECT * FROM categoria WHERE id = ?";
+    protected TecnicoModel buscarById(Long id) throws SQLException {
+        String sql = "SELECT * FROM tecnicos WHERE id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
-            return rs.next() ? CategoriaModel.fromResultSet(rs) : null;
+            return rs.next() ? new TecnicoModel().fromResultSet(rs) : null;
         }
     }
 }

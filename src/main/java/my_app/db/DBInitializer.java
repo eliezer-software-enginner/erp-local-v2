@@ -191,6 +191,14 @@ public final class DBInitializer {
                         FOREIGN KEY (venda_id) REFERENCES vendas(id)
                     )
                 """);
+
+                st.execute("""
+                    CREATE TABLE IF NOT EXISTS tecnicos (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nome TEXT NOT NULL UNIQUE,
+                        data_criacao INTEGER NOT NULL
+                    )
+                """);
             }
             
             // Inserir dados padrão na primeira execução
