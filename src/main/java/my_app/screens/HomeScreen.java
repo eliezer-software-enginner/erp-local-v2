@@ -1,11 +1,9 @@
 package my_app.screens;
 
 import megalodonte.components.*;
-import megalodonte.props.ColumnProps;
-import megalodonte.props.GridFlowProps;
-import megalodonte.props.ImageProps;
-import megalodonte.props.TextProps;
+import megalodonte.props.*;
 import megalodonte.router.Router;
+import megalodonte.styles.CardStyler;
 import megalodonte.styles.ColumnStyler;
 import megalodonte.utils.related.TextVariant;
 import my_app.screens.components.Components;
@@ -21,7 +19,8 @@ public class HomeScreen {
     }
 
     public Component render (){
-        GridFlow items = new GridFlow(new GridFlowProps().tileSize(200, 220).centerHorizontally().spacingOf(16))
+        GridFlow items = new GridFlow(new GridFlowProps().tileSize(200, 220)
+                .centerHorizontally().spacingOf(16))
                 .items(cardItemList, this::CardColumn);
 
 
@@ -49,7 +48,7 @@ public class HomeScreen {
     record CardItem(String img, String title, String desc, String destination){}
     List<CardItem> cardItemList = List.of(
             new CardItem("/assets/venda.png", "Venda (F3)","Tela de vendas","cad-produto"),
-            new CardItem("/assets/ordem_servico.png", "Ordem de serviço (F5)","Tela de ordem de serviço",null),
+            //new CardItem("/assets/ordem_servico.png", "Ordem de serviço (F5)","Tela de ordem de serviço",null),
             new CardItem("/assets/produtos.png", "Produtos (F3)","Gerencie seus produtos","produtos"),
             new CardItem("/assets/clientes.png", "Clientes","Gerencie seus clientes","clientes"),
             new CardItem("/assets/contas_a_receber.png", "Contas a receber","Tela de contas a receber","contas-a-receber"),
@@ -62,11 +61,14 @@ public class HomeScreen {
     Component CardColumn(CardItem cardItem){
        return new Clickable(
                new Card(
-                new Column(new ColumnProps().centerHorizontally(), new ColumnStyler().bgColor("#fff"))
+                new Column(new ColumnProps().centerHorizontally(),
+                        new ColumnStyler()
+                                .borderWidth(0)
+                                .borderColor("#fff"))
                         .c_child(new Image(cardItem.img, new ImageProps().size(60)))
                         .c_child(new Text(cardItem.title, new TextProps().variant(TextVariant.BODY).bold()))
-                        .c_child(new Text(cardItem.desc,  new TextProps().variant(TextVariant.SMALL)))
-                ),
+                        .c_child(new Text(cardItem.desc,  new TextProps().variant(TextVariant.SMALL))),
+                       new CardProps().padding(10), new CardStyler().borderColor("#fff")),
                ()-> router.spawnWindow(cardItem.destination));
 
     }

@@ -9,7 +9,7 @@ public abstract class ModelBase<Dto> {
     public Long id;
     public Long dataCriacao;//TODO: mudar para createdMillis
 
-    private Map<String,Map<String,String>> mapSqlFieldDtoField;
+    private Map<String,Map<String,String>> mapSqlFieldModelField;
 
    // abstract public ModelBase<?> fromResultSet(ResultSet queryResultSet) throws SQLException;
     @Deprecated
@@ -26,12 +26,12 @@ public abstract class ModelBase<Dto> {
     }
 
     public Map<String, Map<String,String>> getMapSqlFieldModelFieldBase() {
-        if(mapSqlFieldDtoField == null){
-            mapSqlFieldDtoField = new HashMap<>();
-            mapSqlFieldDtoField.put("id", Map.of("id", "long"));
-            mapSqlFieldDtoField.put("data_criacao",Map.of("dataCriacao","long"));
+        if(mapSqlFieldModelField == null){
+            mapSqlFieldModelField = new HashMap<>();
+            mapSqlFieldModelField.put("id", Map.of("id", "long"));
+            mapSqlFieldModelField.put("data_criacao",Map.of("dataCriacao","long"));
         }
-        return mapSqlFieldDtoField;
+        return mapSqlFieldModelField;
     }
 
     protected void setField(String fieldName, Object value) {

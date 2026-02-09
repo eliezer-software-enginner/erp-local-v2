@@ -199,6 +199,27 @@ public final class DBInitializer {
                         data_criacao INTEGER NOT NULL
                     )
                 """);
+
+                st.execute("""
+                    CREATE TABLE IF NOT EXISTS ordens_de_servico (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        cliente_id INTEGER,
+                        tecnico_id INTEGER,
+                        equipamento TEXT,
+                        descricao TEXT,
+                        mao_de_obra_valor REAL,
+                        pecas_valor REAL,
+                        tipo_pagamento TEXT,
+                        problemas TEXT,
+                        observacao TEXT,
+                        checklist_relatorio TEXT,
+                        data_escolhida TEXT,
+                        total_liquido REAL NOT NULL,
+                        data_criacao INTEGER NOT NULL,
+                        FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+                        FOREIGN KEY (tecnico_id) REFERENCES tecnicos(id)
+                    )
+                """);
             }
             
             // Inserir dados padrão na primeira execução
