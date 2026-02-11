@@ -31,10 +31,6 @@ public class TecnicoScreen implements ScreenComponent, ContratoTelaCrud {
     State<TecnicoModel> tecnicoSelecionada = State.of(null);
     ListState<TecnicoModel> tecnicos = ListState.of(List.of());
 
-//    List<String> status = List.of("Aberto", "Aguardando peça", "Autorizado", "Cancelado", "Em andamento", "Faturado", "Finalizado", "Orçamento");
-//    State<String> statusSelecionado = State.of(status.getFirst());
-
-
     public TecnicoScreen(Router router) {
         this.router = router;
         tecnicoRepository = new TecnicoRepository();

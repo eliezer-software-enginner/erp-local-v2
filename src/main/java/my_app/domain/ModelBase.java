@@ -50,6 +50,7 @@ public abstract class ModelBase<Dto> {
             case "int" -> rs.getInt(sqlField);
             case "double" -> rs.getDouble(sqlField);
             case "boolean" -> rs.getBoolean(sqlField);
+            case "big-decimal" -> rs.getBigDecimal(sqlField);
             default -> throw new RuntimeException("Tipo não suportado: " + type);
         };
     }
