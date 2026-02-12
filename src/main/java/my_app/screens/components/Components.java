@@ -18,10 +18,7 @@ import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.components.inputs.OnChangeResult;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.ColumnStyler;
-import megalodonte.styles.DatePickerStyler;
-import megalodonte.styles.InputStyler;
-import megalodonte.styles.TextStyler;
+import megalodonte.styles.*;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
@@ -322,15 +319,16 @@ public class Components {
             Function<T, String> display, boolean compareById,
             String btnText, Runnable handleClick) {
 
-        var rowProps = new RowProps().spacingOf(10);
+        var rowProps = new RowProps().spacingOf(2)
+                .bottomVertically();
 
         return new Row(rowProps)
-                .r_child(new Row(new RowProps().bottomVertically())
                         .r_child(Components.SelectColumn(  label,  list,  stateSelected, display,compareById))
-                        .r_child(new Button(btnText, new ButtonProps().height(37)
+                        .r_child(new Button(btnText, new ButtonProps().height(35)
                                 .textColor("#FFF")
-                                .onClick(handleClick)))
-                );
+                                .marginBottom(2)
+                                .onClick(handleClick))
+                        );
     }
 
     public static Column TextColumn(String label, String value) {

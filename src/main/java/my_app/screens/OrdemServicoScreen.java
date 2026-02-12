@@ -81,8 +81,8 @@ public class OrdemServicoScreen implements ScreenComponent, ContratoTelaCrud {
         
         // Inscrever para receber eventos de criação de técnicos
         EventBus.getInstance().subscribe(event -> {
-            if (event instanceof TecnicoCriadoEvent) {
-                TecnicoModel novoTecnico = ((TecnicoCriadoEvent) event).getTecnico();
+            if (event instanceof TecnicoCriadoEvent ev) {
+                TecnicoModel novoTecnico = ev.getTecnico();
                 UI.runOnUi(() -> {
                     tecnicos.add(novoTecnico);
                     // Se for o primeiro técnico, selecioná-lo automaticamente
@@ -151,7 +151,7 @@ public class OrdemServicoScreen implements ScreenComponent, ContratoTelaCrud {
                 .r_child(Components.DatePickerColumn(dataVisita, "Data de visita"))
                 .r_child(Components.SelectColumn("Cliente", clientes, clienteSelected, f -> f.nome, true))
                 .r_child(Components.SelectColumnWithButton("Técnico", tecnicos, tecnicoSelected, it -> it.nome, true,
-                        "Criar", this::openTecnicoWindow))
+                        "+", this::openTecnicoWindow))
                 .r_child(Components.InputColumn("Equipamento", equipamento, "Marca, Modelo ou Serial"))
                 .r_child(Components.InputColumnCurrency("Mão de obra (R$)", maoDeObra));
 
