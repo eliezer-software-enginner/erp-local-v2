@@ -1,10 +1,14 @@
 package my_app.screens.components;
 
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
+import javafx.stage.Stage;
 import megalodonte.*;
 import megalodonte.components.*;
 import megalodonte.components.Button;
@@ -44,6 +48,12 @@ import static my_app.utils.Utils.formatPhone;
 public class Components {
 
     static Theme theme = ThemeManager.theme();
+
+    public static Row TextWithDetails(String label, Object value) {
+        return new Row()
+                .r_child(new Text(label, new TextProps().fontSize(theme.typography().body()).bold()))
+                .r_child(new Text(value.toString(), new TextProps().fontSize(theme.typography().body())));
+    }
 
     public static Component aPrazoForm(
             State<List<Parcela>> parcelas,
@@ -122,7 +132,15 @@ public class Components {
         popup.getContent().add(label);
         popup.setAutoHide(true);
         popup.show(router.getCurrentActiveStage());
+    }
 
+    public static void ShowModal(Component ui, Router router){
+        Stage stage = new Stage();
+        stage.setScene(new Scene((Parent) ui.getJavaFxNode(), 700, 500));
+        stage.setTitle("Detalhes");
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(router.getCurrentActiveStage());
+        stage.show();
     }
 
     public static void ShowAlertAdvice(String bodyMessage, Runnable handleSuccessEvent) {
@@ -136,7 +154,6 @@ public class Components {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             handleSuccessEvent.run();
         }
-
     }
 
     public static Card CardImageSelector(State<String> imagemState, Runnable handleChangeImage) {

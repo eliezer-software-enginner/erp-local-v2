@@ -61,6 +61,9 @@ dependencies {
     //sqlite
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 
+    //componentes gemfx
+    //implementation("com.dlsc.gemsfx:gemsfx:2.16.0")
+
     //implementation("megalodonte:megalodonte-previewer-components:1.0.0")
 
     // Dependências JavaFX removidas (agora gerenciadas pelo bloco 'javafx { ... }')

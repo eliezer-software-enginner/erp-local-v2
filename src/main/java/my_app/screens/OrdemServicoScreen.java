@@ -1,7 +1,9 @@
 package my_app.screens;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import megalodonte.ComputedState;
 import megalodonte.ListState;
 import megalodonte.State;
@@ -10,16 +12,14 @@ import megalodonte.base.UI;
 import megalodonte.components.*;
 import megalodonte.props.ColumnProps;
 import megalodonte.props.RowProps;
+import megalodonte.props.TextProps;
 import megalodonte.router.Router;
-import my_app.db.dto.CompraDto;
+import megalodonte.utils.related.TextVariant;
 import my_app.db.dto.OrdemServicoDto;
 import my_app.db.models.*;
 import my_app.db.repositories.*;
 import my_app.domain.ContratoTelaCrud;
-import my_app.domain.Parcela;
 import my_app.screens.components.Components;
-import my_app.services.CompraMercadoriaService;
-import my_app.services.ContasPagarService;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
 
@@ -62,7 +62,7 @@ public class OrdemServicoScreen implements ScreenComponent, ContratoTelaCrud {
         double maoObraValue = Double.parseDouble(maoDeObra.get()) / 100.0;
         double pecasValorValue = Double.parseDouble(pecasValor.get()) / 100.0;
 
-        return String.valueOf (maoObraValue - pecasValorValue);
+        return String.valueOf (maoObraValue + pecasValorValue);
     }, maoDeObra, pecasValor);
 
 
@@ -117,7 +117,6 @@ public class OrdemServicoScreen implements ScreenComponent, ContratoTelaCrud {
                 e.printStackTrace();
                 UI.runOnUi(() -> Components.ShowAlertError("Erro ao buscar compras: " + e.getMessage()));
             }
-
         });
     }
 
@@ -163,15 +162,36 @@ public class OrdemServicoScreen implements ScreenComponent, ContratoTelaCrud {
                 .header()
                 .columns()
                 .column("ID", it -> it.id, (double) 90)
+                .column("N. OS", it -> it.numeroOs, (double) 90)
                 .column("Cliente", it -> it.cliente.nome)
-                .column("Técnico Visitante", it -> it.tecnico)
+                .column("Status", it -> it.status)
                 .column("Equipamento", it -> it.equipamento)
                 .column("Mão de obra", it -> Utils.toBRLCurrency(it.maoDeObraValor))
                 .column("Total liq.", it -> Utils.toBRLCurrency(it.totalLiquido))
-                .column("Data de criação da OS", it -> DateUtils.millisToBrazilianDateTime(it.dataCriacao))
                 .column("Data de visita", it -> DateUtils.millisToBrazilianDateTime(it.dataEscolhida))
+                .column("Data de criação da OS", it -> DateUtils.millisToBrazilianDateTime(it.dataCriacao))
                 .build()
-                .onItemSelectChange(it -> osSelected.set(it));
+                .onItemSelectChange(it -> osSelected.set(it))
+                .onItemDoubleClick(it-> Components.ShowModal( ItemDetails(it), router));
+    }
+
+    Component ItemDetails(OrdemServicoModel model){
+        return new Column(new ColumnProps().paddingAll(20))
+                .c_child(new Text("Detalhes da ordem de serviço", new TextProps().variant(TextVariant.SUBTITLE)))
+                .c_child(new SpacerVertical(20))
+                .c_child(Components.TextWithDetails("ID: ", model.id))
+                .c_child(Components.TextWithDetails("Número da Ordem de serviço: ", model.numeroOs))
+                .c_child(Components.TextWithDetails("Checklist/Relatório: ", model.checklistRelatorio))
+                .c_child(Components.TextWithDetails("Cliente: ", model.cliente.nome))
+                .c_child(Components.TextWithDetails("Técnico visitante: ", model.tecnico.nome))
+                .c_child(Components.TextWithDetails("Data de visita: ", DateUtils.millisToBrazilianDateTime(model.dataEscolhida)))
+                .c_child(Components.TextWithDetails("Equipamento: ", model.equipamento))
+                .c_child(Components.TextWithDetails("Mão de obra (R$): ", Utils.toBRLCurrency(model.maoDeObraValor)))
+                .c_child(Components.TextWithDetails("Peças (R$): ", Utils.toBRLCurrency(model.pecas_valor)))
+                .c_child(Components.TextWithDetails("Total líquido (R$): ", Utils.toBRLCurrency(model.totalLiquido)))
+                .c_child(Components.TextWithDetails("Tipo de pagamento: ", model.tipoPagamento))
+                .c_child(Components.TextWithDetails("Status: ", model.status))
+                .c_child(Components.TextWithDetails("Data de criação: ", DateUtils.millisToBrazilianDateTime(model.dataCriacao)));
     }
 
     @Override
@@ -195,7 +215,6 @@ public class OrdemServicoScreen implements ScreenComponent, ContratoTelaCrud {
             Async.Run(() -> {
                 try {
                     Long osId = data.id;
-                    // Depois exclui a compra
                     ordemServicoRepository.excluirById(osId);
                     UI.runOnUi(() -> {
                         ordensDeServicoList.removeIf(it -> it.id.equals(osId));
@@ -265,8 +284,14 @@ public class OrdemServicoScreen implements ScreenComponent, ContratoTelaCrud {
                 }
             } else {
                 try {
-                    ordemServicoRepository.salvar(dto);
-                    UI.runOnUi(()-> Components.ShowPopup(router, "Sua ordem de serviço foi salva com sucesso!"));
+                    var model = ordemServicoRepository.salvar(dto);
+                    model.tecnico = tecnicoSelected.get();
+                    model.cliente = clienteSelected.get();
+
+                    UI.runOnUi(()-> {
+                        ordensDeServicoList.add(model);
+                        Components.ShowPopup(router, "Sua ordem de serviço foi salva com sucesso!");
+                    });
                 } catch (SQLException e) {
                     UI.runOnUi(() -> Components.ShowAlertError("Erro ao salvar ordem de serviço: " + e.getMessage()));
                 }
