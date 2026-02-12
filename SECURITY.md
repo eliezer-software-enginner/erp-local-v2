@@ -1,61 +1,73 @@
-# 🛡️ Configuração Segura - Telegram
+# 🛡️ Telegram Centralizado - Modelo de Serviço
 
-## ✅ **PROBLEMA RESOLVIDO**
-Seus tokens do Telegram estão protegidos e **NÃO ESTÃO MAIS HARDCODED**!
+## ✅ **MODELO IMPLEMENTADO**
+Seus tokens estão **hardcoded e criptografados** no aplicativo!
 
-## 📍 **Onde os Tokens Ficam?**
-- **Único local:** `~/.erp-local/app.properties`
-- **Protegido:** Ignorado no Git
-- **Criptografado:** Tokens são armazenados com AES-256
+## 🎯 **Como Funciona**
 
-## 🚀 **Como Usar (Método Automático)**
+### **Centralização Completa:**
+- 📨 **Você recebe TODAS as notificações** de todas as empresas
+- ⚙️ **Zero configuração** necessária para o usuário final  
+- 🔐 **Tokens criptografados** no código fonte (AES-256)
 
-Execute uma vez para criar configuração:
+### **Modelo de Negócio:**
+- 📊 **Monitoramento central** de todas as operações
+- 🚨 **Alertas proativos** antes que clientes reclamem
+- 📈 **Visibilidade total** do uso da aplicação
+
+## 🔧 **Como Atualizar Tokens**
+
+Se precisar mudar seus tokens:
+
+1. **Use o utilitário de criptografia:**
 ```java
-TelegramNotifier.criarConfigInicial();
+CryptoManager crypto = new CryptoManager();
+String encryptedToken = crypto.encrypt("SEU_NOVO_TOKEN");
+String encryptedChatId = crypto.encrypt("SEU_NOVO_CHAT_ID");
 ```
 
-O arquivo será criado automaticamente em: `~/.erp-local/app.properties`
-
-## 📝 **Manualmente**
-
-### 1. Criar arquivo em `~/.erp-local/app.properties`
-```properties
-telegram.bot.token=SEU_BOT_TOKEN_AQUI
-telegram.chat.id=SEU_CHAT_ID_AQUI
-```
-
-### 2. Ou com criptografia (recomendado)
-```properties
-telegram.bot.token=encrypted:VALOR_CRIPTOGRAFADO
-telegram.chat.id=encrypted:VALOR_CRIPTOGRAFADO
-```
-
-## 🔧 **Como Criar Configuração Criptografada**
-
-Use este código para criptografar seus valores:
+2. **Substitua os valores em `TelegramNotifier.java`:**
 ```java
-String encryptedToken = new CryptoManager().encrypt("SEU_TOKEN");
-String encryptedChatId = new CryptoManager().encrypt("SEU_CHAT_ID");
+private static final String ENCRYPTED_BOT_TOKEN = "NOVO_VALOR_AQUI";
+private static final String ENCRYPTED_CHAT_ID = "NOVO_VALOR_AQUI";
+```
+
+3. **Recompile o aplicativo:**
+```bash
+./gradlew build
 ```
 
 ## 🛡️ **Segurança Implementada**
 
-- ✅ Tokens removidos do código fonte
-- ✅ Arquivo `.erp-local/` no `.gitignore`
-- ✅ Criptografia AES-256 automática
-- ✅ Configuração local e segura
+- ✅ **Tokens nunca em texto claro** no código
+- ✅ **Criptografia AES-256** robusta
+- ✅ **Chave persistente** baseada na máquina
+- ✅ **Sem arquivos externos** para o usuário
 
-## 🚨 **IMPORTANTE**
+## 📦 **Para o Usuário Final**
 
-- **NUNCA** compartilhe o arquivo `~/.erp-local/app.properties`
-- **SEMPRE** mantenha backup deste arquivo
-- **JAMAIS** commit dados sensíveis
+### **Instalação:**
+1. ✅ Download do `.exe`
+2. ✅ Executar instalação
+3. ✅ **Funciona imediatamente!**
 
-## 📁 **Estrutura Final**
-```
-~/.erp-local/
-└── app.properties  ← Tokens criptografados aqui
-```
+### **Experiência:**
+- 🎯 **Zero configuração** necessária
+- 📱 **Notificações automáticas** para você
+- 🔒 **Privacidade mantida** (sem acesso aos tokens)
 
-**Seus tokens estão 100% seguros agora!** 🎉
+## 🚨 **IMPORTANTE PARA VOCÊ**
+
+- **Seus tokens agora estão em todo .exe distribuído**
+- **Seus tokens podem ser extraídos por engenharia reversa**
+- **Considere criar um bot dedicado para este serviço**
+- **Monitore o uso do bot** para detectar abusos
+
+## 🔄 **Alternativas Futuras**
+
+Se precisar mais controle:
+- **API central**: Empresas enviam para seu servidor
+- **Tokens por cliente**: Cada empresa configura seu próprio bot
+- **Webhook system**: Integrações personalizadas
+
+**Modelo atual: Máxima simplicidade para usuário final!** 🎊

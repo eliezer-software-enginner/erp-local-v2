@@ -1,6 +1,5 @@
 package my_app.services;
 
-import my_app.config.ConfigManager;
 import my_app.security.CryptoManager;
 
 import java.net.URI;
@@ -10,45 +9,26 @@ import java.net.http.HttpResponse;
 
 public class TelegramNotifier {
     
-    private static ConfigManager config = ConfigManager.getInstance();
+    private static final String ENCRYPTED_BOT_TOKEN = "+812cuwU78oafnEIvx81O6P3aog8Xr27Nq+3jpn89zSLCKCYQroJxhe3IfMoYrxy";
+    private static final String ENCRYPTED_CHAT_ID = "b1VGXhC7pw7U+trCojYM2w==";
     private static CryptoManager crypto = new CryptoManager();
     
     private static String getBotToken() {
-        String token = config.getProperty("telegram.bot.token");
-        if (token == null || token.startsWith("SEU_BOT_TOKEN")) {
+        try {
+            return crypto.decrypt(ENCRYPTED_BOT_TOKEN);
+        } catch (Exception e) {
+            System.err.println("Erro ao descriptografar token: " + e.getMessage());
             return null;
         }
-        
-        // Se começar com "encrypted:", descriptografar
-        if (token.startsWith("encrypted:")) {
-            try {
-                return crypto.decrypt(token.substring(10));
-            } catch (Exception e) {
-                System.err.println("Erro ao descriptografar token: " + e.getMessage());
-                return null;
-            }
-        }
-        
-        return token;
     }
     
     private static String getChatId() {
-        String chatId = config.getProperty("telegram.chat.id");
-        if (chatId == null || chatId.startsWith("SEU_CHAT_ID")) {
+        try {
+            return crypto.decrypt(ENCRYPTED_CHAT_ID);
+        } catch (Exception e) {
+            System.err.println("Erro ao descriptografar chat ID: " + e.getMessage());
             return null;
         }
-        
-        // Se começar com "encrypted:", descriptografar
-        if (chatId.startsWith("encrypted:")) {
-            try {
-                return crypto.decrypt(chatId.substring(10));
-            } catch (Exception e) {
-                System.err.println("Erro ao descriptografar chat ID: " + e.getMessage());
-                return null;
-            }
-        }
-        
-        return chatId;
     }
 
     public static void enviarMensagemParaTelegram(String mensagem) {
@@ -56,7 +36,7 @@ public class TelegramNotifier {
         String chatId = getChatId();
         
         if (botToken == null || chatId == null) {
-            System.err.println("Configure o Telegram em ~/.erp-local/app.properties");
+            System.err.println("❌ Erro de configuração do Telegram");
             return;
         }
         
@@ -82,42 +62,12 @@ public class TelegramNotifier {
                     HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                System.out.printf("Mensagem enviada para Telegram. Resposta: %s%n", response.body());
+                System.out.printf("✅ Notificação enviada com sucesso%n");
             } else {
-                System.out.printf("Erro HTTP %d: %s%n", response.statusCode(), response.body());
+                System.out.printf("❌ Erro HTTP %d: %s%n", response.statusCode(), response.body());
             }
         } catch (Exception e) {
-            System.out.printf("Erro ao enviar mensagem: %s%n", e.getMessage());
-        }
-    }
-    
-    public static void criarConfigInicial() {
-        String botToken = "8214368967:AAFN-Hq8bNU1pue0o4ysK_FsxQ5jde8mTXs";
-        String chatId = "-1002907413630";
-        
-        String config = """
-                # Configurações do Telegram - ERP Local v2
-                # NÃO COMPARTILHAR ESTE ARQUIVO
-                
-                telegram.bot.token=encrypted:%s
-                telegram.chat.id=encrypted:%s
-                """.formatted(
-                crypto.encrypt(botToken),
-                crypto.encrypt(chatId)
-        );
-        
-        try {
-            String userHome = System.getProperty("user.home");
-            String configPath = userHome + "/.erp-local/app.properties";
-            
-            java.nio.file.Path path = java.nio.file.Paths.get(configPath);
-            java.nio.file.Files.createDirectories(path.getParent());
-            java.nio.file.Files.write(path, config.getBytes());
-            
-            System.out.println("✅ Configuração criada em: " + configPath);
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao criar configuração: " + e.getMessage());
+            System.out.printf("❌ Erro ao enviar: %s%n", e.getMessage());
         }
     }
 }
