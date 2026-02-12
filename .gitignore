@@ -63,3 +63,6 @@ app.properties
 *.crt
 *.p12
 *.jks
+
+SECURITY.md
+criptografando-dados-sensiveis.png
