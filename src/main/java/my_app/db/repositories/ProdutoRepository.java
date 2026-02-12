@@ -59,7 +59,12 @@ public class ProdutoRepository extends BaseRepository<ProdutoDto, ProdutoModel> 
             ps.setString(10, p.imagem);
             ps.setLong(11, System.currentTimeMillis());
             ps.setString(12, p.marca);
-            ps.setString(13, p.validade);
+
+            if (p.validade != null) {
+                ps.setLong(13, p.validade);
+            } else {
+                ps.setNull(13, java.sql.Types.BIGINT);
+            }
             ps.setString(14, p.comissao);
             ps.setString(15, p.garantia);
             ps.executeUpdate();
@@ -106,7 +111,11 @@ public class ProdutoRepository extends BaseRepository<ProdutoDto, ProdutoModel> 
             ps.setString(8, p.observacoes);
             ps.setString(9, p.imagem);
             ps.setString(10, p.marca);
-            ps.setString(11, p.validade);
+            if (p.validade != null) {
+                ps.setLong(13, p.validade);
+            } else {
+                ps.setNull(13, java.sql.Types.BIGINT);
+            }
             ps.setString(12, p.comissao);
             ps.setString(13, p.garantia);
             ps.setString(14, p.codigoBarras);

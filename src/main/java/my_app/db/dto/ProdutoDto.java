@@ -16,7 +16,7 @@ public class ProdutoDto {
     public BigDecimal estoque;
     public String observacoes;
     public String imagem;
-    public String validade;
+    public Long validade;
     public String comissao;
     public String garantia;
 }

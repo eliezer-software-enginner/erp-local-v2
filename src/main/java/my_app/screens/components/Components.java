@@ -398,7 +398,6 @@ public class Components {
                     if (numeric.isEmpty()) {
                         return OnChangeResult.of("", "");
                     }
-
                     return OnChangeResult.of(numeric, numeric);
                 })
                 .lockCursorToEnd();

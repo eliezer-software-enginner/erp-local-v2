@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ProdutoModel extends ModelBase<ProdutoDto> {
-    public Long id;
     //TODO: CODIGO DE BARRAS DEVERIA SER UMA TABELA, ONDE ELE É UNICO POR PRODUTO
 
     // ainda string, mas já pensando em normalizar depois
@@ -37,8 +36,7 @@ public class ProdutoModel extends ModelBase<ProdutoDto> {
     public String observacoes;
     public String imagem;
 
-    public Long dataCriacao; // epoch millis
-    public String validade;
+    public Long validade;
     public String comissao;
     public String garantia;
 
@@ -59,7 +57,12 @@ public class ProdutoModel extends ModelBase<ProdutoDto> {
         p.observacoes = rs.getString("observacoes");
         p.imagem = rs.getString("imagem");
         p.marca = rs.getString("marca");
-        p.validade = rs.getString("validade");
+        p.validade = rs.getLong("validade");
+
+        if (rs.wasNull()) {
+            p.validade = null;
+        }
+
         p.comissao = rs.getString("comissao");
         p.garantia = rs.getString("garantia");
 

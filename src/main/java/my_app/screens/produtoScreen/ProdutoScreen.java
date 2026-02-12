@@ -1,6 +1,8 @@
 package my_app.screens.produtoScreen;
 
 import javafx.stage.FileChooser;
+import megalodonte.ComputedState;
+import megalodonte.Show;
 import megalodonte.async.Async;
 import megalodonte.base.UI;
 import megalodonte.components.*;
@@ -17,6 +19,8 @@ import my_app.domain.ContratoTelaCrud;
 import my_app.screens.components.Components;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
+
+import java.util.List;
 
 public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
     private final Router router;
@@ -58,7 +62,7 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
     private Component createMainContent() {
         return new Column(new ColumnProps().spacingOf(30))
                 .c_child(createFormSection())
-                .c_child(createTableSection());
+                .c_child(table());
     }
 
     private Component createFormSection() {
@@ -83,25 +87,10 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
                                 new TextProps().variant(TextVariant.BODY).bold()))
                         .c_child(new SpacerVertical(20))
                         .c_child(new Row()
-                                .r_child(ProdutoComponents.ContainerLeft(vm))
+                                .r_child(ContainerLeft(vm))
                                 .r_child(Components.CardImageSelector(vm.imagem, handleChangeImage)))
                         .c_child(new SpacerVertical(25))
                         .c_child(Components.actionButtons(vm.btnText,this::handleAddOrUpdate, this::clearForm)),
-                new CardProps()
-                        .padding(0)
-                        .radius(12)
-        );
-    }
-
-    private Component createTableSection() {
-        return new Card(
-                new Column(new ColumnProps().paddingAll(25))
-                        .c_child(new Row(new RowProps().spacingOf(10))
-                                .r_child(new Text("Produtos Cadastrados",
-                                        new TextProps().fontSize(20).bold()))
-                        )
-                        .c_child(new SpacerVertical(15))
-                        .c_child(table()),
                 new CardProps()
                         .padding(0)
                         .radius(12)
@@ -114,7 +103,7 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
         simpleTable.fromData(vm.produtos)
                 .header()
                 .columns()
-                .column("ID", it-> it.id)
+                .column("ID", it-> it.id, 70.0)
                 .column("Código", it-> it.codigoBarras)
                 .column("Estoque", it-> it.estoque)
                 .column("Descrição", it-> it.descricao)
@@ -126,6 +115,51 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
                 .onItemSelectChange(vm.produtoSelected::set);
 
         return simpleTable;
+    }
+
+    public Component ContainerLeft(ProdutoScreenViewModel vm) {
+        var rowProps = new RowProps().spacingOf(10);
+
+        Runnable handleGerarCodigoBarras = ()->{
+            final var codigo = Utils.gerarCodigoBarrasEAN13();
+            vm.codigoBarras.set(codigo);
+        };
+
+
+       var showValidadePicker = ComputedState.of(()->vm.perecivelSelected.get().equals("Sim"), vm.perecivelSelected);
+
+        return new Column(new ColumnProps().spacingOf(20))
+                .c_child(
+                        new Row(rowProps)
+                                .r_child(new Row(new RowProps().bottomVertically())
+                                        .r_child(Components.InputColumn("SKU(Código de barras)", vm.codigoBarras, ""))
+                                        .r_child(new Button("Gerar", new ButtonProps().height(37)
+                                                .textColor("#FFF")
+                                                .onClick(handleGerarCodigoBarras)))
+                                )
+                                .r_child(Components.InputColumn("Descrição curta", vm.descricao, ""))
+                                .r_child(Components.SelectColumn("Unidade", vm.unidades, vm.unidadeSelected, it -> it))
+                                .r_child(Components.InputColumn("Marca", vm.marca, ""))
+                ).c_child(new Row(rowProps)
+                                .r_child(Components.InputColumnCurrency("Preço de compra", vm.precoCompra))
+                                //.r_child(Components.InputColumn("Margem %", vm.margem, ""))
+//                        .r_child(Components.InputColumn("Lucro", vm.lucro,Entypo.CREDIT))
+                                .r_child(Components.InputColumnCurrency("Preço de venda", vm.precoVenda))
+                                .r_child(Components.SelectColumn("Categoria", vm.categorias, vm.categoriaSelected, it -> it.nome))
+                                .r_child(Components.SelectColumn("Fornecedor", vm.fornecedores, vm.fornecedorSelected, it -> it.nome))
+                                .r_child(Components.SelectColumn("É perecível?", List.of("Sim", "Não"), vm.perecivelSelected, it-> it))
+                                .r_child(Show.when(showValidadePicker, ()-> Components.DatePickerColumn(vm.validade, "Validade"))
+                                )
+
+                ).c_child(new Row(rowProps)
+                        .r_child(Components.InputColumn("Garantia", vm.garantia, ""))
+                        //.r_child(Components.DatePickerColumn(vm.validade, "Validade"))
+                        .r_child(Components.InputColumn("Comissão", vm.comissao, ""))
+                )
+                .c_child(new Row(rowProps)
+                        .r_child(Components.TextAreaColumn("Observações", vm.observacoes, ""))
+                        .r_child(Components.InputColumnNumeric("Estoque", vm.estoque, ""))//fornecedor padrão
+                );
     }
 
     @Override
@@ -189,7 +223,7 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
         vm.marca.set(model.marca);
         vm.unidadeSelected.set(model.unidade);
         vm.estoque.set(Utils.quantidadeTratada(model.estoque));
-        vm.validade.set(model.validade);
+        vm.validade.set(DateUtils.millisParaLocalDate(model.validade));
         vm.observacoes.set(model.observacoes);
         vm.imagem.set(model.imagem);
     }

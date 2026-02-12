@@ -35,13 +35,13 @@ public class AppRoutes {
                 //ok
                 new Router.Route("tecnicos",router-> new TecnicoScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de Técnicos para ordem de serviço", true)),
 
-                new Router.Route("ordem-de-servico",router-> new OrdemServicoScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de contas a receber", true)),
+                new Router.Route("ordem-de-servico",router-> new OrdemServicoScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de ordens de serviço", true)),
 
                 new Router.Route("contas-a-receber",router-> new ContasAReceberScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de contas a receber", true)),
                 //ok
                 new Router.Route("vendas",router-> new VendaMercadoriaScreen(router), new Router.RouteProps(1000, 650, "Gerencie sua venda de mercadorias", true))
         );
-        return new Router(routes, "ordem-de-servico", stage);
+        return new Router(routes, "produtos", stage);
     }
 }
 

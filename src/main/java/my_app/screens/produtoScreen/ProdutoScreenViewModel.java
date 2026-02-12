@@ -18,6 +18,7 @@ import my_app.db.repositories.ProdutoRepository;
 import my_app.lifecycle.viewmodel.component.ViewModel;
 import my_app.screens.components.Components;
 import my_app.services.ProdutoService;
+import my_app.utils.DateUtils;
 import my_app.utils.Utils;
 
 import java.math.BigDecimal;
@@ -55,7 +56,7 @@ public class ProdutoScreenViewModel extends ViewModel {
 
     public final State<String> observacoes = new State<>("");
     public final State<String> estoque = new State<>("0");
-    public final State<String> validade = new State<>("");
+    public final State<LocalDate> validade = State.of(null);
     public final State<LocalDate> dtCriacao = State.of(null);
 
     public final State<String> imagem = new State<>("/assets/produto-generico.png");
@@ -63,6 +64,8 @@ public class ProdutoScreenViewModel extends ViewModel {
     public final State<Boolean> modoEdicao = State.of(false);
     public final ComputedState<String> btnText = ComputedState.of(() -> modoEdicao.get() ? "Atualizar" : "+ Adicionar", modoEdicao);
     public final State<ProdutoModel> produtoSelected = State.of(null);
+
+    public final State<String> perecivelSelected = new State<>("Sim");
 
     public ProdutoDto toProduto() {
         var p = new ProdutoDto();
@@ -79,11 +82,19 @@ public class ProdutoScreenViewModel extends ViewModel {
         p.observacoes = observacoes.get();
         p.imagem = imagem.get();
         p.marca = marca.get();
+
+        p.validade = validade.isNull()? null: DateUtils.localDateParaMillis(validade.get());
         return p;
     }
 
+
     public void salvarOuAtualizar(Router router) {
         var dto = toProduto();
+
+        if(perecivelSelected.get().equals("Sim") && validade.isNull()) {
+            Components.ShowAlertError("Escolha a data de validade");
+            return;
+        }
 
         if (modoEdicao.get()) {
             Async.Run(() -> {
@@ -91,6 +102,7 @@ public class ProdutoScreenViewModel extends ViewModel {
                     service.atualizar(new ProdutoModel().fromIdAndDto(produtoSelected.get().id, dto));
                     var produtosList = produtoRepository.listar();
                     UI.runOnUi(() -> {
+                        this.produtos.clear();
                         this.produtos.addAll(produtosList);
                         Components.ShowPopup(router, "Produto atualizado com sucesso!");
                     });
@@ -130,7 +142,7 @@ public class ProdutoScreenViewModel extends ViewModel {
         marca.set("");
         unidadeSelected.set("UN");
         estoque.set("0");
-        validade.set("");
+        validade.set(null);
         observacoes.set("");
         imagem.set("/assets/produto-generico.png");
     }
