@@ -187,6 +187,7 @@ public class Components {
                                         .placeHolder("dd/mm/yyyy")
                                         .locale(new Locale("pt", "BR"))
                                         .pattern("dd/MM/yyyy")
+                                        .width(140)
                                         .editable(false),
                                 new DatePickerStyler().
                                         borderWidth(theme.border().width())
@@ -206,6 +207,7 @@ public class Components {
                                         .locale(new Locale("pt", "BR"))
                                         .pattern("dd/MM/yyyy")
                                         .editable(false)
+                                        .width(140)
                                         .placeHolder("dd/MM/yyyy"),
                                 new DatePickerStyler().
                                         borderWidth(theme.border().width())
@@ -249,10 +251,14 @@ public class Components {
                 .onClick(handleAdd));
     }
 
+    private final static SelectProps selectProps = new SelectProps()
+            .minWidth(100)
+            .height(35);
+
     public static <T> Component SelectColumn(String label, State<List<T>> listState, State<T> stateSelected, Function<T, String> display) {
         return new Column()
                 .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
-                .c_child(new Select<T>(new SelectProps().height(35))
+                .c_child(new Select<T>(selectProps)
                         .items(listState)
                         .value(stateSelected)
                         .displayText(display)
@@ -262,7 +268,7 @@ public class Components {
     public static <T> Component SelectColumn(String label, List<T> list, State<T> stateSelected, Function<T, String> display) {
         return new Column()
                 .c_child(new Text(label, new TextProps().fontSize(theme.typography().small())))
-                .c_child(new Select<T>(new SelectProps().height(35))
+                .c_child(new Select<T>(selectProps)
                         .items(list)
                         .value(stateSelected)
                         .displayText(display)
@@ -270,7 +276,7 @@ public class Components {
     }
 
     public static <T> Component SelectColumn(String label, State<List<T>> list, State<T> stateSelected, Function<T, String> display, boolean compareById) {
-        var select = new Select<T>(new SelectProps().height(35))
+        var select = new Select<T>(selectProps)
                 .items(list)
                 .value(stateSelected)
                 .displayText(display);
@@ -285,7 +291,7 @@ public class Components {
     }
 
     public static <T> Component SelectColumn(String label, List<T> list, State<T> stateSelected, Function<T, String> display, boolean compareById) {
-        var select = new Select<T>(new SelectProps().height(35))
+        var select = new Select<T>(selectProps)
                 .items(list)
                 .value(stateSelected)
                 .displayText(display);
@@ -300,7 +306,7 @@ public class Components {
     }
 
     public static <T> Component SelectColumn(String label, ListState<T> list, State<T> stateSelected,Function<T, String> display, boolean compareById) {
-        var select = new Select<T>(new SelectProps().height(35))
+        var select = new Select<T>(selectProps)
                 .items(list)
                 .value(stateSelected)
                 .displayText(display);
@@ -409,6 +415,7 @@ public class Components {
         var fonticon = FontIcon.of(icon, 15, Color.web("green"));
 
         var inputProps = new InputProps().fontSize(theme.typography().small()).height(35)
+                .width(140)
                 .placeHolder("R$ 0,00");
 
         var inputStyler = new InputStyler().

@@ -20,8 +20,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class ProdutoComponents {
-    private static Theme theme = ThemeManager.theme();
-
     public static Component ContainerLeft(ProdutoScreenViewModel vm) {
         var rowProps = new RowProps().spacingOf(10);
 
@@ -44,7 +42,7 @@ public class ProdutoComponents {
                                 .r_child(Components.InputColumn("Marca", vm.marca, ""))
                 ).c_child(new Row(rowProps)
                                 .r_child(Components.InputColumnCurrency("Preço de compra", vm.precoCompra))
-                                .r_child(Components.InputColumn("Margem %", vm.margem, ""))
+                                //.r_child(Components.InputColumn("Margem %", vm.margem, ""))
 //                        .r_child(Components.InputColumn("Lucro", vm.lucro,Entypo.CREDIT))
                                 .r_child(Components.InputColumnCurrency("Preço de venda", vm.precoVenda))
                 ).c_child(new Row(rowProps)
