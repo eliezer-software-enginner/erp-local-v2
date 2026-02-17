@@ -46,10 +46,20 @@ public class Components {
 
     static Theme theme = ThemeManager.theme();
 
-    public static Row TextWithDetails(String label, Object value) {
+    public static Row TextWithDetails(String label, Object value, boolean wrapText) {
+        var comp = new Text(value == null? "" : value.toString(),
+                (TextProps) new TextProps().fontSize(theme.typography().body()));
+
+        var textValueComponent = wrapText?  new TextFlow(comp) :comp;
+
         return new Row()
-                .r_child(new Text(label, (TextProps) new TextProps().fontSize(theme.typography().body()).bold()))
-                .r_child(new Text(value == null? "" : value.toString(), (TextProps) new TextProps().fontSize(theme.typography().body())));
+                .r_childs(
+                        new Text(label, (TextProps) new TextProps().fontSize(theme.typography().body()).bold()),
+                        textValueComponent
+                );
+    }
+    public static Row TextWithDetails(String label, Object value) {
+       return TextWithDetails(label, value, false);
     }
 
     public static Component aPrazoForm(
@@ -129,13 +139,17 @@ public class Components {
         popup.show(router.getCurrentActiveStage());
     }
 
-    public static void ShowModal(Component ui, Router router){
+    public static void ShowModal(Component ui, Router router, int height){
         Stage stage = new Stage();
-        stage.setScene(new Scene((Parent) ui.getJavaFxNode(), 700, 500));
+        stage.setScene(new Scene((Parent) ui.getJavaFxNode(), 700, height));
         stage.setTitle("Detalhes");
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(router.getCurrentActiveStage());
         stage.show();
+    }
+
+    public static void ShowModal(Component ui, Router router){
+        ShowModal(ui, router, 500);
     }
 
     public static void ShowAlertAdvice(String bodyMessage, Runnable handleSuccessEvent) {

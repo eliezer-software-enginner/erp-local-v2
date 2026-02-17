@@ -117,7 +117,7 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
                 .onItemSelectChange(vm.produtoSelected::set)
                 .onItemDoubleClick(it-> {
                     IO.println("ok");
-                    Components.ShowModal( ItemDetails(it), router);
+                    Components.ShowModal( ItemDetails(it), router, 550);
                 });
 
         return simpleTable;
@@ -190,11 +190,11 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
                 .c_child(Components.TextWithDetails("Estoque: ", model.estoque))
                 .c_child(Components.TextWithDetails("Preço de compra (R$): ", Utils.toBRLCurrency(model.precoCompra)))
                 .c_child(Components.TextWithDetails("Preço de venda (R$): ", Utils.toBRLCurrency(model.precoVenda)))
-                .c_child(Components.TextWithDetails("Total líquido (R$): ", Utils.toBRLCurrency(model.totalLiquido)))
+                .c_child(Components.TextWithDetails("Ganho líquido estimado (R$): ", Utils.toBRLCurrency(model.totalLiquido)))
                 .c_child(Components.TextWithDetails("Garantia: ", model.garantia))
                 .c_child(Components.TextWithDetails("Data de criação: ", DateUtils.millisToBrazilianDateTime(model.dataCriacao)))
                 .c_child(Components.TextWithDetails("Validade: ", validade))
-                .c_child(Components.TextWithDetails("Observação: ", model.observacoes));
+                .c_child(Components.TextWithDetails("Observação: ", model.observacoes,true));
     }
 
     @Override
