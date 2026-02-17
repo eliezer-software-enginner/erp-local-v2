@@ -3,10 +3,7 @@ package my_app.screens;
 import megalodonte.components.*;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.CardStyler;
-import megalodonte.styles.ColumnStyler;
 import megalodonte.utils.related.TextVariant;
-import my_app.screens.components.Components;
 
 import java.util.List;
 
@@ -24,7 +21,7 @@ public class HomeScreen {
                 .items(cardItemList, this::CardColumn);
 
 
-        return new Column(new ColumnProps(), new ColumnStyler().bgColor("#fff"))
+        return new Column(new ColumnProps().bgColor("#fff"))
                 .c_child(menuBar())
                 .c_child(new Scroll(items)
                 );
@@ -32,7 +29,7 @@ public class HomeScreen {
 
     private Component menuBar(){
         return new MenuBar()
-                .menu(new Menu("Preferências"))
+                .menu(new Menu("Preferências").item("Abrir tela", ()-> router.spawnWindow("preferencias")))
                 .menu(new Menu("Cadastros")
                         .item("Fornecedores", ()-> router.spawnWindow("fornecedores"))
                         .item("Clientes", ()-> router.spawnWindow("clientes"))
@@ -65,15 +62,13 @@ public class HomeScreen {
     Component CardColumn(CardItem cardItem){
        return new Clickable(
                new Card(
-                new Column(new ColumnProps().centerHorizontally(),
-                        new ColumnStyler()
-                                .borderWidth(0)
-                                .borderColor("#fff"))
+                new Column(new ColumnProps().centerHorizontally())
                         .c_child(new Image(cardItem.img, new ImageProps().size(60)))
                         .c_child(new Text(cardItem.title, (TextProps) new TextProps().variant(TextVariant.BODY).bold()))
                         .c_child(new Text(cardItem.desc,  new TextProps().variant(TextVariant.SMALL))),
-                       new CardProps().padding(10), new CardStyler().borderColor("#fff")),
-               ()-> router.spawnWindow(cardItem.destination));
+                       new CardProps().padding(10).borderColor("#fff").bgColor("red").borderWidth(10)),
+               ()-> router.spawnWindow(cardItem.destination)
+       );
 
     }
 }

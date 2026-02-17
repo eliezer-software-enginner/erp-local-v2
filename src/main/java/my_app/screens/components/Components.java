@@ -18,13 +18,10 @@ import megalodonte.components.inputs.TextAreaInput;
 import megalodonte.components.inputs.OnChangeResult;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.*;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
-import my_app.db.models.ClienteModel;
 import my_app.domain.Parcela;
-import my_app.screens.ComprasScreen;
 import my_app.utils.DateUtils;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.antdesignicons.AntDesignIconsOutlined;
@@ -34,7 +31,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -97,18 +93,16 @@ public class Components {
     public static Component actionButtons(ComputedState<String> btnText, Runnable onClick, Runnable onClearForm) {
         return new Row(new RowProps().spacingOf(10))
                 .r_child(new Button(btnText,
-                        (ButtonProps) new ButtonProps()
+                        new ButtonProps()
                                 .fillWidth()
                                 .height(31)
-                                .fontSize(16),
-                                new ButtonStyler()
+                                .fontSize(16)
                                 .textColor("white").bgColor("#10b981")
                 )  .onClick(onClick))
                 .r_child(new Button("Limpar",
                         (ButtonProps)  new ButtonProps()
                                 .fillWidth()
-                                .height(31).fontSize(16),
-                                new ButtonStyler().textColor("white").bgColor("#6b7280")
+                                .height(31).fontSize(16).textColor("white").bgColor("#6b7280")
                                ).onClick(onClearForm)
                 );
     }
@@ -172,8 +166,7 @@ public class Components {
                         .c_child(new Image(imagemState, new ImageProps().size(120)))
                         .c_child(new SpacerVertical().fill())
                         .c_child(new Button("Inserir imagem",
-                                (ButtonProps) new ButtonProps().fontSize(theme.typography().small()),
-                                        new ButtonStyler().bgColor("#A6B1E1"))
+                                (ButtonProps) new ButtonProps().fontSize(theme.typography().small()).bgColor("#A6B1E1"))
                                 .onClick(handleChangeImage)
                         ),
                 new CardProps().height(300).padding(20)
@@ -201,8 +194,7 @@ public class Components {
                                         .locale(new Locale("pt", "BR"))
                                         .pattern("dd/MM/yyyy")
                                         .width(140)
-                                        .editable(false),
-                                new DatePickerStyler().
+                                        .editable(false).
                                         borderWidth(theme.border().width())
                                         .borderColor(theme.colors().primary())
                         )
@@ -221,8 +213,7 @@ public class Components {
                                         .pattern("dd/MM/yyyy")
                                         .editable(false)
                                         .width(140)
-                                        .placeHolder("dd/MM/yyyy"),
-                                new DatePickerStyler().
+                                        .placeHolder("dd/MM/yyyy").
                                         borderWidth(theme.border().width())
                                         .borderColor(theme.colors().primary())
                         )
@@ -243,26 +234,21 @@ public class Components {
     }
 
     static ButtonProps propsBtnCadastro = (ButtonProps) new ButtonProps().fillWidth().height(31)
-                .fontSize(theme.typography().small());
-    static ButtonStyler styleBtncadastro = new ButtonStyler().textColor("white").bgColor("#2563eb");
+                .fontSize(theme.typography().small()).textColor("white").bgColor("#2563eb");
 
     public static Component ButtonCadastro(String textState, Runnable handleAdd) {
-        return new Button(textState, propsBtnCadastro,
-                styleBtncadastro
+        return new Button(textState, propsBtnCadastro
         ).onClick(handleAdd);
     }
 
     public static Component ButtonCadastro(ComputedState<String> textState, Runnable handleAdd) {
-        return new Button(textState, propsBtnCadastro,
-                styleBtncadastro
+        return new Button(textState, propsBtnCadastro
         ).onClick(handleAdd);
     }
 
     @Deprecated(forRemoval = true)
     public static Component ButtonCadastro(State<String> textState, Runnable handleAdd) {
-        return new Button(textState, propsBtnCadastro,
-                styleBtncadastro
-        ).onClick(handleAdd);
+        return new Button(textState, propsBtnCadastro).onClick(handleAdd);
     }
 
     private final static SelectProps selectProps = new SelectProps()
@@ -344,14 +330,14 @@ public class Components {
 
         return new Row(rowProps)
                         .r_child(Components.SelectColumn(  label,  list,  stateSelected, display,compareById))
-                        .r_child(new Button(btnText, (ButtonProps) new ButtonProps().height(31).marginBottom(2),
-                                new ButtonStyler()
-                                .textColor("#FFF")).onClick(handleClick)
+                        .r_child(new Button(btnText, (ButtonProps) new ButtonProps().height(31)
+                                .textColor("#FFF")
+                                .marginBottom(2)).onClick(handleClick)
                         );
     }
 
     public static Column TextColumn(String label, String value) {
-        return new Column(new ColumnProps(), new ColumnStyler()
+        return new Column(new ColumnProps()
                 .borderColor(theme.colors().primary())
                 .borderWidth(theme.border().width()))
                 .c_child(new Text(label, (TextProps) new TextProps().fontSize(theme.typography().body()).bold()))
@@ -367,13 +353,12 @@ public class Components {
     public static Component InputColumnPhone(String label, State<String> inputState) {
         var inputProps = (InputProps) new InputProps()
                 .height(31).placeHolder("(00) 00000-0000")
-                .fontSize(theme.typography().small());
-
-        var inputStyler = new InputStyler()
+                .fontSize(theme.typography().small())
                 .borderWidth(theme.border().width())
                 .borderColor(theme.colors().primary());
 
-        var input = new Input(inputState, inputProps, inputStyler)
+
+        var input = new Input(inputState, inputProps)
                 .onInitialize(value -> {
                     String formatted = formatPhone(value);
                     return OnChangeResult.of(formatted, value);
@@ -399,13 +384,11 @@ public class Components {
 
 
     public static Component InputColumnNumeric(String label, State<String> inputState,  String placeholder) {
-        var inputProps = getInputProps(placeholder);
-
-        var inputStyler = new InputStyler().
+        var inputProps = getInputProps(placeholder).
                 borderWidth(theme.border().width())
                 .borderColor(theme.colors().primary());
 
-        var input = new Input(inputState, inputProps, inputStyler)
+        var input = new Input(inputState, inputProps)
                 .onChange(value -> {
                     String numeric = value.replaceAll("[^0-9]", "");
                     if (numeric.isEmpty()) {
@@ -426,14 +409,11 @@ public class Components {
         var icon = Entypo.CREDIT;
         var fonticon = FontIcon.of(icon, 15, Color.web("green"));
 
-        var inputProps = getInputProps("R$ 0,00").width(140);
-
-        var inputStyler = new InputStyler().
-                borderWidth(theme.border().width())
+        var inputProps = getInputProps("R$ 0,00").width(140).borderWidth(theme.border().width())
                 .borderColor(theme.colors().primary());
 
         // inputState armazena valores brutos (em centavos), campo exibe formato BRL
-        var input = new Input(inputState, inputProps, inputStyler)
+        var input = new Input(inputState, inputProps)
                 .onInitialize(value -> {
                     if (value.matches("\\d+")) {
                         BigDecimal realValue = new BigDecimal(value).movePointLeft(2);
@@ -464,7 +444,7 @@ public class Components {
     }
 
     static InputProps getInputProps(String placeholder, int height){
-        return  (InputProps) new InputProps().height(31)
+        return  (InputProps) new InputProps().height(height)
                 .placeHolder(placeholder).fontSize(theme.typography().small());
     }
 
@@ -472,9 +452,7 @@ public class Components {
         return new Column()
                 .c_child(new Text(label, (TextProps) new TextProps().fontSize(theme.typography().small())))
                 .c_child(new Input((State<String>) inputState,
-                        getInputProps(placeholder),
-                        new InputStyler().
-                                        borderWidth(theme.border().width())
+                        getInputProps(placeholder).borderWidth(theme.border().width())
                                         .borderColor(theme.colors().primary())
                         ).onChangeFocus(focus -> {
                             if (!focus) focusChangeHandler.run();
@@ -489,10 +467,7 @@ public class Components {
         return new Column()
                 .c_child(new Text(label, (TextProps) new TextProps().fontSize(theme.typography().small())))
                 .c_child(new Input((State<String>) inputState,
-                        props,
-                                new InputStyler().
-                                        borderWidth(theme.border().width())
-                                        .borderColor(theme.colors().primary())
+                        props.borderWidth(theme.border().width()).borderColor(theme.colors().primary())
                         )
                 );
     }
@@ -509,17 +484,15 @@ public class Components {
         return new Column()
                 .c_child(new Text(label, (TextProps) new TextProps().fontSize(theme.typography().small())))
                 .c_child(new TextAreaInput(inputState,
-                  getInputProps(placeholder, height),
-                                new InputStyler().
-                                        borderWidth(theme.border().width())
+                  getInputProps(placeholder, height).borderWidth(theme.border().width())
                                         .borderColor(theme.colors().primary())
                         )
                 );
     }
 
     public static Component errorText(String message) {
-        return new Column(new ColumnProps(), new ColumnStyler().bgColor("white")).c_child(new SpacerVertical(5))
-                .c_child(new Text(message, new TextProps().variant(TextVariant.SUBTITLE), new TextStyler().color("red")));
+        return new Column(new ColumnProps().bgColor("white")).c_child(new SpacerVertical(5))
+                .c_child(new Text(message, (TextProps) new TextProps().variant(TextVariant.SUBTITLE).textColor("red")));
     }
 
 

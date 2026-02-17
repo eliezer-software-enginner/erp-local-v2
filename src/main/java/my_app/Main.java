@@ -3,13 +3,16 @@ package my_app;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import megalodonte.async.Async;
 import megalodonte.theme.ThemeManager;
 import my_app.core.Themes;
 import my_app.db.DBInitializer;
+import my_app.db.repositories.PreferenciasRepository;
 import my_app.hotreload.CoesionApp;
 import my_app.hotreload.HotReload;
 import my_app.routes.AppRoutes;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -20,6 +23,8 @@ public class Main extends Application {
     HotReload hotReload;
     boolean devMode = true;
 
+    static boolean askCredentials = false;
+
     static void main(String[] args) {
         launch(args);
     }
@@ -28,8 +33,17 @@ public class Main extends Application {
     public void init() throws Exception {
         super.init();
 
-        //TODO: remover em produção
         DBInitializer.init();
+            try {
+                var prefs = new PreferenciasRepository().listar();
+                if(!prefs.isEmpty()){
+                    var pref = prefs.getFirst();
+                    //ThemeManager.setTheme(pref.tema.equals("Claro")? Themes.LIGHT: Themes.DARK);
+                    askCredentials = pref.credenciaisHabilitadas == 1;
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
     }
 
     @Override
@@ -48,10 +62,9 @@ public class Main extends Application {
         stage.setTitle("Erp local");
         //stage.setResizable(false);
 
-        ThemeManager.setTheme(Themes.LIGHT);
+//        ThemeManager.setTheme(Themes.LIGHT);
 
-        final var router = new AppRoutes().defineRoutes(stage);
-
+        final var router = new AppRoutes().defineRoutes(stage, askCredentials);
 
         final String[] images = {"/logo_32x32.png", "/logo_256x256.png"};
 

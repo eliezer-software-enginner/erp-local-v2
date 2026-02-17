@@ -10,7 +10,7 @@ public class Themes {
 return new ThemeColors(
                 "#1e293b",                    // background
                 "#1a2235",                    // surface
-                "#2563eb",                    // primary
+                "#fff",                    // primary
                 "#334155",                    // secondary
                 "#ffffff",                    // text primary
                 "#94a3b8",                    // text secondary

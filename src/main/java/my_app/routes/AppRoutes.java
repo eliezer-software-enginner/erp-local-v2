@@ -4,7 +4,6 @@ import javafx.stage.Stage;
 import megalodonte.router.Router;
 import my_app.screens.*;
 import my_app.screens.authScreen.AccessScreen;
-import my_app.screens.authScreen.AutenticacaoScreen;
 import my_app.screens.CategoriaScreen;
 import my_app.screens.comprasAPagarScreen.ComprasAPagarScreen;
 import my_app.screens.contasAReceberScreen.ContasAReceberScreen;
@@ -13,9 +12,8 @@ import my_app.screens.produtoScreen.ProdutoScreen;
 import java.util.Set;
 
 public class AppRoutes {
-    public Router defineRoutes(Stage stage) throws ReflectiveOperationException {
+    public Router defineRoutes(Stage stage, boolean askCredentials) throws ReflectiveOperationException {
         var routes = Set.of(
-                new Router.Route("auth", router -> new AutenticacaoScreen(router), new Router.RouteProps(600, 370,null, false)),
                 new Router.Route("access", router -> new AccessScreen(router), new Router.RouteProps(900, 550,null, false)),
                 new Router.Route("home", router -> new HomeScreen(router), new Router.RouteProps(1050, 550,null, true)),
                 //new Router.Route("cad-produtos/${id}",router-> new ProdutoScreen(router), new Router.RouteProps(1500, 900,"Cadastro de produtos", false)),
@@ -43,9 +41,16 @@ public class AppRoutes {
 
                 new Router.Route("contas-a-receber",router-> new ContasAReceberScreen(router), new Router.RouteProps(1000, 650, "Gerenciamento de contas a receber", true)),
                 //ok
-                new Router.Route("vendas",router-> new VendaMercadoriaScreen(router), new Router.RouteProps(1000, 650, "Gerencie sua venda de mercadorias", true))
+                new Router.Route("vendas",router-> new VendaMercadoriaScreen(router), new Router.RouteProps(1000, 650, "Gerencie sua venda de mercadorias", true)),
+                new Router.Route("preferencias",router-> new PreferenciasScreen(router),
+                        new Router.RouteProps(650, 500, "Alteração de preferências do comportamento do aplicativo", true)),
+                new Router.Route("entrar-com-credenciais",router-> new EnterWithLoginPasswordScreen(router),
+                        new Router.RouteProps(650, 500, "Seja muito bem vindo", false))
+
         );
-        return new Router(routes, "produtos", stage);
+        //return new Router(routes, "entrar-com-credenciais", stage);
+        return new Router(routes, "home", stage);
+        //return new Router(routes,askCredentials? "entrar-com-credenciais": "home", stage);
     }
 }
 

@@ -215,13 +215,23 @@ public final class DBInitializer {
                         checklist_relatorio TEXT,
                         data_escolhida TEXT,
                         total_liquido REAL NOT NULL,
-                        data_criacao INTEGER NOT NULL,
+                        data_criacao REAL NOT NULL,
                         FOREIGN KEY (cliente_id) REFERENCES clientes(id),
                         FOREIGN KEY (tecnico_id) REFERENCES tecnicos(id)
                     )
                 """);
+
+                st.execute("""
+                    CREATE TABLE IF NOT EXISTS preferencias (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        credenciais_habilitadas INTEGER NOT NULL,
+                        tema TEXT NOT NULL,
+                        login TEXT,
+                        senha TEXT,
+                        data_criacao REAL NOT NULL
+                    )
+                """);
             }
-            
             // Inserir dados padrão na primeira execução
             inserirDadosPadrao();
         } catch (SQLException e) {
@@ -231,6 +241,10 @@ public final class DBInitializer {
     
     private static void inserirDadosPadrao() throws SQLException {
         Connection conn = DB.getInstance().connection();
+
+        if (!existePreferenciasPadrao(conn)) {
+            inserirPreferenciasPadrao(conn);
+        }
         
         // Verificar se já existe categoria padrão
         if (!existeCategoriaPadrao(conn)) {
@@ -305,6 +319,16 @@ public final class DBInitializer {
         }
     }
 
+    private static boolean existePreferenciasPadrao(Connection conn) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM preferencias WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, 1);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
     private static void inserirEmpresaPadrao(Connection conn) throws SQLException {
         String sql = "INSERT INTO empresas (texto_responsabilidade, data_criacao) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -354,6 +378,16 @@ public final class DBInitializer {
             ps.setString(3, "");
             ps.setString(4, "");
             ps.setLong(5, System.currentTimeMillis());
+            ps.executeUpdate();
+        }
+    }
+
+    private static void inserirPreferenciasPadrao(Connection conn) throws SQLException {
+        String sql = "INSERT INTO preferencias (tema, credenciais_habilitadas,data_criacao) VALUES (?,?,?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "Claro");
+            ps.setInt(2, 0);
+            ps.setLong(3, System.currentTimeMillis());
             ps.executeUpdate();
         }
     }

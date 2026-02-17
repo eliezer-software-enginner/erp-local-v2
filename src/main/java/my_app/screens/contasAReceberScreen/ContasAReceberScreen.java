@@ -8,9 +8,6 @@ import megalodonte.props.ColumnProps;
 import megalodonte.props.RowProps;
 import megalodonte.props.TextProps;
 import megalodonte.router.Router;
-import megalodonte.styles.ButtonStyler;
-import megalodonte.styles.ColumnStyler;
-import megalodonte.styles.TextStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
@@ -139,7 +136,7 @@ public class ContasAReceberScreen implements ScreenComponent, ContratoTelaCrud {
             .c_child(new SpacerVertical(30))
             .c_child(table());
 
-        return new Column(new ColumnProps().paddingAll(10), new ColumnStyler().bgColor(theme.colors().background()))
+        return new Column(new ColumnProps().paddingAll(10).bgColor(theme.colors().background()))
             .c_child(commonCustomMenus())
             .c_child(new SpacerVertical(10))
             .c_child(Components.ScrollPaneDefault(mainContent));
@@ -155,18 +152,16 @@ public class ContasAReceberScreen implements ScreenComponent, ContratoTelaCrud {
                             new Column(new ColumnProps())
                                 .c_child(new Text("Em Aberto", new TextProps().variant(TextVariant.BODY)))
                                 .c_child(
-                                    new Text(Utils.toBRLCurrency(vm.getTotalEmAberto()), 
-                                        new TextProps().variant(TextVariant.BODY), 
-                                        new TextStyler().color("#ff6b6b"))
+                                    new Text(Utils.toBRLCurrency(vm.getTotalEmAberto()),
+                                            (TextProps) new TextProps().variant(TextVariant.BODY).color("#ff6b6b"))
                                 )
                         )
                         .r_child(
                             new Column(new ColumnProps())
                                 .c_child(new Text("Vencidas", new TextProps().variant(TextVariant.BODY)))
                                 .c_child(
-                                    new Text(Utils.toBRLCurrency(vm.getTotalVencidas()), 
-                                        new TextProps().variant(TextVariant.BODY), 
-                                        new TextStyler().color("#dc3545"))
+                                    new Text(Utils.toBRLCurrency(vm.getTotalVencidas()),
+                                            (TextProps) new TextProps().variant(TextVariant.BODY).color("#dc3545"))
                                 )
                         )
                     )
@@ -193,8 +188,7 @@ public class ContasAReceberScreen implements ScreenComponent, ContratoTelaCrud {
                                             new Button("Registrar",
                                                     (ButtonProps) new ButtonProps()
                                                             .height(35)
-                                                            .fontSize(theme.typography().small()),
-                                                    new ButtonStyler()
+                                                            .fontSize(theme.typography().small())
                                                             .bgColor("#10b981")
                                                             .textColor("white"))
                                                     .onClick(() -> vm.registrarRecebimento(router))
@@ -203,9 +197,7 @@ public class ContasAReceberScreen implements ScreenComponent, ContratoTelaCrud {
                                             new Button("Cancelar",
                                                     (ButtonProps) new ButtonProps()
                                                             .height(35)
-                                                            .fontSize(theme.typography().small()),
-                                                    new ButtonStyler()
-                                                            .bgColor("#6c757d")
+                                                            .fontSize(theme.typography().small()).bgColor("#6c757d")
                                                             .textColor("white")
                                             ).onClick(() -> {
                                                 vm.modoRecebimento.set(false);
@@ -256,9 +248,7 @@ public class ContasAReceberScreen implements ScreenComponent, ContratoTelaCrud {
                                         vm.btnRecebimentoText,
                                         (ButtonProps) new ButtonProps()
                                                 .height(35)
-                                                .fontSize(theme.typography().small()),
-                                        new ButtonStyler()
-                                                .bgColor("#10b981")
+                                                .fontSize(theme.typography().small()) .bgColor("#10b981")
                                                 .textColor("white")
                                         //.fillWidth()
                                 ) .onClick(() -> {
@@ -273,8 +263,7 @@ public class ContasAReceberScreen implements ScreenComponent, ContratoTelaCrud {
                                 new Button("Quitar",
                                         (ButtonProps) new ButtonProps()
                                                 .height(35)
-                                                .fontSize(theme.typography().small()),
-                                        new ButtonStyler()
+                                                .fontSize(theme.typography().small())
                                                 .bgColor("#007bff")
                                                 .textColor("white")).onClick(() -> vm.quitarConta(router))
                         )

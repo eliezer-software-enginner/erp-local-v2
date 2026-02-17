@@ -9,7 +9,6 @@ import megalodonte.props.ColumnProps;
 import megalodonte.props.ImageProps;
 import megalodonte.props.RowProps;
 import megalodonte.router.Router;
-import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import my_app.db.models.EmpresaModel;
@@ -73,7 +72,7 @@ public class CadastroEmpresaScreen implements ScreenComponent {
     private final Theme theme = ThemeManager.theme();
 
     public Component render() {
-        return new Column(new ColumnProps().paddingAll(5), new ColumnStyler().bgColor(theme.colors().background()))
+        return new Column(new ColumnProps().paddingAll(5).bgColor(theme.colors().background()))
                 .c_child(new SpacerVertical(10))
                 .c_child(form());
     }

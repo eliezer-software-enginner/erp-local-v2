@@ -9,13 +9,9 @@ import megalodonte.components.*;
 import megalodonte.components.Component;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.ButtonStyler;
-import megalodonte.styles.ColumnStyler;
-import megalodonte.styles.TextStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
-import my_app.db.models.OrdemServicoModel;
 import my_app.db.models.ProdutoModel;
 import my_app.domain.ContratoTelaCrud;
 import my_app.screens.components.Components;
@@ -40,7 +36,7 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
     }
 
     public Component render() {
-        return new Column(new ColumnProps().paddingAll(15), new ColumnStyler().bgColor(theme.colors().background()))
+        return new Column(new ColumnProps().paddingAll(15).bgColor(theme.colors().background()))
                 .c_child(commonCustomMenus())
                 .c_child(new SpacerVertical(20))
                 .c_child(createHeaderSection())
@@ -54,7 +50,7 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
                         .c_child(Components.FormTitle("Cadastro de Produtos"))
                         .c_child(new SpacerVertical(10))
                         .c_child(new Text("Gerencie o catálogo de produtos do seu estabelecimento",
-                                new TextProps().variant(TextVariant.BODY), new TextStyler().color("#6b7280"))),
+                                (TextProps) new TextProps().variant(TextVariant.BODY).color("#6b7280"))),
                 new CardProps()
                         .padding(0)
                         .radius(12)
@@ -139,8 +135,7 @@ public class ProdutoScreen implements ScreenComponent, ContratoTelaCrud {
                         new Row(rowProps)
                                 .r_child(new Row(new RowProps().bottomVertically())
                                         .r_child(Components.InputColumn("SKU(Código de barras)", vm.codigoBarras, ""))
-                                        .r_child(new Button("Gerar", new ButtonProps().height(37),
-                                                new ButtonStyler().textColor("#FFF"))
+                                        .r_child(new Button("Gerar", new ButtonProps().height(37).textColor("#FFF"))
                                                 .onClick(handleGerarCodigoBarras)
                                         )
                                 )

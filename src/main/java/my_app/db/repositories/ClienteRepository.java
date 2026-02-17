@@ -1,10 +1,7 @@
 package my_app.db.repositories;
 
-import my_app.db.DB;
 import my_app.db.dto.ClienteDto;
-import my_app.db.dto.FornecedorDto;
 import my_app.db.models.ClienteModel;
-import my_app.db.models.FornecedorModel;
 
 import java.sql.*;
 import java.util.ArrayList;

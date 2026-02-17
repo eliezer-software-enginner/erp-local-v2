@@ -7,8 +7,6 @@ import megalodonte.props.ColumnProps;
 import megalodonte.props.RowProps;
 import megalodonte.props.TextProps;
 import megalodonte.router.Router;
-import megalodonte.styles.ButtonStyler;
-import megalodonte.styles.RowStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
@@ -33,8 +31,7 @@ public class AccessScreen {
                 .c_child(new SpacerVertical(20))
                 .c_child(new Button("Entrar no sistema",
                         (ButtonProps) new ButtonProps()
-                                .fontSize(theme.typography().body()),
-                        new ButtonStyler().textColor("#fff").bgColor(theme.colors().primary()))
+                                .fontSize(theme.typography().body()).textColor("#fff").bgColor(theme.colors().primary()))
                         .onClick(this::handleClick));
     }
 
@@ -44,7 +41,7 @@ public class AccessScreen {
     }
 
     public Component textRow(){
-        return new Row(new RowProps().width(200).maxWidth(300).centerHorizontally(), new RowStyler().bgColor("yellow"))
+        return new Row(new RowProps().width(200).maxWidth(300).centerHorizontally().bgColor("yellow"))
                 .r_childs(
                         new Text("usuário", new TextProps().variant(TextVariant.BODY)),
                         new Text(" admin", (TextProps) new TextProps().variant(TextVariant.BODY).bold()),

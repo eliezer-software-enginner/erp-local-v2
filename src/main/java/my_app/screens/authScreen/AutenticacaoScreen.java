@@ -1,21 +1,14 @@
 package my_app.screens.authScreen;
 
 import megalodonte.ComputedState;
-import megalodonte.Show;
 import megalodonte.State;
 import megalodonte.components.*;
 import megalodonte.components.inputs.Input;
 import megalodonte.props.*;
 import megalodonte.router.Router;
-import megalodonte.styles.ButtonStyler;
-import megalodonte.styles.ColumnStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
-import my_app.db.repositories.LicensaRepository;
-import my_app.screens.components.Components;
-
-import java.sql.SQLException;
 
 public class AutenticacaoScreen {
     private final Router router;
@@ -34,10 +27,10 @@ public class AutenticacaoScreen {
 
     public Component render (){
         final ComputedState<String> errorText = ComputedState.of(()->  errorMessage.get(), errorMessage);
-        return new Column(new ColumnProps().centerHorizontally().paddingAll(20), new ColumnStyler().bgColor(theme.colors().background()))
+        return new Column(new ColumnProps().centerHorizontally().paddingAll(20).bgColor(theme.colors().background()))
                 .c_child(
                         new Card(new Column(
-                                new ColumnProps().spacingOf(10).paddingAll(20), new ColumnStyler().bgColor(theme
+                                new ColumnProps().spacingOf(10).paddingAll(20).bgColor(theme
                                 .colors().surface()))
                                 //plics software
                                 .c_child(new Text("Plics SW", new TextProps().tone(TextTone.PRIMARY).variant(TextVariant.SUBTITLE)))
@@ -51,8 +44,7 @@ public class AutenticacaoScreen {
                                 .c_child(
                                         new Button("Entrar no Sistema",
                                         (ButtonProps) new ButtonProps().fillWidth().height(45)
-                                                .fontSize(16),
-                                        new ButtonStyler().textColor("#fff").bgColor("#2563eb")
+                                                .fontSize(16).textColor("#fff").bgColor("#2563eb")
                                         ).onClick(this::verificarChave)
                                 ),
                                 new CardProps().padding(0)

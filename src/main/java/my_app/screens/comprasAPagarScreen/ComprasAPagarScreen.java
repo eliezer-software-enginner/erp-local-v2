@@ -1,17 +1,15 @@
 package my_app.screens.comprasAPagarScreen;
 
-import javafx.scene.control.*;
-import megalodonte.*;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import megalodonte.ComputedState;
+import megalodonte.Show;
 import megalodonte.components.*;
-import megalodonte.components.Button;
 import megalodonte.props.ButtonProps;
 import megalodonte.props.ColumnProps;
 import megalodonte.props.RowProps;
 import megalodonte.props.TextProps;
 import megalodonte.router.Router;
-import megalodonte.styles.ButtonStyler;
-import megalodonte.styles.ColumnStyler;
-import megalodonte.styles.TextStyler;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
@@ -108,7 +106,7 @@ public class ComprasAPagarScreen implements ScreenComponent, ContratoTelaCrud {
             .c_child(new SpacerVertical(30))
             .c_child(table());
 
-        return new Column(new ColumnProps().paddingAll(10), new ColumnStyler().bgColor(theme.colors().background()))
+        return new Column(new ColumnProps().paddingAll(10).bgColor(theme.colors().background()))
             .c_child(commonCustomMenus())
             .c_child(new SpacerVertical(10))
             .c_child(Components.ScrollPaneDefault(mainContent));
@@ -134,8 +132,7 @@ public class ComprasAPagarScreen implements ScreenComponent, ContratoTelaCrud {
                                         new Button("Registrar",
                                                 (ButtonProps) new ButtonProps()
                                                 .height(35)
-                                                .fontSize(theme.typography().small()),
-                                                new ButtonStyler()
+                                                .fontSize(theme.typography().small())
                                                 .bgColor("#10b981")
                                                 .textColor("white"))
                                                 .onClick(() -> vm.registrarPagamento(router))
@@ -144,8 +141,7 @@ public class ComprasAPagarScreen implements ScreenComponent, ContratoTelaCrud {
                                         new Button("Cancelar",
                                                 (ButtonProps) new ButtonProps()
                                                     .height(35)
-                                                    .fontSize(theme.typography().small()),
-                                                new ButtonStyler()
+                                                    .fontSize(theme.typography().small())
                                                         .bgColor("#6c757d")
                                                         .textColor("white")
                                         ).onClick(() -> {
@@ -197,8 +193,7 @@ public class ComprasAPagarScreen implements ScreenComponent, ContratoTelaCrud {
                                         vm.btnPagamentoText,
                                         (ButtonProps) new ButtonProps()
                                                 .height(35)
-                                                .fontSize(theme.typography().small()),
-                                                new ButtonStyler()
+                                                .fontSize(theme.typography().small())
                                                 .bgColor("#10b981")
                                                 .textColor("white")
                                                 //.fillWidth()
@@ -214,8 +209,7 @@ public class ComprasAPagarScreen implements ScreenComponent, ContratoTelaCrud {
                             new Button("Quitar",
                                     (ButtonProps) new ButtonProps()
                                     .height(35)
-                                    .fontSize(theme.typography().small()),
-                                    new ButtonStyler()
+                                    .fontSize(theme.typography().small())
                                     .bgColor("#007bff")
                                     .textColor("white")).onClick(() -> vm.quitarConta(router))
                         )
