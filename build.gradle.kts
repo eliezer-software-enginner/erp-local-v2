@@ -141,6 +141,17 @@ tasks.register<Exec>("createInstallerWindows") {
     commandLine("pwsh", "./scripts/windows/create-installer-using-gradlew.ps1")
 }
 
+tasks.register<Exec>("createInstallerWindowsPython") {
+    group = "distribution"
+    description = "Gera o instalador .msi usando Python."
+
+    dependsOn("jar", "copyDependencies")
+
+    workingDir = projectDir
+
+    commandLine("python", "./scripts/windows/create-installer.py")
+}
+
 tasks.register<Exec>("createFastExeWindows") {
     group = "distribution"
     description = "Gera o executável .exe rápido usando o script PowerShell."
