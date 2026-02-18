@@ -89,7 +89,8 @@ tasks.jar {
     manifest {
         attributes(
             "Implementation-Title" to "JavaFX ${props.getProperty("appName")} app",
-            "Implementation-Version" to project.version
+            "Implementation-Version" to project.version,
+            "Main-Class" to props.getProperty("appMainClass")
         )
     }
 }
