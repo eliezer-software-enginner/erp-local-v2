@@ -292,4 +292,22 @@ public class ContasPagarRepository extends BaseRepository<ContasPagarDto, Contas
             ps.executeUpdate();
         }
     }
+
+    public BigDecimal somarDespesasPorPeriodo(Long dataInicio, Long dataFim) throws SQLException {
+        String sql = """
+            SELECT COALESCE(SUM(valor_pago), 0) as total 
+            FROM contas_pagar 
+            WHERE data_pagamento BETWEEN ? AND ?
+            """;
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
+            ps.setLong(1, dataInicio);
+            ps.setLong(2, dataFim);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("total");
+                }
+            }
+        }
+        return BigDecimal.ZERO;
+    }
 }

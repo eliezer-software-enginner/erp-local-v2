@@ -1,45 +1,80 @@
 package my_app.screens;
 
+import megalodonte.State;
+import megalodonte.async.Async;
+import megalodonte.base.UI;
 import megalodonte.components.*;
 import megalodonte.props.*;
 import megalodonte.router.Router;
 import megalodonte.utils.related.TextVariant;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.antdesignicons.AntDesignIconsOutlined;
+import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public class HomeScreen {
+public class HomeScreen implements ScreenComponent {
 
     private final Router router;
+    private final HomeScreenViewModel viewModel;
+
+    State<String> receita = State.of("R$ 0,00");
+    State<String> despesa = State.of("R$ 0,00");
+    State<String> lucro = State.of("R$ 0,00");
 
     public HomeScreen(Router router) {
         this.router = router;
+        this.viewModel = new HomeScreenViewModel();
+    }
+
+    @Override
+    public void onMount() {
+        viewModel.calcularFinanceiroMesAtual();
+        viewModel.receitas.subscribe(this.receita::set);
+        viewModel.despesas.subscribe(this.despesa::set);
+        viewModel.lucroLiquido.subscribe(this.lucro::set);
     }
 
     public Component render (){
-//        GridFlow items = new GridFlow(new GridFlowProps().tileSize(200, 220)
-//                .centerHorizontally().spacingOf(16))
-//                .items(cardItemList, this::CardColumn);
-
         return new Column(new ColumnProps().bgColor("#fff"))
                 .c_childs(
                         menuBar(),
-                        new Column(new ColumnProps().centerHorizontally()).c_childs(
-                                new Row()
-                                        .r_childs(
-                                                CardColumn(cardItemList.get(0)),
-                                                CardColumn(cardItemList.get(1)),
-                                                CardColumn(cardItemList.get(2)),
-                                                CardColumn(cardItemList.get(3))
-                                        ),
-                                new Row()
-                                        .r_childs(
-                                                CardColumn(cardItemList.get(4)),
-                                                CardColumn(cardItemList.get(5)),
-                                                CardColumn(cardItemList.get(6))
-                                        )
+                        new Row().r_childs(
+                                new Column().c_childs(
+                                        financeCard("Receitas", AntDesignIconsOutlined.RISE, "do mês", receita),
+                                        financeCard("Despesas", AntDesignIconsOutlined.FALL, "do mês", despesa),
+                                        financeCard("Lucro líquido", AntDesignIconsOutlined.FUND, "do mês", lucro)
+                                ),
+                                new Column(new ColumnProps().centerHorizontally()).c_childs(
+                                        new Row()
+                                                .r_childs(
+                                                        CardColumn(cardItemList.get(0)),
+                                                        CardColumn(cardItemList.get(1)),
+                                                        CardColumn(cardItemList.get(2)),
+                                                        CardColumn(cardItemList.get(3))
+                                                ),
+                                        new Row()
+                                                .r_childs(
+                                                        CardColumn(cardItemList.get(4)),
+                                                        CardColumn(cardItemList.get(5)),
+                                                        CardColumn(cardItemList.get(6))
+                                                )
+                                )
                         )
-
                 );
+    }
+
+    private Component financeCard(String title, Ikon ikon, String desc, State<String> valueState){
+        return new Card(new Column(new ColumnProps().centerHorizontally().paddingAll(20))
+                        .c_childs(
+                                Component.CreateFromJavaFxNode(FontIcon.of(ikon)),
+                                new Text(title, (TextProps) new TextProps().variant(TextVariant.BODY).bold()),
+                                new Text(desc,  new TextProps().variant(TextVariant.SMALL)),
+                                new Text(valueState, (TextProps) new TextProps().variant(TextVariant.SUBTITLE).bold())
+                        ),
+                new CardProps().padding(0).height(220).borderRadius(20)
+        );
     }
 
     private Component menuBar(){

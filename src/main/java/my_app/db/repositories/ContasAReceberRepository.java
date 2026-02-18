@@ -291,4 +291,22 @@ public class ContasAReceberRepository extends BaseRepository<ContaAreceberDto, C
             ps.executeUpdate();
         }
     }
+
+    public BigDecimal somarReceitasPorPeriodo(Long dataInicio, Long dataFim) throws SQLException {
+        String sql = """
+            SELECT COALESCE(SUM(valor_recebido), 0) as total 
+            FROM contas_a_receber 
+            WHERE data_recebimento BETWEEN ? AND ?
+            """;
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
+            ps.setLong(1, dataInicio);
+            ps.setLong(2, dataFim);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("total");
+                }
+            }
+        }
+        return BigDecimal.ZERO;
+    }
 }

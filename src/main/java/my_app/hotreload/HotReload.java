@@ -61,15 +61,6 @@ public class HotReload {
         Thread t = new Thread(this::watchLoop, "HotReload-Watcher");
         t.setDaemon(true);
         t.start();
-
-        // Lógica de Inicialização Automática (Bootstrapping da ID)
-        try {
-            System.out.println("[HotReload] Performing initial UI setup and Dependency Injection...");
-            callReloadEntry();
-        } catch (Exception e) {
-            System.err.println("[HotReload] Failed during initial setup call.");
-            e.printStackTrace();
-        }
     }
 
     private void watchLoop() {

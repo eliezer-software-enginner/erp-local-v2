@@ -8,7 +8,7 @@ import megalodonte.props.ColumnProps;
 import my_app.screens.components.Components;
 
 public interface ContratoTelaCrud {
-     void handleClickNew();
+    void handleClickNew();
     void handleClickMenuEdit();
     void handleClickMenuDelete();
     void handleClickMenuClone();
