@@ -14,6 +14,8 @@ import my_app.db.models.*;
 import my_app.db.repositories.*;
 import my_app.domain.ContratoTelaCrud;
 import my_app.domain.Parcela;
+import my_app.events.DadosFinanceirosAtualizadosEvent;
+import my_app.events.EventBus;
 import my_app.screens.components.Components;
 import my_app.services.ContasAReceberService;
 import my_app.services.VendaMercadoriaService;
@@ -376,6 +378,7 @@ public class VendaMercadoriaScreen implements ScreenComponent, ContratoTelaCrud 
                     vendas.add(finalVenda);
                     Components.ShowPopup(router, "Sua venda de mercadoria foi salva com sucesso!");
                     clearForm();
+                    EventBus.getInstance().publish(DadosFinanceirosAtualizadosEvent.getInstance());
                 });
             }
         });

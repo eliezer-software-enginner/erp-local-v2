@@ -12,6 +12,8 @@ import my_app.db.models.ContasPagarModel;
 import my_app.db.models.FornecedorModel;
 import my_app.db.repositories.ContasPagarRepository;
 import my_app.db.repositories.FornecedorRepository;
+import my_app.events.DadosFinanceirosAtualizadosEvent;
+import my_app.events.EventBus;
 import my_app.lifecycle.viewmodel.component.ViewModel;
 import my_app.screens.components.Components;
 import my_app.services.ContasPagarService;
@@ -265,6 +267,7 @@ public class ComprasAPagarScreenViewModel extends ViewModel {
                         Components.ShowPopup(router, "Pagamento registrado com sucesso!");
                         valorPagamento.set("0");
                         modoPagamento.set(false);
+                        EventBus.getInstance().publish(DadosFinanceirosAtualizadosEvent.getInstance());
                     } catch (Exception ex) {
                         Components.ShowAlertError("Erro ao atualizar lista: " + ex.getMessage());
                     }
@@ -293,6 +296,7 @@ public class ComprasAPagarScreenViewModel extends ViewModel {
                             contas.set(index, contaAtualizada);
                         }
                         Components.ShowPopup(router, "Conta quitada com sucesso!");
+                        EventBus.getInstance().publish(DadosFinanceirosAtualizadosEvent.getInstance());
                     } catch (Exception ex) {
                         Components.ShowAlertError("Erro ao atualizar lista: " + ex.getMessage());
                     }

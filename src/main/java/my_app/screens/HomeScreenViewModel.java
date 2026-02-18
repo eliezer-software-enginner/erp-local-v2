@@ -7,6 +7,8 @@ import my_app.db.repositories.ContasAReceberRepository;
 import my_app.db.repositories.ContasPagarRepository;
 import my_app.db.repositories.ComprasRepository;
 import my_app.db.repositories.VendaRepository;
+import my_app.events.DadosFinanceirosAtualizadosEvent;
+import my_app.events.EventBus;
 import my_app.lifecycle.viewmodel.component.ViewModel;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;
@@ -30,6 +32,11 @@ public class HomeScreenViewModel extends ViewModel {
 
     public HomeScreenViewModel() {
         calcularFinanceiroMesAtual();
+        EventBus.getInstance().subscribe(event -> {
+            if (event instanceof DadosFinanceirosAtualizadosEvent) {
+                calcularFinanceiroMesAtual();
+            }
+        });
     }
 
     public void calcularFinanceiroMesAtual() {

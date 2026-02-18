@@ -11,10 +11,11 @@ import my_app.db.dto.ContasPagarDto;
 import my_app.db.models.ClienteModel;
 import my_app.db.models.ContaAreceberModel;
 import my_app.db.models.ContasPagarModel;
-import my_app.db.models.ClienteModel;
 import my_app.db.repositories.ContasAReceberRepository;
 import my_app.db.repositories.ClienteRepository;
 import my_app.db.repositories.VendaRepository;
+import my_app.events.DadosFinanceirosAtualizadosEvent;
+import my_app.events.EventBus;
 import my_app.lifecycle.viewmodel.component.ViewModel;
 import my_app.screens.components.Components;
 import my_app.services.ContasAReceberService;
@@ -218,11 +219,12 @@ public class ContasAReceberScreenViewModel extends ViewModel {
             Async.Run(() -> {
                 try {
                     var contaSalva = repository.salvar(dto);
-                    UI.runOnUi(() -> {
-                        contas.add(contaSalva);
-                        Components.ShowPopup(router, "Conta cadastrada com sucesso!");
-                        limparFormulario();
-                    });
+                UI.runOnUi(() -> {
+                    contas.add(contaSalva);
+                    Components.ShowPopup(router, "Conta cadastrada com sucesso!");
+                    limparFormulario();
+                    EventBus.getInstance().publish(DadosFinanceirosAtualizadosEvent.getInstance());
+                });
                 } catch (Exception e) {
                     UI.runOnUi(() -> Components.ShowAlertError("Erro ao salvar: " + e.getMessage()));
                 }
@@ -263,6 +265,7 @@ public class ContasAReceberScreenViewModel extends ViewModel {
                         Components.ShowPopup(router, "Recebimento registrado com sucesso!");
                         valorRecebimento.set("0");
                         modoRecebimento.set(false);
+                        EventBus.getInstance().publish(DadosFinanceirosAtualizadosEvent.getInstance());
                     } catch (Exception ex) {
                         Components.ShowAlertError("Erro ao atualizar lista: " + ex.getMessage());
                     }
@@ -291,6 +294,7 @@ public class ContasAReceberScreenViewModel extends ViewModel {
                             contas.set(index, contaAtualizada);
                         }
                         Components.ShowPopup(router, "Conta quitada com sucesso!");
+                        EventBus.getInstance().publish(DadosFinanceirosAtualizadosEvent.getInstance());
                     } catch (Exception ex) {
                         Components.ShowAlertError("Erro ao atualizar lista: " + ex.getMessage());
                     }

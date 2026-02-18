@@ -13,6 +13,8 @@ import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
 import my_app.db.models.ContaAreceberModel;
 import my_app.domain.ContratoTelaCrud;
+import my_app.events.DadosFinanceirosAtualizadosEvent;
+import my_app.events.EventBus;
 import my_app.screens.components.Components;
 import my_app.utils.DateUtils;
 import my_app.utils.Utils;

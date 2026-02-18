@@ -19,6 +19,8 @@ import my_app.db.repositories.FornecedorRepository;
 import my_app.db.repositories.ProdutoRepository;
 import my_app.domain.ContratoTelaCrud;
 import my_app.domain.Parcela;
+import my_app.events.DadosFinanceirosAtualizadosEvent;
+import my_app.events.EventBus;
 import my_app.screens.components.Components;
 import my_app.services.CompraMercadoriaService;
 import my_app.services.ContasAReceberService;
@@ -384,6 +386,7 @@ public class ComprasScreen implements ScreenComponent, ContratoTelaCrud {
                     compras.add(compraSalva);
                     Components.ShowPopup(router, "Sua compra de mercadoria foi salva com sucesso!");
                     estoqueAnterior.set(estoqueAtual.get());
+                    EventBus.getInstance().publish(DadosFinanceirosAtualizadosEvent.getInstance());
                 });
             }
         });
