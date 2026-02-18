@@ -1,6 +1,8 @@
 package my_app.screens.authScreen;
 
 
+import javafx.animation.ScaleTransition;
+import javafx.util.Duration;
 import megalodonte.components.*;
 import megalodonte.props.*;
 import megalodonte.router.Router;
@@ -24,7 +26,15 @@ public class AccessScreen {
                 new Column(new ColumnProps().centerHorizontally().width(400)
                         .maxWidth(400).paddingTop(100).spacingOf(10))
                         .c_childs(
-                                new Image("logo_256x256.png", new ImageProps().size(100)),
+                                new Image("logo_256x256.png", new ImageProps().size(100))
+                                        .attachAnimation(it->{
+                                            ScaleTransition zoom = new ScaleTransition(Duration.millis(850), it.getNode());
+                                            zoom.setFromX(1.0); zoom.setFromY(1.0);  // Tamanho original
+                                            zoom.setToX(1.5); zoom.setToY(1.5);      // Aumenta 50%
+                                            zoom.setAutoReverse(true);
+                                            zoom.setCycleCount(2);
+                                            return zoom;
+                                        }),
                                 new Text("Plics SW", (TextProps) new TextProps().variant(TextVariant.TITLE).bold()),
                                 new Text("Plics - Sistema de gestão para pequenos negócios. Controle vendas, compras, estoque e financeiro.",
                                         new TextProps().variant(TextVariant.SUBTITLE)),

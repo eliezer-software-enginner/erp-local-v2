@@ -63,7 +63,7 @@ public class Main extends Application {
     }
 
     public static void initializeScene(Stage stage) throws Exception {
-        stage.setTitle("Erp local");
+        stage.setTitle("Plics SW - Sistema de Gestão para Pequenos Negócios");
         //stage.setResizable(false);
 
 //        ThemeManager.setTheme(Themes.LIGHT);
