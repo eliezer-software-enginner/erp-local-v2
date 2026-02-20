@@ -58,9 +58,6 @@ public class AppRoutes {
             rotaInicial = "home";
         }
 
-        //TODO: remover
-        rotaInicial = "access";
-
         return new Router(routes, rotaInicial, stage);
     }
 }
