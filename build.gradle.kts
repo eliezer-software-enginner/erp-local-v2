@@ -103,6 +103,11 @@ val copyDeps = tasks.register<Copy>("copyDependencies") {
     exclude("org/openjfx/**")
 }
 
+
+tasks.register<Exec>("chmodInstallerScript") {
+    commandLine("chmod", "+x", "scripts/linux/create-installer-using-gradlew-optimized.sh")
+}
+
 tasks.register<Exec>("createInstallerLinux") {
     group = "distribution"
     description = "Gera o instalador .deb usando o script shell."
@@ -124,7 +129,8 @@ tasks.register<Exec>("createInstallerLinuxOptimized") {
 
     workingDir = projectDir
 
-    commandLine("./scripts/linux/create-installer-using-gradlew-optimized.sh")
+//    commandLine("./scripts/linux/create-installer-using-gradlew-optimized.sh")
+    commandLine("bash", "./scripts/linux/create-installer-using-gradlew-optimized.sh")
 }
 
 tasks.register<Exec>("createInstallerWindows") {

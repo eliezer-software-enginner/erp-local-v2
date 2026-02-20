@@ -4,13 +4,34 @@
 set -e
 
 # --- Application Configuration ---
-APP_NAME="realtec-processador"
-APP_VERSION="1.0.0"
-APP_VENDOR="Realtec"
-APP_COPYRIGHT="Copyright 2025"
-APP_DESCRIPTION="Processador de registros contábeis"
-APP_MAIN_CLASS="my_app.Main"
-JAR_FILE="realtec-processador-${APP_VERSION}.jar"
+GRADLE_PROPERTIES_FILE="gradle.properties"
+
+if [ ! -f "$GRADLE_PROPERTIES_FILE" ]; then
+    echo "🚨 ERRO: gradle.properties não encontrado."
+    exit 1
+fi
+
+# Função para ler propriedade ignorando comentários
+get_property() {
+    grep -a "^$1=" "$GRADLE_PROPERTIES_FILE" | head -n 1 | cut -d'=' -f2- | tr -d '\r'
+}
+
+APP_NAME=$(get_property "appName")
+APP_VERSION=$(get_property "appVersion")
+APP_VENDOR=$(get_property "appVendor")
+APP_COPYRIGHT=$(get_property "appCopyright")
+APP_DESCRIPTION=$(get_property "appDescription")
+APP_MAIN_CLASS=$(get_property "appMainClass")
+
+if [ -z "$APP_NAME" ] || [ -z "$APP_VERSION" ] || [ -z "$APP_MAIN_CLASS" ]; then
+    echo "🚨 ERRO: Alguma propriedade não foi lida corretamente do gradle.properties"
+    echo "APP_NAME=$APP_NAME"
+    echo "APP_VERSION=$APP_VERSION"
+    echo "APP_MAIN_CLASS=$APP_MAIN_CLASS"
+    exit 1
+fi
+
+JAR_FILE="${APP_NAME}-${APP_VERSION}.jar"
 
 # Módulos JavaFX
 FX_MODULES="javafx.controls,javafx.graphics"
