@@ -3,6 +3,8 @@ package my_app;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import megalodonte.theme.ThemeManager;
+import my_app.core.Themes;
 import my_app.db.DBInitializer;
 import my_app.db.repositories.PreferenciasRepository;
 import my_app.hotreload.CoesionApp;
@@ -40,6 +42,7 @@ public class Main extends Application {
     public void init() throws Exception {
         super.init();
 
+        ThemeManager.setTheme(Themes.LIGHT);
         DBInitializer.init();
 
         try {
@@ -62,16 +65,12 @@ public class Main extends Application {
         initializeScene(primaryStage);
         initHotReload(primaryStage);
 
-     //   final var router = new AppRoutes().defineRoutes(stage);
-
         stage.show();
     }
 
     public static void initializeScene(Stage stage) throws Exception {
         stage.setTitle("Plics SW - Sistema de Gestão para Pequenos Negócios");
         //stage.setResizable(false);
-
-//        ThemeManager.setTheme(Themes.LIGHT);
 
         new AppRoutes().defineRoutes(stage, askCredentials, forceAccessRoute);
 

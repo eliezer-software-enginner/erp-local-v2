@@ -24,6 +24,8 @@ public class PreferenciasScreen implements ScreenComponent {
     State<String> loginState = State.of("");
     State<String> passwordState = State.of("");
 
+    PreferenciasModel prefLoaded;
+
     public PreferenciasScreen(Router router) {
         this.router = router;
 
@@ -42,6 +44,7 @@ public class PreferenciasScreen implements ScreenComponent {
                 if(!prefs.isEmpty()){
                     var pref = prefs.getFirst();
                     UI.runOnUi(()->{
+                        prefLoaded = pref;
                         //temaSelected.set(pref.tema);
                         habilitarCredenciaisSelected.set(pref.credenciaisHabilitadas==1?"Sim":"Não");
                         loginState.set(pref.login);
@@ -75,16 +78,15 @@ public class PreferenciasScreen implements ScreenComponent {
     void salvarPrefs(){
         Async.Run(()->{
             try{
-                var model = new PreferenciasModel();
-                model.credenciaisHabilitadas = habilitarCredenciaisSelected.get().equals("Sim")? 1: 0;
-                model.login = loginState.get();
-                model.senha = passwordState.get();
+                prefLoaded.credenciaisHabilitadas = habilitarCredenciaisSelected.get().equals("Sim")? 1: 0;
+                prefLoaded.login = loginState.get();
+                prefLoaded.senha = passwordState.get();
                 //model.tema = temaSelected.get();
 
-                preferenciasRepository.atualizar(model);
+                preferenciasRepository.atualizar(prefLoaded);
                 UI.runOnUi(()-> Components.ShowPopup(router, "Preferências foram salvas com sucesso!"));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+               UI.runOnUi(()-> Components.ShowAlertError(e.getMessage()));
             }
         });
     }

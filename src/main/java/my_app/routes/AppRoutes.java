@@ -3,7 +3,7 @@ package my_app.routes;
 import javafx.stage.Stage;
 import megalodonte.router.Router;
 import my_app.screens.*;
-import my_app.screens.authScreen.AccessScreen;
+import my_app.screens.WelcomeScreen;
 import my_app.screens.CategoriaScreen;
 import my_app.screens.comprasAPagarScreen.ComprasAPagarScreen;
 import my_app.screens.contasAReceberScreen.ContasAReceberScreen;
@@ -14,7 +14,7 @@ import java.util.Set;
 public class AppRoutes {
     public Router defineRoutes(Stage stage, boolean askCredentials, boolean forceAccessRoute) throws ReflectiveOperationException {
         var routes = Set.of(
-                new Router.Route("access", router -> new AccessScreen(router), new Router.RouteProps(900, 550,null, false)),
+                new Router.Route("welcome", router -> new WelcomeScreen(router), new Router.RouteProps(900, 550,null, false)),
                 new Router.Route("home", router -> new HomeScreen(router), new Router.RouteProps(1050, 550,null, true)),
                 //new Router.Route("cad-produtos/${id}",router-> new ProdutoScreen(router), new Router.RouteProps(1500, 900,"Cadastro de produtos", false)),
                 new Router.Route("produtos",router-> new ProdutoScreen(router), new Router.RouteProps(1000, 650,"Cadastro de produtos", true)),
@@ -51,7 +51,7 @@ public class AppRoutes {
 
         String rotaInicial;
         if (forceAccessRoute) {
-            rotaInicial = "access";
+            rotaInicial = "welcome";
         } else if (askCredentials) {
             rotaInicial = "entrar-com-credenciais";
         } else {

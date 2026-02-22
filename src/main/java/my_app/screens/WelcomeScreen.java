@@ -1,4 +1,4 @@
-package my_app.screens.authScreen;
+package my_app.screens;
 
 
 import javafx.animation.ScaleTransition;
@@ -9,13 +9,12 @@ import megalodonte.router.Router;
 import megalodonte.theme.Theme;
 import megalodonte.theme.ThemeManager;
 import megalodonte.utils.related.TextVariant;
-import my_app.db.models.PreferenciasModel;
 import my_app.db.repositories.PreferenciasRepository;
 
-public class AccessScreen {
+public class WelcomeScreen {
     private final Router router;
 
-    public AccessScreen(Router router) {
+    public WelcomeScreen(Router router) {
         this.router = router;
     }
 
