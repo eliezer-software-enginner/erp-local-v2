@@ -10,7 +10,7 @@ public class CryptoManager {
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
     // Chave fixa base64 - mesma para todas as máquinas
-    private static final String FIXED_KEY_BASE64 = "sWsxxjCjv2rcoBtCU1/2hlJgK79NjKW8ERGN6P1b95Y=";
+    private static final String FIXED_KEY_BASE64 = "wEyEs+m8BdfYB8h5+nsvhwavrzbuNwDSA/Xxlzj0HDc";
     
     private final SecretKey secretKey;
 
@@ -30,7 +30,7 @@ public class CryptoManager {
             byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao criptografar texto", e);
+            throw new RuntimeException("Erro ao criptografar texto: "+  e.getMessage());
         }
     }
 
@@ -41,7 +41,7 @@ public class CryptoManager {
             byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao descriptografar texto", e);
+            throw new RuntimeException("Erro ao descriptografar texto: " + e.getMessage());
         }
     }
 }
