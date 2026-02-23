@@ -384,12 +384,14 @@ public final class DBInitializer {
     }
 
     private static void inserirPreferenciasPadrao(Connection conn) throws SQLException {
-        String sql = "INSERT INTO preferencias (tema, credenciais_habilitadas, primeiro_acesso, data_criacao) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO preferencias (tema, credenciais_habilitadas, primeiro_acesso, data_criacao, login, senha) VALUES (?,?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "Claro");
             ps.setInt(2, 0);
             ps.setInt(3, 1);
             ps.setLong(4, System.currentTimeMillis());
+            ps.setString(5, "admin");
+            ps.setString(6,"1234");
             ps.executeUpdate();
         }
     }

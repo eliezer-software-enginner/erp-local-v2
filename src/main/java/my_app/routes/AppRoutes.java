@@ -44,7 +44,7 @@ public class AppRoutes {
                 new Router.Route("vendas",router-> new VendaMercadoriaScreen(router), new Router.RouteProps(1000, 650, "Gerencie sua venda de mercadorias", true)),
                 new Router.Route("preferencias",router-> new PreferenciasScreen(router),
                         new Router.RouteProps(650, 500, "Alteração de preferências do comportamento do aplicativo", true)),
-                new Router.Route("entrar-com-credenciais",router-> new EnterWithLoginPasswordScreen(router),
+                new Router.Route("entrar-com-credenciais",router-> new AuthScreen(router),
                         new Router.RouteProps(650, 500, "Seja muito bem vindo", false))
 
         );

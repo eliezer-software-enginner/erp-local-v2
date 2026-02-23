@@ -26,4 +26,8 @@ public class PreferenciasModel extends ModelBase<PreferenciasDto> {
         model.primeiroAcesso = dto.primeiroAcesso();
         return model;
     }
+
+    public boolean isFirstAccess(){
+        return primeiroAcesso != null && primeiroAcesso == 1;
+    }
 }

@@ -50,17 +50,18 @@ public class WelcomeScreen {
     }
 
     private void handleClick(){
-        try {
-            var prefs = new PreferenciasRepository().listar();
-            if (!prefs.isEmpty()) {
-                var pref = prefs.getFirst();
-                pref.primeiroAcesso = 0;
-                new PreferenciasRepository().atualizar(pref);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        router.navigateTo("home");
+//        try {
+//            var prefs = new PreferenciasRepository().listar();
+//            if (!prefs.isEmpty()) {
+//                var pref = prefs.getFirst();
+//                pref.primeiroAcesso = 0;
+//                new PreferenciasRepository().atualizar(pref);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        //router.navigateTo("home");
+        router.navigateTo("entrar-com-credenciais");
     }
 
     public Component textRow(){

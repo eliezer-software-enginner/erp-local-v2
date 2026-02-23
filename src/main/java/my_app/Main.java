@@ -3,6 +3,7 @@ package my_app;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import megalodonte.ListenerManager;
 import megalodonte.theme.ThemeManager;
 import my_app.core.Themes;
 import my_app.db.DBInitializer;
@@ -51,7 +52,7 @@ public class Main extends Application {
                 var pref = prefs.getFirst();
                 //ThemeManager.setTheme(pref.tema.equals("Claro")? Themes.LIGHT: Themes.DARK);
                 askCredentials = pref.credenciaisHabilitadas == 1;
-                forceAccessRoute = pref.primeiroAcesso != null && pref.primeiroAcesso == 1;
+                forceAccessRoute = pref.isFirstAccess();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -101,5 +102,11 @@ public class Main extends Application {
             );
             this.hotReload.start();
         }
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        ListenerManager.disposeAll();
     }
 }
