@@ -28,24 +28,24 @@ public class HomeScreen implements ScreenComponent {
 
     public Component render (){
         return new Column(new ColumnProps().bgColor("#fff"))
-                .c_childs(
+                .children(
                         menuBar(),
-                        new Row().r_childs(
-                                new Column().c_childs(
+                        new Row().children(
+                                new Column().children(
                                         financeCard("Receitas", AntDesignIconsOutlined.RISE, "do mês", viewModel.receitas),
                                         financeCard("Despesas", AntDesignIconsOutlined.FALL, "do mês", viewModel.despesas),
                                         financeCard("Lucro líquido", AntDesignIconsOutlined.FUND, "do mês", viewModel.lucroLiquido)
                                 ),
-                                new Column(new ColumnProps().centerHorizontally()).c_childs(
+                                new Column(new ColumnProps().centerHorizontally()).children(
                                         new Row()
-                                                .r_childs(
+                                                .children(
                                                         CardColumn(cardItemList.get(0)),
                                                         CardColumn(cardItemList.get(1)),
                                                         CardColumn(cardItemList.get(2)),
                                                         CardColumn(cardItemList.get(3))
                                                 ),
                                         new Row()
-                                                .r_childs(
+                                                .children(
                                                         CardColumn(cardItemList.get(4)),
                                                         CardColumn(cardItemList.get(5)),
                                                         CardColumn(cardItemList.get(6))
@@ -57,7 +57,7 @@ public class HomeScreen implements ScreenComponent {
 
     private Component financeCard(String title, Ikon ikon, String desc, State<String> valueState){
         return new Card(new Column(new ColumnProps().centerHorizontally().paddingAll(20))
-                        .c_childs(
+                        .children(
                                 Component.CreateFromJavaFxNode(FontIcon.of(ikon)),
                                 new Text(title, (TextProps) new TextProps().variant(TextVariant.BODY).bold()),
                                 new Text(desc,  new TextProps().variant(TextVariant.SMALL)),

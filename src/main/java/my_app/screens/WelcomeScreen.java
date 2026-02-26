@@ -24,7 +24,7 @@ public class WelcomeScreen {
         return new Column(new ColumnProps().centerHorizontally()).c_child(
                 new Column(new ColumnProps().centerHorizontally().width(400)
                         .maxWidth(400).paddingTop(100).spacingOf(10))
-                        .c_childs(
+                        .children(
                                 new Image("logo_256x256.png", new ImageProps().size(100))
                                         .attachAnimation(it->{
                                             ScaleTransition zoom = new ScaleTransition(Duration.millis(850), it.getNode());
@@ -66,7 +66,7 @@ public class WelcomeScreen {
 
     public Component textRow(){
         return new Row(new RowProps().width(200).maxWidth(300).centerHorizontally().bgColor("yellow"))
-                .r_childs(
+                .children(
                         new Text("usuário", new TextProps().variant(TextVariant.BODY)),
                         new Text(" admin", (TextProps) new TextProps().variant(TextVariant.BODY).bold()),
                         new Text(" e senha", new TextProps().variant(TextVariant.BODY)),

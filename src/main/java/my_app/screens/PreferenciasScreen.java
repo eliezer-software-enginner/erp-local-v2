@@ -60,11 +60,11 @@ public class PreferenciasScreen implements ScreenComponent {
     public Component render() {
         var crentialsScreenIsVisible = ComputedState.of(()-> habilitarCredenciaisSelected.get().equals("Sim"), habilitarCredenciaisSelected);
 
-        return new Column(new ColumnProps().paddingAll(20)).c_childs(
+        return new Column(new ColumnProps().paddingAll(20)).children(
                 new Text("Minhas preferências"),
                 //Components.SelectColumn("Alterar Tema", List.of("Claro", "Escuro"), temaSelected, it->it),
                 Components.SelectColumn("Habilitar credenciais", List.of("Sim", "Não"), habilitarCredenciaisSelected, it->it),
-                Show.when(crentialsScreenIsVisible, ()-> new Column().c_childs(
+                Show.when(crentialsScreenIsVisible, ()-> new Column().children(
                         new Text("Escolha seu login e senha de acesso"),
                         Components.InputColumn("Login", loginState, ""),
                         Components.InputColumn("Senha", passwordState, "")

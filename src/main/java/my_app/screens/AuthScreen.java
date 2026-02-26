@@ -46,7 +46,7 @@ public class AuthScreen implements ScreenComponent {
     }
 
     public Component render() {
-        return new Column(new ColumnProps().paddingAll(20)).c_childs(
+        return new Column(new ColumnProps().paddingAll(20)).children(
                 new Text("Realiza já seu login na Plics SW"),
                 Show.when(showLicensaState,  ()-> Components.InputColumn("Licensa", licensaState, "")),
                         Components.InputColumn("Login", loginState, ""),

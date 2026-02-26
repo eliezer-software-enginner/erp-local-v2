@@ -49,7 +49,7 @@ public class Components {
         var textValueComponent = wrapText?  new TextFlow(comp) :comp;
 
         return new Row()
-                .r_childs(
+                .children(
                         new Text(label, (TextProps) new TextProps().fontSize(theme.typography().body()).bold()),
                         textValueComponent
                 );
